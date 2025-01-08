@@ -14,15 +14,7 @@ namespace StanetRemoteControl
 {
     internal static class Program
     {
-        private static IService1 serv = new RemoteControlNode.Service1Client();
-        private static Macchina mac = new Macchina();
-        private static Connessione conn = new Connessione();
-        private static Form1 pagina = new Form1();
-
-        private static Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-        private static Bitmap immagine = new Bitmap(rec.Width, rec.Height);
-
-        private static string COMANDO;
+        
 
         /// <summary>
         /// Punto di ingresso principale dell'applicazione.
@@ -31,6 +23,16 @@ namespace StanetRemoteControl
         static void Main()
         {
             Application.SetCompatibleTextRenderingDefault(false);
+
+            IService1 serv = new RemoteControlNode.Service1Client();
+            Macchina mac = new Macchina();
+            Connessione conn = new Connessione();
+            Form1 pagina = new Form1();
+
+            Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            Bitmap immagine = new Bitmap(rec.Width, rec.Height);
+
+            string COMANDO;
             /*-----------------------*/
             /*Macchina*/
             /*Verifica se già presente utenza in memoria*/
@@ -69,6 +71,8 @@ namespace StanetRemoteControl
             pagina.MioId = mac.User;
             pagina.MiaPsw = mac.Password;
 
+            conn.Command = "";
+
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
             new Thread(delegate() 
             {
@@ -79,6 +83,15 @@ namespace StanetRemoteControl
                     conn = serv.POST(conn);
                     COMANDO = conn.Command;
 
+                    /*esegue operazione a seconda del comando*/
+                    switch (COMANDO) 
+                    {
+                        case "":
+                            break;
+
+                        default:
+                            break;
+                    }
 
                 }
             }).Start();
