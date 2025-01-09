@@ -24,9 +24,6 @@ namespace StanetRemoteControl
         {
             Application.SetCompatibleTextRenderingDefault(false);
 
-            IService1 serv = new RemoteControlNode.Service1Client();
-            Macchina mac = new Macchina();
-            Connessione conn = new Connessione();
             Form1 pagina = new Form1();
 
             Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
@@ -41,47 +38,47 @@ namespace StanetRemoteControl
             {
                 fs = File.Open("C:\\Program Files\\StanetRemoteControl\\Macchina.txt", FileMode.OpenOrCreate);
                 fs.Dispose();
-                mac = JsonSerializer.Deserialize<Macchina>(File.ReadAllText("C:\\Program Files\\StanetRemoteControl\\Macchina.txt"));
+                pagina.mac = JsonSerializer.Deserialize<Macchina>(File.ReadAllText("C:\\Program Files\\StanetRemoteControl\\Macchina.txt"));
 
-                if (mac == null)
+                if (pagina.mac == null)
                 {
                     //Se non presente la registra
-                    mac = serv.RegistraMacchina(new Macchina());
-                    File.WriteAllText("C:\\Program Files\\StanetRemoteControl\\Macchina.txt", JsonSerializer.Serialize<Macchina>(mac));
+                    pagina.mac = pagina.serv.RegistraMacchina(new Macchina());
+                    File.WriteAllText("C:\\Program Files\\StanetRemoteControl\\Macchina.txt", JsonSerializer.Serialize<Macchina>(pagina.mac));
                 }
             }
             catch (Exception e)
             {
-                conn.Error = e.Message;
+                pagina.conn.Error = e.Message;
                 pagina.Errore = e.Message;
             }
 
             /*Connessione*/
             try
             {
-                if (mac != new Macchina()) { conn = serv.ApriConnessione(mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
+                if (pagina.mac != new Macchina()) { pagina.conn = pagina.serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
             }
             catch (Exception e)
             {
-                conn.Error = e.Message;
+                pagina.conn.Error = e.Message;
                 pagina.Errore = e.Message;
             }
             /*-----------------------*/
 
-            pagina.MioId = mac.User;
-            pagina.MiaPsw = mac.Password;
+            pagina.MioId = pagina.mac.User;
+            pagina.MiaPsw = pagina.mac.Password;
 
-            conn.Command = "";
+            pagina.conn.Command = "";
 
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
             new Thread(delegate() 
             {
-                while (conn.Command.CompareTo("FINE") != 0) 
+                while (pagina.conn.Command.CompareTo("FINE") != 0) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
-                    conn.Screen = immagine;
-                    conn = serv.POST(conn);
-                    COMANDO = conn.Command;
+                    pagina.conn.Screen = immagine;
+                    pagina.conn = pagina.serv.POST(pagina.conn);
+                    COMANDO = pagina.conn.Command;
 
                     /*esegue operazione a seconda del comando*/
                     switch (COMANDO) 
@@ -95,7 +92,6 @@ namespace StanetRemoteControl
 
                 }
             }).Start();
-
 
             Application.EnableVisualStyles();
             

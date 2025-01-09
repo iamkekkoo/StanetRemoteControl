@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Text.Json;
 using System.Windows.Forms.VisualStyles;
+using StanetRemoteControl.RemoteControlNode;
 
 namespace StanetRemoteControl
 {
@@ -147,32 +148,38 @@ namespace StanetRemoteControl
 
         private void panelClick(object sender, EventArgs e) 
         {
-            Comando = JsonSerializer.Serialize<EventArgs>(e);
+            conn.Command = JsonSerializer.Serialize<EventArgs>(e);
+            serv.GET(conn);
         }
 
         private void panelDoubleClick(object sender, EventArgs e)
         {
-            Comando = JsonSerializer.Serialize<EventArgs>(e);
+            conn.Command = JsonSerializer.Serialize<EventArgs>(e);
+            serv.GET(conn);
         }
 
         private void panelKey(object sender, PreviewKeyDownEventArgs e) 
         {
-            Comando = JsonSerializer.Serialize<PreviewKeyDownEventArgs>(e);
+            conn.Command = JsonSerializer.Serialize<PreviewKeyDownEventArgs>(e);
+            serv.GET(conn);
         }
 
         private void panelMouseClick(object sender, MouseEventArgs e)
         {
-            Comando = JsonSerializer.Serialize<MouseEventArgs>(e);
+            conn.Command = JsonSerializer.Serialize<MouseEventArgs>(e);
+            serv.GET(conn);
         }
 
         private void panelMouseDoubleClick(object sender, MouseEventArgs e)
         {
-            Comando = JsonSerializer.Serialize<MouseEventArgs>(e);
+            conn.Command = JsonSerializer.Serialize<MouseEventArgs>(e);
+            serv.GET(conn);
         }
 
         private void panelMouseDown(object sender, MouseEventArgs e)
         {
-            Comando = JsonSerializer.Serialize<MouseEventArgs>(e);
+            conn.Command = JsonSerializer.Serialize<MouseEventArgs>(e);
+            serv.GET(conn);
         }
 
 
@@ -202,7 +209,9 @@ namespace StanetRemoteControl
             set { label5.Text = value; }
         }
 
-        public string Comando;
+        public IService1 serv = new RemoteControlNode.Service1Client();
+        public Macchina mac = new Macchina();
+        public Connessione conn = new Connessione();
         private Panel panel1;
     }
 }
