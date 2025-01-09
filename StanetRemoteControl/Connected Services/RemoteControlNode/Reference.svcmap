@@ -22,12 +22,11 @@
     <MetadataSource Address="https://remotecontrolhub.azurewebsites.net/Service1.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Service1.xsd" MetadataType="Schema" ID="f9d18d37-5ab7-4b62-aae0-79d679250551" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd2" />
-    <MetadataFile FileName="Service11.xsd" MetadataType="Schema" ID="d49a6cfb-8430-4a54-8734-bed3ebd82ce7" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd3" />
     <MetadataFile FileName="Service1.disco" MetadataType="Disco" ID="b0516c63-a52c-4a7e-8130-55939f582ff9" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?disco" />
-    <MetadataFile FileName="Service12.xsd" MetadataType="Schema" ID="f3c57882-456a-4877-9ecf-481305dc4c4c" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd0" />
     <MetadataFile FileName="Service13.xsd" MetadataType="Schema" ID="2c8cb803-51ea-4779-abf8-b5f19ebab2d1" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd1" />
     <MetadataFile FileName="Service1.wsdl" MetadataType="Wsdl" ID="fdf2d98b-7123-49bf-b900-3ea36972cded" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?wsdl" />
+    <MetadataFile FileName="Service12.xsd" MetadataType="Schema" ID="f3c57882-456a-4877-9ecf-481305dc4c4c" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd0" />
+    <MetadataFile FileName="Service1.xsd" MetadataType="Schema" ID="f9d18d37-5ab7-4b62-aae0-79d679250551" SourceId="1" SourceUrl="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd2" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

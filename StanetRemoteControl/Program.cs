@@ -40,7 +40,7 @@ namespace StanetRemoteControl
                 fs.Dispose();
                 pagina.mac = JsonSerializer.Deserialize<Macchina>(File.ReadAllText("C:\\Program Files\\StanetRemoteControl\\Macchina.txt"));
 
-                if (pagina.mac == null)
+                if (pagina.mac.ID == 0)
                 {
                     //Se non presente la registra
                     pagina.mac = pagina.serv.RegistraMacchina(new Macchina());
@@ -50,18 +50,18 @@ namespace StanetRemoteControl
             catch (Exception e)
             {
                 pagina.conn.Error = e.Message;
-                pagina.Errore = e.Message;
+                pagina.Errore = "1 --- " + e.Message;
             }
 
             /*Connessione*/
             try
             {
-                if (pagina.mac != new Macchina()) { pagina.conn = pagina.serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
+                if (pagina.mac.ID != 0) { pagina.conn = pagina.serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
             }
             catch (Exception e)
             {
                 pagina.conn.Error = e.Message;
-                pagina.Errore = e.Message;
+                pagina.Errore = "2 --- " + e.Message;
             }
             /*-----------------------*/
 
@@ -76,7 +76,7 @@ namespace StanetRemoteControl
                 while (pagina.conn.Command.CompareTo("FINE") != 0) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
-                    pagina.conn.Screen = immagine;
+                    pagina.conn.Screen = JsonSerializer.Serialize<Image>(immagine);
                     pagina.conn = pagina.serv.POST(pagina.conn);
                     COMANDO = pagina.conn.Command;
 

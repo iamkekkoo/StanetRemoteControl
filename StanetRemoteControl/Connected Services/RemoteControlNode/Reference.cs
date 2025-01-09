@@ -160,10 +160,10 @@ namespace StanetRemoteControl.RemoteControlNode {
         private int ID_ControllatoField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int ID_ControlloreField;
+        private System.Nullable<int> ID_ControlloreField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Drawing.Image ScreenField;
+        private string ScreenField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Nullable<System.DateTime> TimeField;
@@ -231,7 +231,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID_Controllore {
+        public System.Nullable<int> ID_Controllore {
             get {
                 return this.ID_ControlloreField;
             }
@@ -244,7 +244,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Drawing.Image Screen {
+        public string Screen {
             get {
                 return this.ScreenField;
             }
