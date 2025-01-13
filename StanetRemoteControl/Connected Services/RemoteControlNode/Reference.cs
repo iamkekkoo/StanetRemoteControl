@@ -26,7 +26,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         private string EmailField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int IDField;
+        private long IDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string IPField;
@@ -64,7 +64,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
+        public long ID {
             get {
                 return this.IDField;
             }
@@ -154,13 +154,13 @@ namespace StanetRemoteControl.RemoteControlNode {
         private string ErrorField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int IDField;
+        private long IDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int ID_ControllatoField;
+        private long ID_ControllatoField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Nullable<int> ID_ControlloreField;
+        private System.Nullable<long> ID_ControlloreField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string ScreenField;
@@ -205,7 +205,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
+        public long ID {
             get {
                 return this.IDField;
             }
@@ -218,7 +218,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID_Controllato {
+        public long ID_Controllato {
             get {
                 return this.ID_ControllatoField;
             }
@@ -231,7 +231,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Nullable<int> ID_Controllore {
+        public System.Nullable<long> ID_Controllore {
             get {
                 return this.ID_ControlloreField;
             }
@@ -296,10 +296,10 @@ namespace StanetRemoteControl.RemoteControlNode {
         System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ApriConnessioneAsync(StanetRemoteControl.RemoteControlNode.Macchina mac);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/ChiediAccesso", ReplyAction="http://tempuri.org/IService1/ChiediAccessoResponse")]
-        StanetRemoteControl.RemoteControlNode.Connessione ChiediAccesso(string id, string psw, int mioId);
+        StanetRemoteControl.RemoteControlNode.Connessione ChiediAccesso(string user, string psw, long mioId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/ChiediAccesso", ReplyAction="http://tempuri.org/IService1/ChiediAccessoResponse")]
-        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string id, string psw, int mioId);
+        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GET", ReplyAction="http://tempuri.org/IService1/GETResponse")]
         StanetRemoteControl.RemoteControlNode.Connessione GET(StanetRemoteControl.RemoteControlNode.Connessione con);
@@ -357,12 +357,12 @@ namespace StanetRemoteControl.RemoteControlNode {
             return base.Channel.ApriConnessioneAsync(mac);
         }
         
-        public StanetRemoteControl.RemoteControlNode.Connessione ChiediAccesso(string id, string psw, int mioId) {
-            return base.Channel.ChiediAccesso(id, psw, mioId);
+        public StanetRemoteControl.RemoteControlNode.Connessione ChiediAccesso(string user, string psw, long mioId) {
+            return base.Channel.ChiediAccesso(user, psw, mioId);
         }
         
-        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string id, string psw, int mioId) {
-            return base.Channel.ChiediAccessoAsync(id, psw, mioId);
+        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId) {
+            return base.Channel.ChiediAccessoAsync(user, psw, mioId);
         }
         
         public StanetRemoteControl.RemoteControlNode.Connessione GET(StanetRemoteControl.RemoteControlNode.Connessione con) {

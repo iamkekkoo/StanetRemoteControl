@@ -3,7 +3,7 @@
   <xs:complexType name="Macchina">
     <xs:sequence>
       <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="IP" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="PASS" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />
@@ -15,9 +15,9 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Command" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Error" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="ID_Controllato" type="xs:int" />
-      <xs:element minOccurs="0" name="ID_Controllore" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
+      <xs:element minOccurs="0" name="ID_Controllato" type="xs:long" />
+      <xs:element minOccurs="0" name="ID_Controllore" nillable="true" type="xs:long" />
       <xs:element minOccurs="0" name="Screen" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Time" nillable="true" type="xs:dateTime" />
     </xs:sequence>

@@ -1,14 +1,14 @@
 ﻿using StanetRemoteControl.RemoteControlNode;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
 using System.IO;
 using System.Drawing;
 using System.Threading;
+
+using System.Text;
+using System.Net.Http.Headers;
+using System.Security;
 
 namespace StanetRemoteControl
 {
@@ -34,24 +34,39 @@ namespace StanetRemoteControl
             /*Macchina*/
             /*Verifica se già presente utenza in memoria*/
             FileStream fs;
-            try
-            {
-                fs = File.Open("C:\\Program Files\\StanetRemoteControl\\Macchina.txt", FileMode.OpenOrCreate);
-                fs.Dispose();
-                pagina.mac = JsonSerializer.Deserialize<Macchina>(File.ReadAllText("C:\\Program Files\\StanetRemoteControl\\Macchina.txt"));
+            StreamReader reader;
+            string macchina;
 
-                if (pagina.mac.ID == 0)
-                {
-                    //Se non presente la registra
-                    pagina.mac = pagina.serv.RegistraMacchina(new Macchina());
-                    File.WriteAllText("C:\\Program Files\\StanetRemoteControl\\Macchina.txt", JsonSerializer.Serialize<Macchina>(pagina.mac));
-                }
-            }
-            catch (Exception e)
+            string path = AppDomain.CurrentDomain.BaseDirectory;
+            string dir = path + "\\StanetRemoteControl";
+            string filename = dir + "\\Macchina.txt";
+            
+            if (!Directory.Exists(dir)) 
             {
-                pagina.conn.Error = e.Message;
-                pagina.Errore = "1 --- " + e.Message;
+                Directory.CreateDirectory(dir);
             }
+            fs = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            reader = new StreamReader(fs);
+            macchina = reader.ReadToEnd();
+            if (macchina.CompareTo("") == 0)
+            {
+                //file appena creato -> vuoto
+                //Se non presente la registra
+                pagina.mac = pagina.serv.RegistraMacchina(new Macchina());
+
+                //File.WriteAllText(filename, JsonSerializer.Serialize<Macchina>(pagina.mac));
+            }
+            else 
+            {
+                /*altrimenti utilizza la macchina registrata*/
+                pagina.mac = JsonSerializer.Deserialize<Macchina>(macchina);
+            }
+                
+
+            reader.Dispose();
+            fs.Dispose();
+             
+           
 
             /*Connessione*/
             try
@@ -71,7 +86,7 @@ namespace StanetRemoteControl
             pagina.conn.Command = "";
 
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
-            new Thread(delegate() 
+            /*new Thread(delegate() 
             {
                 while (pagina.conn.Command.CompareTo("FINE") != 0) 
                 {
@@ -80,7 +95,7 @@ namespace StanetRemoteControl
                     pagina.conn = pagina.serv.POST(pagina.conn);
                     COMANDO = pagina.conn.Command;
 
-                    /*esegue operazione a seconda del comando*/
+                    esegue operazione a seconda del comando
                     switch (COMANDO) 
                     {
                         case "":
@@ -91,7 +106,7 @@ namespace StanetRemoteControl
                     }
 
                 }
-            }).Start();
+            }).Start();*/
 
             Application.EnableVisualStyles();
             
