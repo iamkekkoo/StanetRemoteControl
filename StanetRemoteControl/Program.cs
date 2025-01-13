@@ -22,17 +22,18 @@ namespace StanetRemoteControl
         [STAThread]
         static void Main()
         {
+            /*Variabili*/
             Application.SetCompatibleTextRenderingDefault(false);
 
             Form1 pagina = new Form1();
+            FormConnessione paginaConn = new FormConnessione();
+            IService1 serv = new RemoteControlNode.Service1Client();
 
             Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             Bitmap immagine = new Bitmap(rec.Width, rec.Height);
 
             string COMANDO;
-            /*-----------------------*/
-            /*Macchina*/
-            /*Verifica se già presente utenza in memoria*/
+
             FileStream fs;
             StreamReader reader;
             string macchina;
@@ -40,7 +41,10 @@ namespace StanetRemoteControl
             string path = AppDomain.CurrentDomain.BaseDirectory;
             string dir = path + "\\StanetRemoteControl";
             string filename = dir + "\\Macchina.txt";
-            
+            /*-----------------------*/
+
+
+
             if (!Directory.Exists(dir)) 
             {
                 Directory.CreateDirectory(dir);
@@ -48,12 +52,22 @@ namespace StanetRemoteControl
             fs = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             reader = new StreamReader(fs);
             macchina = reader.ReadToEnd();
+
+            /*Macchina*/
+            /*Verifica se già presente utenza in memoria*/
             if (macchina.CompareTo("") == 0)
             {
                 //file appena creato -> vuoto
                 //Se non presente la registra
-                pagina.mac = pagina.serv.RegistraMacchina(new Macchina());
 
+
+                /*pagina.mac = serv.RegistraMacchina(new Macchina());*/
+                pagina.mac = new Macchina();
+                
+                
+                
+                
+                
                 //File.WriteAllText(filename, JsonSerializer.Serialize<Macchina>(pagina.mac));
             }
             else 
@@ -71,11 +85,11 @@ namespace StanetRemoteControl
             /*Connessione*/
             try
             {
-                if (pagina.mac.ID != 0) { pagina.conn = pagina.serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
+                if (pagina.mac.ID != 0) { paginaConn.connIngresso = serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
             }
             catch (Exception e)
             {
-                pagina.conn.Error = e.Message;
+                paginaConn.connIngresso.Error = e.Message;
                 pagina.Errore = "2 --- " + e.Message;
             }
             /*-----------------------*/
@@ -83,7 +97,7 @@ namespace StanetRemoteControl
             pagina.MioId = pagina.mac.User;
             pagina.MiaPsw = pagina.mac.Password;
 
-            pagina.conn.Command = "";
+            paginaConn.connIngresso.Command = "";
 
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
             /*new Thread(delegate() 
