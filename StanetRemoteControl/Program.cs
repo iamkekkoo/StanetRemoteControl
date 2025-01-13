@@ -26,13 +26,10 @@ namespace StanetRemoteControl
             Application.SetCompatibleTextRenderingDefault(false);
 
             Form1 pagina = new Form1();
-            FormConnessione paginaConn = new FormConnessione();
-            IService1 serv = new RemoteControlNode.Service1Client();
+            
+            
 
-            Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-            Bitmap immagine = new Bitmap(rec.Width, rec.Height);
-
-            string COMANDO;
+            
 
             FileStream fs;
             StreamReader reader;
@@ -85,11 +82,11 @@ namespace StanetRemoteControl
             /*Connessione*/
             try
             {
-                if (pagina.mac.ID != 0) { paginaConn.connIngresso = serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
+                if (pagina.mac.ID != 0) { pagina.connIngresso = pagina.paginaConn.serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
             }
             catch (Exception e)
             {
-                paginaConn.connIngresso.Error = e.Message;
+                pagina.connIngresso.Error = e.Message;
                 pagina.Errore = "2 --- " + e.Message;
             }
             /*-----------------------*/
@@ -97,30 +94,9 @@ namespace StanetRemoteControl
             pagina.MioId = pagina.mac.User;
             pagina.MiaPsw = pagina.mac.Password;
 
-            paginaConn.connIngresso.Command = "";
+            pagina.connIngresso.Command = "";
 
-            /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
-            /*new Thread(delegate() 
-            {
-                while (pagina.conn.Command.CompareTo("FINE") != 0) 
-                {
-                    Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
-                    pagina.conn.Screen = JsonSerializer.Serialize<Image>(immagine);
-                    pagina.conn = pagina.serv.POST(pagina.conn);
-                    COMANDO = pagina.conn.Command;
-
-                    esegue operazione a seconda del comando
-                    switch (COMANDO) 
-                    {
-                        case "":
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                }
-            }).Start();*/
+            
 
             Application.EnableVisualStyles();
             

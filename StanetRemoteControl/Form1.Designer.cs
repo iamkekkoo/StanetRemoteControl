@@ -49,9 +49,9 @@ namespace StanetRemoteControl
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.Color.Red;
-            this.label5.Location = new System.Drawing.Point(12, 424);
+            this.label5.Location = new System.Drawing.Point(14, 530);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(0, 24);
+            this.label5.Size = new System.Drawing.Size(0, 26);
             this.label5.TabIndex = 5;
             // 
             // label1
@@ -59,9 +59,9 @@ namespace StanetRemoteControl
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Monotype Corsiva", 36F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(99, 79);
+            this.label1.Location = new System.Drawing.Point(111, 99);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(238, 72);
+            this.label1.Size = new System.Drawing.Size(284, 85);
             this.label1.TabIndex = 0;
             this.label1.Text = "Il tuo ID";
             // 
@@ -69,9 +69,9 @@ namespace StanetRemoteControl
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(114, 151);
+            this.label2.Location = new System.Drawing.Point(128, 189);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(0, 38);
+            this.label2.Size = new System.Drawing.Size(0, 46);
             this.label2.TabIndex = 1;
             // 
             // label4
@@ -79,9 +79,9 @@ namespace StanetRemoteControl
             this.label4.AutoSize = true;
             this.label4.BackColor = System.Drawing.Color.Transparent;
             this.label4.Font = new System.Drawing.Font("Monotype Corsiva", 36F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(445, 79);
+            this.label4.Location = new System.Drawing.Point(501, 99);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(242, 72);
+            this.label4.Size = new System.Drawing.Size(292, 85);
             this.label4.TabIndex = 2;
             this.label4.Text = "Password";
             // 
@@ -89,34 +89,37 @@ namespace StanetRemoteControl
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(487, 151);
+            this.label3.Location = new System.Drawing.Point(548, 189);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(0, 38);
+            this.label3.Size = new System.Drawing.Size(0, 46);
             this.label3.TabIndex = 3;
             // 
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F);
-            this.button1.Location = new System.Drawing.Point(281, 252);
+            this.button1.Location = new System.Drawing.Point(316, 315);
+            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(263, 77);
+            this.button1.Size = new System.Drawing.Size(296, 96);
             this.button1.TabIndex = 4;
             this.button1.Text = "Connetti";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
             this.AcceptButton = this.button1;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(900, 562);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "Form1";
             this.Text = "Stanet Remote Control";
             this.ResumeLayout(false);
@@ -146,6 +149,14 @@ namespace StanetRemoteControl
         }
 
         public Macchina mac = new Macchina();
+        public Connessione connIngresso = new Connessione();
+        public FormConnessione paginaConn = new FormConnessione();
+
+        public Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+        public Bitmap immagine;
+
+        public string COMANDO;
+
         private Label label1;
         private Label label2;
         private Label label3;
