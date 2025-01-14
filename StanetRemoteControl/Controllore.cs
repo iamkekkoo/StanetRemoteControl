@@ -30,10 +30,14 @@ namespace StanetRemoteControl
                 pictureBox1.Height = this.Height;
                 new Thread(delegate ()
                 {
-                    while (connUscita.Screen.CompareTo("") != 0) //Connessione chiusa dal controllato
+                    var b = true;
+                    while ( b ) //Connessione chiusa dal controllato
                     {
-                        serv.GET(connUscita);
-                        pictureBox1.Image = ResizeImage(JsonSerializer.Deserialize<Image>(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
+                        if (connUscita.Screen != null) {
+                            if (connUscita.Screen.CompareTo("") == 0) { b = false; }
+                            serv.GET(connUscita);
+                            pictureBox1.Image = ResizeImage(JsonSerializer.Deserialize<Image>(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
+                        }
                     }
                 }).Start();
             }
