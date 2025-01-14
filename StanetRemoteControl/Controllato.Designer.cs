@@ -21,7 +21,7 @@ namespace StanetRemoteControl
         /// <param name="disposing">ha valore true se le risorse gestite devono essere eliminate, false in caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
-            connIngresso.Screen = "";
+            connIngresso.Screen = "FINE";
             paginaConn.serv.POST(connIngresso);
             if (disposing && (components != null))
             {

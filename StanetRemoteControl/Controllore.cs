@@ -34,7 +34,7 @@ namespace StanetRemoteControl
                     while ( b ) //Connessione chiusa dal controllato
                     {
                         if (connUscita.Screen != null) {
-                            if (connUscita.Screen.CompareTo("") == 0) { b = false; }
+                            if (connUscita.Screen.CompareTo("FINE") == 0) { b = false; }
                             serv.GET(connUscita);
                             pictureBox1.Image = ResizeImage(JsonSerializer.Deserialize<Image>(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
                         }
