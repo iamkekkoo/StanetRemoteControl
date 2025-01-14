@@ -24,8 +24,7 @@ namespace StanetRemoteControl
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
             new Thread(delegate() 
             {
-                connIngresso.Command = "";
-                while (connIngresso.Command.CompareTo("FINE") != 0 ) 
+                while ( true ) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
                     connIngresso.Screen = JsonSerializer.Serialize<Image>(immagine);
