@@ -17,18 +17,19 @@ namespace StanetRemoteControl
         public Controllato()
         {
             InitializeComponent();
-
+            mac.User = "";
+            mac.Password = "";
             immagine = new Bitmap(rec.Width, rec.Height);
 
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
             new Thread(delegate() 
             {
-                while (connIngresso.Command.CompareTo("FINE") != 0) 
+                connIngresso.Command = "";
+                while (connIngresso.Command.CompareTo("FINE") != 0 ) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
                     connIngresso.Screen = JsonSerializer.Serialize<Image>(immagine);
                     connIngresso = paginaConn.serv.POST(connIngresso);
-                    
 
                     /*esegue operazione a seconda del comando*/
                     switch (connIngresso.Command) 
@@ -38,7 +39,7 @@ namespace StanetRemoteControl
                             break;
 
                         default:
-                            if(connIngresso.Command != null) { COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
+                            if(connIngresso.Command != null && connIngresso.Command.CompareTo("") != 0) { COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
                             break;
                     }
 
