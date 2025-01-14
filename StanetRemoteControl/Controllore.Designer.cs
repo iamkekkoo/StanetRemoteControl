@@ -80,22 +80,13 @@ namespace StanetRemoteControl
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox1.Location = new System.Drawing.Point(32, 405);
+            this.pictureBox1.BackColor = System.Drawing.Color.Black;
+            this.pictureBox1.Location = new System.Drawing.Point(32, 213);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(26, 16);
+            this.pictureBox1.Size = new System.Drawing.Size(568, 208);
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
-
-            pictureBox1.Click += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            pictureBox1.DoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            pictureBox1.MouseClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            pictureBox1.MouseDoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            pictureBox1.MouseMove += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); }; //aggiustare posizione mouse
-            pictureBox1.MouseWheel += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            pictureBox1.PreviewKeyDown += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            
             // 
             // Controllore
             // 
