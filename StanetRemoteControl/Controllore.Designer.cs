@@ -39,6 +39,7 @@ namespace StanetRemoteControl
             this.button1 = new System.Windows.Forms.Button();
             this.Error = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -81,18 +82,29 @@ namespace StanetRemoteControl
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.Color.Black;
-            this.pictureBox1.Location = new System.Drawing.Point(32, 213);
+            this.pictureBox1.Location = new System.Drawing.Point(80, 162);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(568, 208);
+            this.pictureBox1.Size = new System.Drawing.Size(634, 208);
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.ForeColor = System.Drawing.Color.Red;
+            this.label1.Location = new System.Drawing.Point(19, 405);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(0, 16);
+            this.label1.TabIndex = 5;
             // 
             // Controllore
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.Error);
             this.Controls.Add(this.button1);
@@ -122,5 +134,6 @@ namespace StanetRemoteControl
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label Error;
         private System.Windows.Forms.PictureBox pictureBox1;
+        public System.Windows.Forms.Label label1;
     }
 }

@@ -14,12 +14,27 @@ namespace StanetRemoteControl
 {
     public partial class Controllato : Form
     {
-        public Controllato()
+        public Controllato(string macchina)
         {
             InitializeComponent();
-            mac.User = "";
-            mac.Password = "";
             immagine = new Bitmap(rec.Width, rec.Height);
+
+            if (macchina.CompareTo("") == 0)
+            {
+                //file appena creato -> vuoto
+                //Se non presente la registra
+
+                mac = paginaConn.serv.RegistraMacchina(new Macchina());
+                
+                //File.WriteAllText(filename, JsonSerializer.Serialize<Macchina>(pagina.mac));
+            }
+            else
+            {
+                /*altrimenti utilizza la macchina registrata*/
+                mac = JsonSerializer.Deserialize<Macchina>(macchina);
+            }
+
+            connIngresso = paginaConn.serv.ApriConnessione(mac);
 
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
             new Thread(delegate() 
@@ -40,7 +55,7 @@ namespace StanetRemoteControl
                             break;
 
                         default:
-                            if(connIngresso.Command != null && connIngresso.Command.CompareTo("") != 0) { COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
+                            if(connIngresso.Command != null && connIngresso.Command.CompareTo("FINE") != 0) { COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
                             break;
                     }
 

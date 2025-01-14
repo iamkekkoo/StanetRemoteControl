@@ -31,7 +31,6 @@ namespace StanetRemoteControl
                 pictureBox1.Visible = true;
                 new Thread(delegate ()
                 {
-                    
                     var b = true;
                     while ( b ) 
                     {

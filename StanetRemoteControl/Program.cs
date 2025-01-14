@@ -25,12 +25,6 @@ namespace StanetRemoteControl
             /*Variabili*/
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Controllato pagina = new Controllato();
-            
-            
-
-            
-
             FileStream fs;
             StreamReader reader;
             string macchina;
@@ -41,7 +35,7 @@ namespace StanetRemoteControl
             /*-----------------------*/
 
 
-
+            /*Lavoro sulle directory per leggere il file Macchina*/
             if (!Directory.Exists(dir)) 
             {
                 Directory.CreateDirectory(dir);
@@ -50,53 +44,21 @@ namespace StanetRemoteControl
             reader = new StreamReader(fs);
             macchina = reader.ReadToEnd();
 
-            /*Macchina*/
-            /*Verifica se già presente utenza in memoria*/
-            if (macchina.CompareTo("") == 0)
-            {
-                //file appena creato -> vuoto
-                //Se non presente la registra
+            
+            Controllato pagina = new Controllato(macchina);
 
-                pagina.mac = pagina.paginaConn.serv.RegistraMacchina(new Macchina());
-                
-                
-                
-                
-                //File.WriteAllText(filename, JsonSerializer.Serialize<Macchina>(pagina.mac));
-            }
-            else 
-            {
-                /*altrimenti utilizza la macchina registrata*/
-                pagina.mac = JsonSerializer.Deserialize<Macchina>(macchina);
-            }
-                
+            /*Qui devo registrare la macchina creata da pagina su file*/
+
+            /*--------------------------------------------------------*/
 
             reader.Dispose();
             fs.Dispose();
              
-           
-
-            /*Connessione*/
-            try
-            {
-                if (pagina.mac.ID != 0) { pagina.connIngresso = pagina.paginaConn.serv.ApriConnessione(pagina.mac); } //Apre Connessione solo se la macchina esiste (no eccezioni)
-            }
-            catch (Exception e)
-            {
-                pagina.connIngresso.Error = e.Message;
-                pagina.Errore = "2 --- " + e.Message;
-            }
-            /*-----------------------*/
-
             pagina.MioId = pagina.mac.User;
             pagina.MiaPsw = pagina.mac.Password;
+                      
 
-            pagina.connIngresso.Command = "";
-
-            
-
-            Application.EnableVisualStyles();
-            
+            Application.EnableVisualStyles();            
             Application.Run(pagina);
         }
     }
