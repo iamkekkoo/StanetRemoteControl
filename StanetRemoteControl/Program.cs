@@ -58,9 +58,7 @@ namespace StanetRemoteControl
                 //Se non presente la registra
 
 
-                /*pagina.mac = serv.RegistraMacchina(new Macchina());*/
-                pagina.mac = new Macchina();
-                
+                pagina.mac = pagina.paginaConn.serv.RegistraMacchina(new Macchina());
                 
                 
                 

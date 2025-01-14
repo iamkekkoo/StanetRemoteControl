@@ -38,7 +38,7 @@ namespace StanetRemoteControl
                             break;
 
                         default:
-                            COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command);
+                            if(connIngresso.Command != null) { COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
                             break;
                     }
 
