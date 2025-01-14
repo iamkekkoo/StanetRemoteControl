@@ -25,7 +25,7 @@ namespace StanetRemoteControl
             /*Variabili*/
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Form1 pagina = new Form1();
+            Controllato pagina = new Controllato();
             
             
 

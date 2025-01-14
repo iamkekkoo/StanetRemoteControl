@@ -8,7 +8,7 @@ using StanetRemoteControl.RemoteControlNode;
 
 namespace StanetRemoteControl
 {
-    partial class Form1
+    partial class Controllato
     {
         /// <summary>
         /// Variabile di progettazione necessaria.
@@ -21,6 +21,8 @@ namespace StanetRemoteControl
         /// <param name="disposing">ha valore true se le risorse gestite devono essere eliminate, false in caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
+            connIngresso.Screen = "";
+            paginaConn.serv.POST(connIngresso);
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -150,12 +152,12 @@ namespace StanetRemoteControl
 
         public Macchina mac = new Macchina();
         public Connessione connIngresso = new Connessione();
-        public FormConnessione paginaConn = new FormConnessione();
+        public Controllore paginaConn = new Controllore();
 
         public Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
         public Bitmap immagine;
 
-        public string COMANDO;
+        public EventArgs COMANDO;
 
         private Label label1;
         private Label label2;

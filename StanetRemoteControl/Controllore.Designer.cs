@@ -1,8 +1,10 @@
 ﻿using StanetRemoteControl.RemoteControlNode;
+using System;
+using System.Text.Json;
 
 namespace StanetRemoteControl
 {
-    partial class FormConnessione
+    partial class Controllore
     {
         /// <summary>
         /// Required designer variable.
@@ -43,27 +45,24 @@ namespace StanetRemoteControl
             // textBox1
             // 
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F);
-            this.textBox1.Location = new System.Drawing.Point(90, 119);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.textBox1.Location = new System.Drawing.Point(80, 95);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(281, 62);
+            this.textBox1.Size = new System.Drawing.Size(250, 53);
             this.textBox1.TabIndex = 0;
             // 
             // textBox2
             // 
             this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F);
-            this.textBox2.Location = new System.Drawing.Point(522, 119);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.textBox2.Location = new System.Drawing.Point(464, 95);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(281, 62);
+            this.textBox2.Size = new System.Drawing.Size(250, 53);
             this.textBox2.TabIndex = 1;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(791, 506);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.button1.Location = new System.Drawing.Point(703, 405);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(96, 41);
+            this.button1.Size = new System.Drawing.Size(85, 33);
             this.button1.TabIndex = 2;
             this.button1.Text = "Invio";
             this.button1.UseVisualStyleBackColor = true;
@@ -74,33 +73,42 @@ namespace StanetRemoteControl
             this.Error.AutoSize = true;
             this.Error.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
             this.Error.ForeColor = System.Drawing.Color.Red;
-            this.Error.Location = new System.Drawing.Point(14, 530);
+            this.Error.Location = new System.Drawing.Point(12, 424);
             this.Error.Name = "Error";
-            this.Error.Size = new System.Drawing.Size(0, 20);
+            this.Error.Size = new System.Drawing.Size(0, 17);
             this.Error.TabIndex = 3;
             // 
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox1.Location = new System.Drawing.Point(12, 530);
+            this.pictureBox1.Location = new System.Drawing.Point(32, 405);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(29, 20);
+            this.pictureBox1.Size = new System.Drawing.Size(26, 16);
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
+
+            pictureBox1.Click += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
+            pictureBox1.DoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
+            pictureBox1.MouseClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
+            pictureBox1.MouseDoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
+            pictureBox1.MouseMove += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); }; //aggiustare posizione mouse
+            pictureBox1.MouseWheel += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
+            pictureBox1.PreviewKeyDown += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
+            
             // 
-            // FormConnessione
+            // Controllore
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(900, 562);
+            this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.Error);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "FormConnessione";
-            this.Text = "FormConnessione";
+            this.Name = "Controllore";
+            this.Text = "Stanet Remote Control";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -109,8 +117,14 @@ namespace StanetRemoteControl
 
         #endregion
 
+        
+
         public IService1 serv = new RemoteControlNode.Service1Client();
         public Connessione connUscita = new Connessione();
+        public Int64 IdMacchina;
+
+        private static int proporzione_x = 0;
+        private static int proporzione_y = 0;
         
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;

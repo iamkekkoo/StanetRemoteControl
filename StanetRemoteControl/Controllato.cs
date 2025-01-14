@@ -12,9 +12,9 @@ using StanetRemoteControl.RemoteControlNode;
 
 namespace StanetRemoteControl
 {
-    public partial class Form1 : Form
+    public partial class Controllato : Form
     {
-        public Form1()
+        public Controllato()
         {
             InitializeComponent();
 
@@ -28,16 +28,17 @@ namespace StanetRemoteControl
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
                     connIngresso.Screen = JsonSerializer.Serialize<Image>(immagine);
                     connIngresso = paginaConn.serv.POST(connIngresso);
-                    COMANDO = connIngresso.Command;
+                    
 
                     /*esegue operazione a seconda del comando*/
-                    switch (COMANDO) 
+                    switch (connIngresso.Command) 
                     {
                         case "FINE":
                             /*termina la comunicazione col client*/
                             break;
 
                         default:
+                            COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command);
                             break;
                     }
 
@@ -49,8 +50,9 @@ namespace StanetRemoteControl
         {
             new Thread(delegate ()
             {
-                paginaConn = new FormConnessione();
+                paginaConn = new Controllore();
                 Application.EnableVisualStyles();
+                paginaConn.IdMacchina = mac.ID;
                 Application.Run(paginaConn);
             }).Start();
         }
