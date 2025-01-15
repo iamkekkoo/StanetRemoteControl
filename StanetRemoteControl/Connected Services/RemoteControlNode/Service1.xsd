@@ -18,8 +18,8 @@
       <xs:element minOccurs="0" name="Error" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="ID_Controllato" type="xs:long" />
-      <xs:element minOccurs="0" name="ID_Controllore" nillable="true" type="xs:long" />
-      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/System.Drawing" minOccurs="0" name="Screen" nillable="true" type="q1:Image" />
+      <xs:element minOccurs="0" name="ID_Controllore" type="xs:long" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/System.Drawing" minOccurs="0" name="Screen" nillable="true" type="q1:Bitmap" />
       <xs:element minOccurs="0" name="Time" nillable="true" type="xs:dateTime" />
     </xs:sequence>
   </xs:complexType>

@@ -5,9 +5,11 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,6 +26,7 @@ namespace StanetRemoteControl
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             connUscita = serv.ChiediAccesso(textBox1.Text, textBox2.Text, IdMacchina);
             if (connUscita.ID != 0) 
             {
@@ -41,12 +44,13 @@ namespace StanetRemoteControl
                 pictureBox1.Visible = true;
                 new Thread(delegate ()
                 {
+                    converter = new ImageConverter();
                     var b = true;
                     while ( b ) 
                     {
+                        connUscita = serv.GET(connUscita);
                         if (connUscita.Screen != null) {
                             if ((int)connUscita.Screen.Tag == -1) { b = false; }//Connessione chiusa dal controllato
-                            serv.GET(connUscita);
                             pictureBox1.Image = ResizeImage(connUscita.Screen, pictureBox1.Width, pictureBox1.Height);
                         }
                     }
@@ -86,4 +90,39 @@ namespace StanetRemoteControl
             return destImage;
         }
     }
+
+    public class immagine {
+        public object Tag;
+        public struct PhysicalDimension 
+        {
+            public bool IsEmpty;
+            public int Width;
+            public int Height;
+        }
+        public struct Size 
+        {
+            public bool IsEmpty;
+            public int Width;
+            public int Height;
+        }
+        public int Width;
+        public int Height;
+        public int HorizontalResolution;
+        public int VerticalResolution;
+        public int Flags;
+        public struct RawFormat 
+        {
+            public string Guid;
+        }
+        public int PixelFormat;
+        public struct Palette 
+        {
+            public int Flags;
+            public List<Object> Entries;
+        }
+        public List<String> FrameDimensionsList;
+        public List<object> PropertyIdList;
+        public List<object> PropertyItems;
+    }
+
 }

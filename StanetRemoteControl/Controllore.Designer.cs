@@ -1,5 +1,7 @@
 ﻿using StanetRemoteControl.RemoteControlNode;
 using System;
+using System.Drawing;
+using System.IO;
 using System.Text.Json;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -91,13 +93,13 @@ namespace StanetRemoteControl
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
 
-            pictureBox1.Click += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
+            /*pictureBox1.Click += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
             pictureBox1.DoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
             pictureBox1.MouseClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<System.Windows.Forms.MouseEventArgs>(new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).X, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).Y, e.Delta)); };
             pictureBox1.MouseDoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<System.Windows.Forms.MouseEventArgs>(new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).X, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).Y, e.Delta)); };
             pictureBox1.MouseMove += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<System.Windows.Forms.MouseEventArgs>(new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).X, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).Y, e.Delta)); };
             pictureBox1.PreviewKeyDown += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<PreviewKeyDownEventArgs>(e); };
-
+            */
             // 
             // label1
             // 
@@ -135,10 +137,9 @@ namespace StanetRemoteControl
         public IService1 serv = new RemoteControlNode.Service1Client();
         public Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
+        public ImageConverter converter;
 
-        private static int proporzione_x = 0;
-        private static int proporzione_y = 0;
-        
+
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button button1;
