@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace StanetRemoteControl
 {
@@ -26,8 +27,17 @@ namespace StanetRemoteControl
             connUscita = serv.ChiediAccesso(textBox1.Text, textBox2.Text, IdMacchina);
             if (connUscita.ID != 0) 
             {
+                textBox1.Visible = false;
+                textBox2.Visible = false;
+                button1.Visible = false;
+                label1.Visible = false;
+
+                this.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
+                this.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
+
                 pictureBox1.Width = this.Width;
                 pictureBox1.Height = this.Height;
+
                 pictureBox1.Visible = true;
                 new Thread(delegate ()
                 {
@@ -35,9 +45,9 @@ namespace StanetRemoteControl
                     while ( b ) 
                     {
                         if (connUscita.Screen != null) {
-                            if (connUscita.Screen.CompareTo("FINE") == 0) { b = false; }//Connessione chiusa dal controllato
+                            if ((int)connUscita.Screen.Tag == -1) { b = false; }//Connessione chiusa dal controllato
                             serv.GET(connUscita);
-                            pictureBox1.Image = ResizeImage(JsonSerializer.Deserialize<Image>(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
+                            pictureBox1.Image = ResizeImage(connUscita.Screen, pictureBox1.Width, pictureBox1.Height);
                         }
                     }
                 }).Start();

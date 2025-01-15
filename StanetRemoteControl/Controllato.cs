@@ -43,7 +43,7 @@ namespace StanetRemoteControl
                 while ( b ) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
-                    connIngresso.Screen = JsonSerializer.Serialize<Image>(immagine);
+                    connIngresso.Screen = immagine;
                     connIngresso = paginaConn.serv.POST(connIngresso);
 
                     /*esegue operazione a seconda del comando*/
