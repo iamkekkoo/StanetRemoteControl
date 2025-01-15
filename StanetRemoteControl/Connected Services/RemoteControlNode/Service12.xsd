@@ -48,28 +48,30 @@
   <xs:element name="GET">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="con" nillable="true" type="q6:Connessione" />
+        <xs:element minOccurs="0" name="cmd" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="IdConnessione" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GETResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="GETResult" nillable="true" type="q7:Connessione" />
+        <xs:element minOccurs="0" name="GETResult" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="POST">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="con" nillable="true" type="q8:Connessione" />
+        <xs:element minOccurs="0" name="Screen" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="IdConnessione" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="POSTResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="POSTResult" nillable="true" type="q9:Connessione" />
+        <xs:element minOccurs="0" name="POSTResult" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

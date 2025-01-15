@@ -163,7 +163,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         private long ID_ControlloreField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Drawing.Bitmap ScreenField;
+        private string ScreenField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Nullable<System.DateTime> TimeField;
@@ -244,7 +244,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Drawing.Bitmap Screen {
+        public string Screen {
             get {
                 return this.ScreenField;
             }
@@ -302,16 +302,16 @@ namespace StanetRemoteControl.RemoteControlNode {
         System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GET", ReplyAction="http://tempuri.org/IService1/GETResponse")]
-        StanetRemoteControl.RemoteControlNode.Connessione GET(StanetRemoteControl.RemoteControlNode.Connessione con);
+        string GET(string cmd, long IdConnessione);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GET", ReplyAction="http://tempuri.org/IService1/GETResponse")]
-        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> GETAsync(StanetRemoteControl.RemoteControlNode.Connessione con);
+        System.Threading.Tasks.Task<string> GETAsync(string cmd, long IdConnessione);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/POST", ReplyAction="http://tempuri.org/IService1/POSTResponse")]
-        StanetRemoteControl.RemoteControlNode.Connessione POST(StanetRemoteControl.RemoteControlNode.Connessione con);
+        string POST(string Screen, long IdConnessione);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/POST", ReplyAction="http://tempuri.org/IService1/POSTResponse")]
-        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> POSTAsync(StanetRemoteControl.RemoteControlNode.Connessione con);
+        System.Threading.Tasks.Task<string> POSTAsync(string Screen, long IdConnessione);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -365,20 +365,20 @@ namespace StanetRemoteControl.RemoteControlNode {
             return base.Channel.ChiediAccessoAsync(user, psw, mioId);
         }
         
-        public StanetRemoteControl.RemoteControlNode.Connessione GET(StanetRemoteControl.RemoteControlNode.Connessione con) {
-            return base.Channel.GET(con);
+        public string GET(string cmd, long IdConnessione) {
+            return base.Channel.GET(cmd, IdConnessione);
         }
         
-        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> GETAsync(StanetRemoteControl.RemoteControlNode.Connessione con) {
-            return base.Channel.GETAsync(con);
+        public System.Threading.Tasks.Task<string> GETAsync(string cmd, long IdConnessione) {
+            return base.Channel.GETAsync(cmd, IdConnessione);
         }
         
-        public StanetRemoteControl.RemoteControlNode.Connessione POST(StanetRemoteControl.RemoteControlNode.Connessione con) {
-            return base.Channel.POST(con);
+        public string POST(string Screen, long IdConnessione) {
+            return base.Channel.POST(Screen, IdConnessione);
         }
         
-        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> POSTAsync(StanetRemoteControl.RemoteControlNode.Connessione con) {
-            return base.Channel.POSTAsync(con);
+        public System.Threading.Tasks.Task<string> POSTAsync(string Screen, long IdConnessione) {
+            return base.Channel.POSTAsync(Screen, IdConnessione);
         }
     }
 }

@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using Newtonsoft.Json;
 
 namespace StanetRemoteControl
 {
@@ -48,10 +49,10 @@ namespace StanetRemoteControl
                     var b = true;
                     while ( b ) 
                     {
-                        connUscita = serv.GET(connUscita);
+                        connUscita.Screen = serv.GET(connUscita.Command, connUscita.ID);
                         if (connUscita.Screen != null) {
-                            if ((int)connUscita.Screen.Tag == -1) { b = false; }//Connessione chiusa dal controllato
-                            pictureBox1.Image = ResizeImage(connUscita.Screen, pictureBox1.Width, pictureBox1.Height);
+                            if ((int)connUscita.Screen.CompareTo("FINE") == 0) { b = false; this.Dispose(); }//Connessione chiusa dal controllato
+                            pictureBox1.Image = ResizeImage((Bitmap)Newtonsoft.Json.JsonConvert.DeserializeObject(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
                         }
                     }
                 }).Start();

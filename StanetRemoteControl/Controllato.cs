@@ -6,9 +6,12 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
+using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 
 namespace StanetRemoteControl
@@ -32,7 +35,7 @@ namespace StanetRemoteControl
             else
             {
                 /*altrimenti utilizza la macchina registrata*/
-                mac = JsonSerializer.Deserialize<Macchina>(macchina);
+                mac = System.Text.Json.JsonSerializer.Deserialize<Macchina>(macchina);
             }
 
             connIngresso = paginaConn.serv.ApriConnessione(mac);
@@ -45,8 +48,8 @@ namespace StanetRemoteControl
                 while ( b ) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
-                    connIngresso.Screen = immagine;
-                    connIngresso = paginaConn.serv.POST(connIngresso);
+                    connIngresso.Screen = Newtonsoft.Json.JsonConvert.SerializeObject(immagine);
+                    connIngresso.Command = paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
 
                     /*esegue operazione a seconda del comando*/
                     switch (connIngresso.Command) 
@@ -59,8 +62,9 @@ namespace StanetRemoteControl
                         default:
                             try
                             {
-                                if (connIngresso.Command != null && connIngresso.Command.CompareTo("FINE") != 0)
-                                { COMANDO = JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
+                                if (connIngresso.Command.CompareTo("FINE") != 0)
+                                { COMANDO = System.Text.Json.JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
+                                else { this.Dispose(); }
                             }
                             catch (Exception e) { }
                             break;
