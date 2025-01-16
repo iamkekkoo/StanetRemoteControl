@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -42,14 +43,10 @@ namespace StanetRemoteControl
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
 
-                    var jpegCodec = ImageCodecInfo.GetImageEncoders().First(enc => enc.FormatID == ImageFormat.Jpeg.Guid);
-                    var jpegParams = new EncoderParameters(1);
-                    jpegParams.Param = new[] { new EncoderParameter(Encoder.Quality, 100L) };                    
-
                     // creat packet
                     //ImagePacket packet = new ImagePacket(ImageToByte(GetCompressedBitmap(immagine, 60L)));
 
-                    connIngresso.Screen = GetCompressedBitmap(immagine, 60L);
+                    connIngresso.Screen = imageToByteArray(immagine);
                     connIngresso.Command = paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
 
                     /*esegue operazione a seconda del comando*/
@@ -85,10 +82,21 @@ namespace StanetRemoteControl
             }).Start();
         }
 
-        public byte[] ImageToByte(Image img)
+        public byte[] imageToByteArray(System.Drawing.Image imageIn)
         {
-            ImageConverter converter = new ImageConverter();
-            return (byte[])converter.ConvertTo(img, typeof(byte[]));
+            MemoryStream ms = new MemoryStream();
+            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            return ms.ToArray();
+        }
+
+        public static byte[] Compress(byte[] data)
+        {
+            MemoryStream output = new MemoryStream();
+            using (DeflateStream dstream = new DeflateStream(output, CompressionLevel.Optimal))
+            {
+                dstream.Write(data, 0, data.Length);
+            }
+            return output.ToArray();
         }
 
         private Image GetCompressedBitmap(Bitmap bmp, long quality)

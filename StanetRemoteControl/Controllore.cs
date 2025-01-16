@@ -47,13 +47,13 @@ namespace StanetRemoteControl
                         // conver bytes to Image
                         //Image receive_image = BytesToImage(packet.GetRawData());
 
-                        if (connUscita.Screen != null && (int)connUscita.Screen.Tag != -1)
+                        if (connUscita.Screen != null && connUscita.Screen != BitConverter.GetBytes(-1))
                         {
-                            pictureBox1.Image = ResizeImage(connUscita.Screen, pictureBox1.Width, pictureBox1.Height);
+                            pictureBox1.Image = ResizeImage(BytesToImage(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
                         }
                         else 
                         {
-                            if ((int)connUscita.Screen.Tag == -1) { b = false; this.Dispose(); }//Connessione chiusa dal controllato
+                            if (connUscita.Screen == BitConverter.GetBytes(-1)) { b = false; this.Dispose(); }//Connessione chiusa dal controllato
                         }
                     }
                 }).Start();

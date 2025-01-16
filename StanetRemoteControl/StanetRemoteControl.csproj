@@ -172,7 +172,6 @@
     <Compile Include="Controllore.Designer.cs">
       <DependentUpon>Controllore.cs</DependentUpon>
     </Compile>
-    <Compile Include="ImagePacket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Controllato.resx">
@@ -192,9 +191,6 @@
     </Compile>
     <None Include="Connected Services\RemoteControlNode\Service1.wsdl" />
     <None Include="Connected Services\RemoteControlNode\Service1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\RemoteControlNode\Service11.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\RemoteControlNode\Service12.xsd">
