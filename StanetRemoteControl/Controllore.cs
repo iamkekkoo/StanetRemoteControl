@@ -50,7 +50,7 @@ namespace StanetRemoteControl
 
                         if (connUscita.Screen != null && connUscita.Screen != BitConverter.GetBytes(-1))
                         {
-                            pictureBox1.Image = BytesToImage(connUscita.Screen);
+                            pictureBox1.Image = ResizeImage(BytesToImage(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
                         }
                         else 
                         {
