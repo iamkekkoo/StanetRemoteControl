@@ -26,11 +26,12 @@ namespace StanetRemoteControl
                 button1.Visible = false;
                 label1.Visible = false;
 
-                this.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
-                this.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
+                this.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100 + pictureBox1.Padding.Top;
+                this.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100 + pictureBox1.Padding.Left;
 
                 pictureBox1.Width = this.Width;
                 pictureBox1.Height = this.Height;
+
 
                 pictureBox1.Visible = true;
                 new Thread(delegate ()
