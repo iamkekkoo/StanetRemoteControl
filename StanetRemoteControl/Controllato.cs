@@ -41,7 +41,7 @@ namespace StanetRemoteControl
                 var b = true;
                 while ( b ) 
                 {
-                    Graphics.FromImage(immagine).CopyFromScreen(0,0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height));
+                    Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size);
                     connIngresso.Screen = imageToByteArray(immagine);
                     connIngresso.Command = paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
 
