@@ -51,6 +51,7 @@ namespace StanetRemoteControl
                         case "FINE":
                             /*termina la comunicazione col client*/
                             b = false;
+                            this.Dispose();
                             break;
 
                         default:
