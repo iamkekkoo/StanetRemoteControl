@@ -163,7 +163,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         private long ID_ControlloreField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ScreenField;
+        private System.Drawing.Image ScreenField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Nullable<System.DateTime> TimeField;
@@ -244,7 +244,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Screen {
+        public System.Drawing.Image Screen {
             get {
                 return this.ScreenField;
             }
@@ -302,16 +302,16 @@ namespace StanetRemoteControl.RemoteControlNode {
         System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GET", ReplyAction="http://tempuri.org/IService1/GETResponse")]
-        string GET(string cmd, long IdConnessione);
+        System.Drawing.Image GET(string cmd, long IdConnessione);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GET", ReplyAction="http://tempuri.org/IService1/GETResponse")]
-        System.Threading.Tasks.Task<string> GETAsync(string cmd, long IdConnessione);
+        System.Threading.Tasks.Task<System.Drawing.Image> GETAsync(string cmd, long IdConnessione);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/POST", ReplyAction="http://tempuri.org/IService1/POSTResponse")]
-        string POST(string Screen, long IdConnessione);
+        string POST(System.Drawing.Image Screen, long IdConnessione);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/POST", ReplyAction="http://tempuri.org/IService1/POSTResponse")]
-        System.Threading.Tasks.Task<string> POSTAsync(string Screen, long IdConnessione);
+        System.Threading.Tasks.Task<string> POSTAsync(System.Drawing.Image Screen, long IdConnessione);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -365,19 +365,19 @@ namespace StanetRemoteControl.RemoteControlNode {
             return base.Channel.ChiediAccessoAsync(user, psw, mioId);
         }
         
-        public string GET(string cmd, long IdConnessione) {
+        public System.Drawing.Image GET(string cmd, long IdConnessione) {
             return base.Channel.GET(cmd, IdConnessione);
         }
         
-        public System.Threading.Tasks.Task<string> GETAsync(string cmd, long IdConnessione) {
+        public System.Threading.Tasks.Task<System.Drawing.Image> GETAsync(string cmd, long IdConnessione) {
             return base.Channel.GETAsync(cmd, IdConnessione);
         }
         
-        public string POST(string Screen, long IdConnessione) {
+        public string POST(System.Drawing.Image Screen, long IdConnessione) {
             return base.Channel.POST(Screen, IdConnessione);
         }
         
-        public System.Threading.Tasks.Task<string> POSTAsync(string Screen, long IdConnessione) {
+        public System.Threading.Tasks.Task<string> POSTAsync(System.Drawing.Image Screen, long IdConnessione) {
             return base.Channel.POSTAsync(Screen, IdConnessione);
         }
     }

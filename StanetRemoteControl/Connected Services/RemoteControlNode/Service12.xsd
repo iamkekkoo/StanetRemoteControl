@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/RemoteControlHub" />
+  <xs:import schemaLocation="https://remotecontrolhub.azurewebsites.net/Service1.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/System.Drawing" />
   <xs:element name="RegistraMacchina">
     <xs:complexType>
       <xs:sequence>
@@ -56,14 +57,14 @@
   <xs:element name="GETResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="GETResult" nillable="true" type="xs:string" />
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/System.Drawing" minOccurs="0" name="GETResult" nillable="true" type="q6:Image" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="POST">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="Screen" nillable="true" type="xs:string" />
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/System.Drawing" minOccurs="0" name="Screen" nillable="true" type="q7:Image" />
         <xs:element minOccurs="0" name="IdConnessione" type="xs:long" />
       </xs:sequence>
     </xs:complexType>

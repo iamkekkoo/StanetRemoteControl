@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
-using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 
 namespace StanetRemoteControl
@@ -48,7 +41,15 @@ namespace StanetRemoteControl
                 while ( b ) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
-                    connIngresso.Screen = Newtonsoft.Json.JsonConvert.SerializeObject(immagine);
+
+                    var jpegCodec = ImageCodecInfo.GetImageEncoders().First(enc => enc.FormatID == ImageFormat.Jpeg.Guid);
+                    var jpegParams = new EncoderParameters(1);
+                    jpegParams.Param = new[] { new EncoderParameter(Encoder.Quality, 100L) };                    
+
+                    // creat packet
+                    //ImagePacket packet = new ImagePacket(ImageToByte(GetCompressedBitmap(immagine, 60L)));
+
+                    connIngresso.Screen = GetCompressedBitmap(immagine, 60L);
                     connIngresso.Command = paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
 
                     /*esegue operazione a seconda del comando*/
@@ -62,9 +63,8 @@ namespace StanetRemoteControl
                         default:
                             try
                             {
-                                if (connIngresso.Command.CompareTo("FINE") != 0)
+                                if (connIngresso.Command != null)
                                 { COMANDO = System.Text.Json.JsonSerializer.Deserialize<EventArgs>(connIngresso.Command); }
-                                else { this.Dispose(); }
                             }
                             catch (Exception e) { }
                             break;
@@ -83,6 +83,25 @@ namespace StanetRemoteControl
                 paginaConn.IdMacchina = mac.ID;
                 Application.Run(paginaConn);
             }).Start();
+        }
+
+        public byte[] ImageToByte(Image img)
+        {
+            ImageConverter converter = new ImageConverter();
+            return (byte[])converter.ConvertTo(img, typeof(byte[]));
+        }
+
+        private Image GetCompressedBitmap(Bitmap bmp, long quality)
+        {
+            using (var mss = new MemoryStream())
+            {
+                EncoderParameter qualityParam = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
+                ImageCodecInfo imageCodec = ImageCodecInfo.GetImageEncoders().FirstOrDefault(o => o.FormatID == ImageFormat.Jpeg.Guid);
+                EncoderParameters parameters = new EncoderParameters(1);
+                parameters.Param[0] = qualityParam;
+                bmp.Save(mss, imageCodec, parameters);
+                return Image.FromStream(mss);
+            }
         }
     }
 }

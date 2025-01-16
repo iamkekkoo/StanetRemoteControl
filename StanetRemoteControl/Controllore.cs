@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
-using Newtonsoft.Json;
 
 namespace StanetRemoteControl
 {
@@ -50,9 +40,20 @@ namespace StanetRemoteControl
                     while ( b ) 
                     {
                         connUscita.Screen = serv.GET(connUscita.Command, connUscita.ID);
-                        if (connUscita.Screen != null) {
-                            if ((int)connUscita.Screen.CompareTo("FINE") == 0) { b = false; this.Dispose(); }//Connessione chiusa dal controllato
-                            pictureBox1.Image = ResizeImage((Bitmap)Newtonsoft.Json.JsonConvert.DeserializeObject(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
+
+                        //ImagePacket packet = System.Text.Json.JsonSerializer.Deserialize<ImagePacket>(connUscita.Screen);
+
+                        //byte[] receive_bytes = packet.GetRawData();
+                        // conver bytes to Image
+                        //Image receive_image = BytesToImage(packet.GetRawData());
+
+                        if (connUscita.Screen != null && (int)connUscita.Screen.Tag != -1)
+                        {
+                            pictureBox1.Image = ResizeImage(connUscita.Screen, pictureBox1.Width, pictureBox1.Height);
+                        }
+                        else 
+                        {
+                            if ((int)connUscita.Screen.Tag == -1) { b = false; this.Dispose(); }//Connessione chiusa dal controllato
                         }
                     }
                 }).Start();
@@ -90,40 +91,13 @@ namespace StanetRemoteControl
 
             return destImage;
         }
-    }
 
-    public class immagine {
-        public object Tag;
-        public struct PhysicalDimension 
+        public static Image BytesToImage(byte[] value)
         {
-            public bool IsEmpty;
-            public int Width;
-            public int Height;
+            using (var ms = new MemoryStream(value))
+            {
+                return Image.FromStream(ms);
+            }
         }
-        public struct Size 
-        {
-            public bool IsEmpty;
-            public int Width;
-            public int Height;
-        }
-        public int Width;
-        public int Height;
-        public int HorizontalResolution;
-        public int VerticalResolution;
-        public int Flags;
-        public struct RawFormat 
-        {
-            public string Guid;
-        }
-        public int PixelFormat;
-        public struct Palette 
-        {
-            public int Flags;
-            public List<Object> Entries;
-        }
-        public List<String> FrameDimensionsList;
-        public List<object> PropertyIdList;
-        public List<object> PropertyItems;
     }
-
 }

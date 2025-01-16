@@ -22,7 +22,7 @@ namespace StanetRemoteControl
         protected override void Dispose(bool disposing)
         {
             connUscita.Command = "FINE";
-            serv.GET(connUscita);
+            serv.GET(connUscita.Command, connUscita.ID);
             if (disposing && (components != null))
             {
                 components.Dispose();
