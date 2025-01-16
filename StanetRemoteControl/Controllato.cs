@@ -42,7 +42,7 @@ namespace StanetRemoteControl
                 while ( b ) 
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(new Point(rec.Left, rec.Top), Point.Empty, rec.Size);
-                    connIngresso.Screen = imageToByteArray(GetCompressedBitmap(immagine, 60L));
+                    connIngresso.Screen = imageToByteArray(immagine);
                     connIngresso.Command = paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
 
                     /*esegue operazione a seconda del comando*/
