@@ -85,21 +85,13 @@ namespace StanetRemoteControl
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.Black;
-            this.pictureBox1.Location = new System.Drawing.Point(80, 162);
+            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox1.Location = new System.Drawing.Point(12, 424);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(634, 208);
+            this.pictureBox1.Size = new System.Drawing.Size(34, 17);
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
-
-            /*pictureBox1.Click += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            pictureBox1.DoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<EventArgs>(e); };
-            pictureBox1.MouseClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<System.Windows.Forms.MouseEventArgs>(new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).X, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).Y, e.Delta)); };
-            pictureBox1.MouseDoubleClick += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<System.Windows.Forms.MouseEventArgs>(new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).X, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).Y, e.Delta)); };
-            pictureBox1.MouseMove += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<System.Windows.Forms.MouseEventArgs>(new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).X, pictureBox1.PointToClient(new System.Drawing.Point(e.X, e.Y)).Y, e.Delta)); };
-            pictureBox1.PreviewKeyDown += (sender, e) => { connUscita.Command = JsonSerializer.Serialize<PreviewKeyDownEventArgs>(e); };
-            */
             // 
             // label1
             // 

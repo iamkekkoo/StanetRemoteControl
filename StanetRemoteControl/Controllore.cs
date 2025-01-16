@@ -21,17 +21,17 @@ namespace StanetRemoteControl
             connUscita = serv.ChiediAccesso(textBox1.Text, textBox2.Text, IdMacchina);
             if (connUscita.ID != 0) 
             {
-                textBox1.Visible = false;
-                textBox2.Visible = false;
-                button1.Visible = false;
-                label1.Visible = false;
+                textBox1.Size = new Size(0, 0);
+                textBox2.Size = new Size(0, 0);
+                button1.Size = new Size(0, 0);
+                label1.Size = new Size(0, 0);
 
-                this.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100 + pictureBox1.Padding.Top;
-                this.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100 + pictureBox1.Padding.Left;
+                this.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
+                this.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
 
                 pictureBox1.Width = this.Width;
                 pictureBox1.Height = this.Height;
-
+                pictureBox1.SetBounds(0,0,this.Width,this.Height);
 
                 pictureBox1.Visible = true;
                 new Thread(delegate ()
