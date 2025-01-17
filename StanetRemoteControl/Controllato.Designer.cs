@@ -166,7 +166,7 @@ namespace StanetRemoteControl
         public Connessione connIngresso = new Connessione();
         public Controllore paginaConn = new Controllore();
 
-        public Rectangle rec = new Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+        public Rectangle rec = new Rectangle(0, 0, SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
         public Bitmap immagine;
 
         public EventArgs COMANDO;

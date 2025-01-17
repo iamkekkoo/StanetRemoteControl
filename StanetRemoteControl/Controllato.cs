@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
@@ -41,10 +42,10 @@ namespace StanetRemoteControl
                 var b = true;
                 while ( b ) 
                 {
-                    Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size);
+                    Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, rec.Size);
                     connIngresso.Screen = imageToByteArray(immagine);
                     connIngresso.Command = paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
-
+                    //pictureBox1.Image = ResizeImage(immagine, pictureBox1.Width+1, pictureBox1.Height+1);
                     /*esegue operazione a seconda del comando*/
                     switch (connIngresso.Command) 
                     {
@@ -96,17 +97,29 @@ namespace StanetRemoteControl
             return output.ToArray();
         }
 
-        private Image GetCompressedBitmap(Bitmap bmp, long quality)
+        private Bitmap ResizeImage(Image image, int width, int height)
         {
-            using (var mss = new MemoryStream())
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
             {
-                EncoderParameter qualityParam = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
-                ImageCodecInfo imageCodec = ImageCodecInfo.GetImageEncoders().FirstOrDefault(o => o.FormatID == ImageFormat.Jpeg.Guid);
-                EncoderParameters parameters = new EncoderParameters(1);
-                parameters.Param[0] = qualityParam;
-                bmp.Save(mss, imageCodec, parameters);
-                return Image.FromStream(mss);
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
             }
+
+            return destImage;
         }
     }
 }
