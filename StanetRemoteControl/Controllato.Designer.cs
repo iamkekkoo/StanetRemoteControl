@@ -5,6 +5,9 @@ using System.Windows.Forms;
 using System.Text.Json;
 using System.Windows.Forms.VisualStyles;
 using StanetRemoteControl.RemoteControlNode;
+using System.IO;
+using System.Windows;
+using System.Collections.Generic;
 
 namespace StanetRemoteControl
 {
@@ -21,8 +24,14 @@ namespace StanetRemoteControl
         /// <param name="disposing">ha valore true se le risorse gestite devono essere eliminate, false in caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
-            connIngresso.Screen = BitConverter.GetBytes(-1);
-            paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
+            attivo = false;
+
+            foreach (var conn in connIngresso) 
+            {
+                conn.Screen = BitConverter.GetBytes(0);
+                paginaConn.serv.POST(conn.Screen, conn.ID);
+            }
+
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -44,8 +53,6 @@ namespace StanetRemoteControl
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // label5
@@ -55,7 +62,7 @@ namespace StanetRemoteControl
             this.label5.ForeColor = System.Drawing.Color.Red;
             this.label5.Location = new System.Drawing.Point(14, 530);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(0, 26);
+            this.label5.Size = new System.Drawing.Size(50, 26);
             this.label5.TabIndex = 5;
             // 
             // label1
@@ -101,7 +108,7 @@ namespace StanetRemoteControl
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F);
-            this.button1.Location = new System.Drawing.Point(316, 315);
+            this.button1.Location = new System.Drawing.Point(308, 363);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(296, 96);
@@ -110,14 +117,6 @@ namespace StanetRemoteControl
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(659, 360);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(229, 190);
-            this.pictureBox1.TabIndex = 6;
-            this.pictureBox1.TabStop = false;
-            // 
             // Controllato
             // 
             this.AcceptButton = this.button1;
@@ -125,7 +124,6 @@ namespace StanetRemoteControl
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(900, 562);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
@@ -135,9 +133,10 @@ namespace StanetRemoteControl
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "Controllato";
             this.Text = "Stanet Remote Control";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
+            this.FormClosed += (sender, e) => Dispose();
 
         }
 
@@ -162,16 +161,20 @@ namespace StanetRemoteControl
             set { label5.Text = value; }
         }
 
-        public Macchina mac = new Macchina();
-        public Connessione connIngresso = new Connessione();
-        public Controllore paginaConn = new Controllore();
+        public static Macchina mac = new Macchina();
+        private static List<Connessione> connIngresso = new List<Connessione>();
+        private Controllore paginaConn = new Controllore();
+        private static int i;
+        private static bool attivo = true;
 
-        public Rectangle rec = new Rectangle(0, 0, SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
-        public Bitmap immagine;
+        private FileStream fs;
+        private StreamReader reader;
+        private StreamWriter writer;
+        private string macchina;
 
-        public EventArgs COMANDO;
+        private Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width+1000, Screen.AllScreens[0].Bounds.Height+800);
 
-        public ImageConverter converter;
+        private EventArgs COMANDO;
 
         private Label label1;
         private Label label2;
@@ -179,7 +182,6 @@ namespace StanetRemoteControl
         private Label label4;
         private Label label5;
         private Button button1;
-        private PictureBox pictureBox1;
     }
 }
 

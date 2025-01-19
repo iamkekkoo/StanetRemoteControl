@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Interop;
 
 namespace StanetRemoteControl
 {
@@ -32,65 +33,29 @@ namespace StanetRemoteControl
                 pictureBox1.Width = this.Width;
                 pictureBox1.Height = this.Height;
                 pictureBox1.SetBounds(0,0,this.Width,this.Height);
-
+                pictureBox1.BackColor = Color.Black;
                 pictureBox1.Visible = true;
                 new Thread(delegate ()
                 {
-                    converter = new ImageConverter();
-                    var b = true;
-                    while ( b ) 
+                    attivo = true;
+                    while ( attivo && connUscita.Screen != BitConverter.GetBytes(0)) 
                     {
                         connUscita.Screen = serv.GET(connUscita.Command, connUscita.ID);
-
-                        //ImagePacket packet = System.Text.Json.JsonSerializer.Deserialize<ImagePacket>(connUscita.Screen);
-
-                        //byte[] receive_bytes = packet.GetRawData();
-                        // conver bytes to Image
-                        //Image receive_image = BytesToImage(packet.GetRawData());
-
-                        if (connUscita.Screen != null && connUscita.Screen != BitConverter.GetBytes(-1))
+                        if (connUscita.Screen != null)
                         {
-                            pictureBox1.Image = ResizeImage(BytesToImage(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
+                            /*resize dell'immagine rispetto alla grandezza della finestra (lasciando le proporzioni dell'immagine)*/
+                            if (pictureBox1.Width >= pictureBox1.Height)
+                            { pictureBox1.Image = (Image)(new Bitmap(BytesToImage(connUscita.Screen), pictureBox1.Width, BytesToImage(connUscita.Screen).Height * pictureBox1.Width / BytesToImage(connUscita.Screen).Width)); }
+                            else
+                            { pictureBox1.Image = (Image)(new Bitmap(BytesToImage(connUscita.Screen), BytesToImage(connUscita.Screen).Width * pictureBox1.Height / BytesToImage(connUscita.Screen).Height, pictureBox1.Height)); }
                         }
                         else 
                         {
-                            if (connUscita.Screen == BitConverter.GetBytes(-1)) { b = false; this.Dispose(); }//Connessione chiusa dal controllato
+                            if (connUscita.Screen == BitConverter.GetBytes(0)) { attivo = false; this.Dispose(); }//Connessione chiusa dal controllato
                         }
                     }
                 }).Start();
             }
-        }
-
-        /// <summary>
-        /// Resize the image to the specified width and height.
-        /// </summary>
-        /// <param name="image">The image to resize.</param>
-        /// <param name="width">The width to resize to.</param>
-        /// <param name="height">The height to resize to.</param>
-        /// <returns>The resized image.</returns>
-        private Bitmap ResizeImage(Image image, int width, int height)
-        {
-            var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(width, height);
-
-            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(destImage))
-            {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-
-            return destImage;
         }
 
         public static Image BytesToImage(byte[] value)
