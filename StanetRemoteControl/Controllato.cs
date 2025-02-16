@@ -62,57 +62,58 @@ namespace StanetRemoteControl
             MioId = mac.User;
             MiaPsw = mac.Password;
 
-            /*il thread avvia una nuova connessione ogni volta che viene chiusa la connessione con un client (max 1 controllore alla volta)*/
-            new Thread(delegate ()
-            {
-                i = 0;
+            /*il thread aggiunge una connessione allo stack ogni volta che l'ultima dello stack viene impegnata (multiconnessione lato ricevitore)*/
+            
                 while (attivo)
                 {
-                    while (connIngresso[i].ID_Controllore == 0)
-                    {
-                        connIngresso[i] = paginaConn.serv.ApriConnessione(mac);
-                    }
+                    new Thread(delegate ()
+                        {
+                            while (connIngresso[connIngresso.Count-1].ID_Controllore == 0)
+                            {
+                                connIngresso[connIngresso.Count - 1] = paginaConn.serv.ApriConnessione(mac);
+                            }
+
+                            connIngresso.Add(new Connessione());
+                            
+                        }).Start();
 
                     new Thread(delegate ()
-                    {
-                        var k = i;
-
-                        var b = true;
-                        while (b)
                         {
-                            Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, immagine.Size);
-                            connIngresso[k].Screen = imageToByteArray(immagine);
-                            connIngresso[k].Command = paginaConn.serv.POST(connIngresso[k].Screen, connIngresso[k].ID);
+                            var k = connIngresso.Count - 2;
 
-                            /*esegue operazione a seconda del comando*/
-                            if (connIngresso[k].Command != null)
+                            var b = true;
+                            while (b)
                             {
-                                if (connIngresso[k].Command.CompareTo("FINE") == 0)
+                                Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, immagine.Size);
+                                connIngresso[k].Screen = imageToByteArray(immagine);
+                                connIngresso[k].Command = paginaConn.serv.POST(connIngresso[k].Screen, connIngresso[k].ID);
+
+                                /*esegue operazione a seconda del comando*/
+                                if (connIngresso[k].Command != null)
                                 {
-                                    /*comunicazione terminata dal controllore*/
-                                    b = false;
-                                }
-                                else
-                                {
-                                    /*prova a deserializzare in tutti i tipi possibili (in caso di eccezione passa al tipo successivo)*/
-                                    try { Errore = connIngresso[k].Command; }
-                                    catch (Exception e)
+                                    if (connIngresso[k].Command.CompareTo("FINE") == 0)
                                     {
+                                        /*comunicazione terminata dal controllore*/
+                                        b = false;
+                                    }
+                                    else
+                                    {
+                                        /*prova a deserializzare in tutti i tipi possibili (in caso di eccezione passa al tipo successivo)*/
                                         try { Errore = connIngresso[k].Command; }
-                                        catch (Exception e2)
+                                        catch (Exception e)
                                         {
-                                            Errore = e2.Message;
+                                            try { Errore = connIngresso[k].Command; }
+                                            catch (Exception e2)
+                                            {
+                                                Errore = e2.Message;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    }).Start();
+                        }).Start();
                 }
 
-                connIngresso.Add(new Connessione());
-                i++;
-            }).Start();
         }
 
         private void button1_Click(object sender, EventArgs e)

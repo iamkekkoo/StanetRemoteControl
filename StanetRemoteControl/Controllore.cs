@@ -35,8 +35,7 @@ namespace StanetRemoteControl
                 pictureBox1.SetBounds(0,0,this.Width,this.Height);
                 pictureBox1.BackColor = Color.Black;
                 pictureBox1.Visible = true;
-                new Thread(delegate ()
-                {
+                
                     attivo = true;
                     while ( attivo && connUscita.Screen != BitConverter.GetBytes(0)) 
                     {
@@ -54,7 +53,7 @@ namespace StanetRemoteControl
                             if (connUscita.Screen == BitConverter.GetBytes(0)) { attivo = false; this.Dispose(); }//Connessione chiusa dal controllato
                         }
                     }
-                }).Start();
+                
             }
         }
 
