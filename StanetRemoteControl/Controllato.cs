@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using StanetRemoteControl.RemoteControlNode;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
+using System.IO.Pipelines;
+using System.Runtime.Remoting.Messaging;
 
 namespace StanetRemoteControl
 {
@@ -21,6 +18,61 @@ namespace StanetRemoteControl
         {
             InitializeComponent();
             connIngresso.Add(new Connessione());
+
+            //Thread di connessione lato controllato
+            Thread avviaConnessione = new Thread(delegate ()
+            {
+                var k = connIngresso.Count - 1;
+
+                var b = true;
+                while (b)
+                {
+                    Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, immagine.Size);
+                    connIngresso[k].Screen = imageToByteArray(immagine);
+                    connIngresso[k].Command = paginaConn.serv.POST(connIngresso[k].Screen, connIngresso[k].ID);
+
+                    /*esegue operazione a seconda del comando*/
+                    if (connIngresso[k].Command != null)
+                    {
+                        if (connIngresso[k].Command.CompareTo("FINE") == 0)
+                        {
+                            /*comunicazione terminata dal controllore*/
+                            b = false;
+                        }
+                        else
+                        {
+                            /*prova a deserializzare in tutti i tipi possibili (in caso di eccezione passa al tipo successivo)*/
+                            try { Errore = connIngresso[k].Command; }
+                            catch (Exception e)
+                            {
+                                try { Errore = connIngresso[k].Command; }
+                                catch (Exception e2)
+                                {
+                                    Errore = e2.Message;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            /*Thread di avvio del controllato*/
+            inizioControllato = new Thread(delegate () {
+                /*il thread aggiunge una connessione allo stack ogni volta che l'ultima dello stack viene impegnata (multiconnessione lato ricevitore)*/
+                while (attivo)
+                {
+
+
+                    while (connIngresso[connIngresso.Count - 1].ID_Controllore == 0)
+                    {
+                        connIngresso[connIngresso.Count - 1] = paginaConn.serv.ApriConnessione(mac);
+                    }
+
+                    avviaConnessione.Start();
+                    connIngresso.Add(new Connessione());
+
+                }
+            });
 
             /*cerca macchina registrata*/
             string dir = AppDomain.CurrentDomain.BaseDirectory + "\\StanetRemoteControl";
@@ -62,58 +114,7 @@ namespace StanetRemoteControl
             MioId = mac.User;
             MiaPsw = mac.Password;
 
-            /*il thread aggiunge una connessione allo stack ogni volta che l'ultima dello stack viene impegnata (multiconnessione lato ricevitore)*/
-            
-                while (attivo)
-                {
-                    new Thread(delegate ()
-                        {
-                            while (connIngresso[connIngresso.Count-1].ID_Controllore == 0)
-                            {
-                                connIngresso[connIngresso.Count - 1] = paginaConn.serv.ApriConnessione(mac);
-                            }
-
-                            connIngresso.Add(new Connessione());
-                            
-                        }).Start();
-
-                    new Thread(delegate ()
-                        {
-                            var k = connIngresso.Count - 2;
-
-                            var b = true;
-                            while (b)
-                            {
-                                Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, immagine.Size);
-                                connIngresso[k].Screen = imageToByteArray(immagine);
-                                connIngresso[k].Command = paginaConn.serv.POST(connIngresso[k].Screen, connIngresso[k].ID);
-
-                                /*esegue operazione a seconda del comando*/
-                                if (connIngresso[k].Command != null)
-                                {
-                                    if (connIngresso[k].Command.CompareTo("FINE") == 0)
-                                    {
-                                        /*comunicazione terminata dal controllore*/
-                                        b = false;
-                                    }
-                                    else
-                                    {
-                                        /*prova a deserializzare in tutti i tipi possibili (in caso di eccezione passa al tipo successivo)*/
-                                        try { Errore = connIngresso[k].Command; }
-                                        catch (Exception e)
-                                        {
-                                            try { Errore = connIngresso[k].Command; }
-                                            catch (Exception e2)
-                                            {
-                                                Errore = e2.Message;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }).Start();
-                }
-
+            return;
         }
 
         private void button1_Click(object sender, EventArgs e)

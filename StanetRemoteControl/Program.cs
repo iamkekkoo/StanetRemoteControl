@@ -24,12 +24,16 @@ namespace StanetRemoteControl
         {
             /*Variabili*/
             Application.SetCompatibleTextRenderingDefault(false);
+
             
             /*crea la pagina e la inserisce nell'applicazione corrente*/
             Controllato pagina = new Controllato();
 
-            Application.EnableVisualStyles();            
-            Application.Run(pagina);
+            Application.EnableVisualStyles();
+            new Thread(delegate () { Application.Run(pagina); }).Start() ;
+
+            /*L'esecuzione delle operazioni ha inizio*/
+            pagina.inizioControllato.Start();
         }
     }
 }

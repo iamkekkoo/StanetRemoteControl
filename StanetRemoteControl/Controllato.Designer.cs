@@ -8,6 +8,7 @@ using StanetRemoteControl.RemoteControlNode;
 using System.IO;
 using System.Windows;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace StanetRemoteControl
 {
@@ -163,8 +164,9 @@ namespace StanetRemoteControl
 
         public static Macchina mac = new Macchina();
         private static List<Connessione> connIngresso = new List<Connessione>();
+        public Thread inizioControllato;
         private Controllore paginaConn = new Controllore();
-        private static int i;
+        
         private static bool attivo = true;
 
         private FileStream fs;
@@ -172,7 +174,7 @@ namespace StanetRemoteControl
         private StreamWriter writer;
         private string macchina;
 
-        private Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width+1000, Screen.AllScreens[0].Bounds.Height+800);
+        private static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width+1000, Screen.AllScreens[0].Bounds.Height+800);
 
         private EventArgs COMANDO;
 
