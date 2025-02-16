@@ -44,9 +44,9 @@ namespace StanetRemoteControl
                         {
                             /*resize dell'immagine rispetto alla grandezza della finestra (lasciando le proporzioni dell'immagine)*/
                             if (pictureBox1.Width >= pictureBox1.Height)
-                            { pictureBox1.Image = (Image)(new Bitmap(BytesToImage(connUscita.Screen), pictureBox1.Width, BytesToImage(connUscita.Screen).Height * pictureBox1.Width / BytesToImage(connUscita.Screen).Width)); }
-                            else
                             { pictureBox1.Image = (Image)(new Bitmap(BytesToImage(connUscita.Screen), BytesToImage(connUscita.Screen).Width * pictureBox1.Height / BytesToImage(connUscita.Screen).Height, pictureBox1.Height)); }
+                            else
+                            { pictureBox1.Image = (Image)(new Bitmap(BytesToImage(connUscita.Screen), pictureBox1.Width, BytesToImage(connUscita.Screen).Height * pictureBox1.Width / BytesToImage(connUscita.Screen).Width)); }
                         }
                         else 
                         {

@@ -63,7 +63,7 @@ namespace StanetRemoteControl
             this.label5.ForeColor = System.Drawing.Color.Red;
             this.label5.Location = new System.Drawing.Point(14, 530);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(50, 26);
+            this.label5.Size = new System.Drawing.Size(0, 26);
             this.label5.TabIndex = 5;
             // 
             // label1
@@ -109,7 +109,7 @@ namespace StanetRemoteControl
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F);
-            this.button1.Location = new System.Drawing.Point(308, 363);
+            this.button1.Location = new System.Drawing.Point(301, 327);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(296, 96);
@@ -136,8 +136,6 @@ namespace StanetRemoteControl
             this.Text = "Stanet Remote Control";
             this.ResumeLayout(false);
             this.PerformLayout();
-
-            this.FormClosed += (sender, e) => Dispose();
 
         }
 

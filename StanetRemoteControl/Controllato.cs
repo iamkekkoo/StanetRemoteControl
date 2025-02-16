@@ -28,8 +28,7 @@ namespace StanetRemoteControl
                 while (b)
                 {
                     Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, immagine.Size);
-                    connIngresso[k].Screen = imageToByteArray(immagine);
-                    connIngresso[k].Command = paginaConn.serv.POST(connIngresso[k].Screen, connIngresso[k].ID);
+                    connIngresso[k].Command = paginaConn.serv.POST(imageToByteArray(immagine), connIngresso[k].ID);
 
                     /*esegue operazione a seconda del comando*/
                     if (connIngresso[k].Command != null)
@@ -61,8 +60,6 @@ namespace StanetRemoteControl
                 /*il thread aggiunge una connessione allo stack ogni volta che l'ultima dello stack viene impegnata (multiconnessione lato ricevitore)*/
                 while (attivo)
                 {
-
-
                     while (connIngresso[connIngresso.Count - 1].ID_Controllore == 0)
                     {
                         connIngresso[connIngresso.Count - 1] = paginaConn.serv.ApriConnessione(mac);
