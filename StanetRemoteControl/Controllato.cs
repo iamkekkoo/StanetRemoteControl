@@ -17,23 +17,24 @@ namespace StanetRemoteControl
         public Controllato()
         {
             InitializeComponent();
-            connIngresso.Add(new Connessione());
+            byte[] bx;
 
             //Thread di connessione lato controllato
-            Thread avviaConnessione = new Thread(delegate ()
+            Thread avviaConnessione = new Thread( delegate ()
             {
-                var k = connIngresso.Count - 1;
+                var k = connIngresso.Count-1;
 
                 var b = true;
                 while (b)
                 {
-                    Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, immagine.Size);
-                    connIngresso[k].Command = paginaConn.serv.POST(imageToByteArray(immagine), connIngresso[k].ID);
-
+                    Graphics.FromImage(immagine).CopyFromScreen(0, 0, immagine.Width, immagine.Height, immagine.Size);
+                    bx = imageToByteArray(immagine);
+                    connIngresso[k].conn.Command = Controllore.serv.POST(bx, connIngresso[k].conn.ID);
+                    Thread.Sleep(400);
                     /*esegue operazione a seconda del comando*/
-                    if (connIngresso[k].Command != null)
+                    if (connIngresso[k].conn.Command != null)
                     {
-                        if (connIngresso[k].Command.CompareTo("FINE") == 0)
+                        if (connIngresso[k].conn.Command.CompareTo("FINE") == 0)
                         {
                             /*comunicazione terminata dal controllore*/
                             b = false;
@@ -41,15 +42,7 @@ namespace StanetRemoteControl
                         else
                         {
                             /*prova a deserializzare in tutti i tipi possibili (in caso di eccezione passa al tipo successivo)*/
-                            try { Errore = connIngresso[k].Command; }
-                            catch (Exception e)
-                            {
-                                try { Errore = connIngresso[k].Command; }
-                                catch (Exception e2)
-                                {
-                                    Errore = e2.Message;
-                                }
-                            }
+                            
                         }
                     }
                 }
@@ -58,16 +51,20 @@ namespace StanetRemoteControl
             /*Thread di avvio del controllato*/
             inizioControllato = new Thread(delegate () {
                 /*il thread aggiunge una connessione allo stack ogni volta che l'ultima dello stack viene impegnata (multiconnessione lato ricevitore)*/
+                long id;
                 while (attivo)
                 {
-                    while (connIngresso[connIngresso.Count - 1].ID_Controllore == 0)
+                    connIngresso.Add((Controllore.serv.ApriConnessione(mac), avviaConnessione));
+                    id = Controllore.serv.ApriConnessione(mac).ID;
+
+                    do
                     {
-                        connIngresso[connIngresso.Count - 1] = paginaConn.serv.ApriConnessione(mac);
-                    }
+                        connIngresso[connIngresso.Count - 1].conn.ID = Controllore.serv.ApriConnessione(mac).ID;
+                        Thread.Sleep(1500);
+                    } while (connIngresso[connIngresso.Count - 1].conn.ID == id) ;
 
-                    avviaConnessione.Start();
-                    connIngresso.Add(new Connessione());
-
+                    (id, connIngresso[connIngresso.Count - 1].conn.ID) = (connIngresso[connIngresso.Count - 1].conn.ID, id);
+                    connIngresso[connIngresso.Count - 1].t.Start();
                 }
             });
 
@@ -96,7 +93,7 @@ namespace StanetRemoteControl
             {
                 //file appena creato -> vuoto
                 //Se non presente la registra
-                mac = paginaConn.serv.RegistraMacchina(new Macchina());
+                mac = Controllore.serv.RegistraMacchina(new Macchina());
                 writer.Write(JsonConvert.SerializeObject(mac));
             }
             else
@@ -125,7 +122,7 @@ namespace StanetRemoteControl
             }).Start();
         }
 
-        private static byte[] imageToByteArray(System.Drawing.Image imageIn)
+        public byte[] imageToByteArray(Image imageIn)
         {
             MemoryStream ms = new MemoryStream();
             imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Png);

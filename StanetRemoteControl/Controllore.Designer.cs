@@ -140,7 +140,7 @@ namespace StanetRemoteControl
         #endregion
         
 
-        public IService1 serv = new RemoteControlNode.Service1Client();
+        public static IService1 serv = new RemoteControlNode.Service1Client();
         private Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
         private ImageConverter converter;

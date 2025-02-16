@@ -9,6 +9,7 @@ using System.IO;
 using System.Windows;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StanetRemoteControl
 {
@@ -27,10 +28,10 @@ namespace StanetRemoteControl
         {
             attivo = false;
 
-            foreach (var conn in connIngresso) 
+            foreach (var Conn in connIngresso) 
             {
-                conn.Screen = BitConverter.GetBytes(0);
-                paginaConn.serv.POST(conn.Screen, conn.ID);
+                Conn.conn.Screen = BitConverter.GetBytes(0);
+                Controllore.serv.POST(Conn.conn.Screen, Conn.conn.ID);
             }
 
             if (disposing && (components != null))
@@ -109,7 +110,7 @@ namespace StanetRemoteControl
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F);
-            this.button1.Location = new System.Drawing.Point(301, 327);
+            this.button1.Location = new System.Drawing.Point(302, 349);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(296, 96);
@@ -160,28 +161,28 @@ namespace StanetRemoteControl
             set { label5.Text = value; }
         }
 
-        public static Macchina mac = new Macchina();
-        private static List<Connessione> connIngresso = new List<Connessione>();
+        public Macchina mac = new Macchina();
+        public List<(Connessione conn, Thread t)> connIngresso = new List<(Connessione, Thread)>();
         public Thread inizioControllato;
-        private Controllore paginaConn = new Controllore();
+        public Controllore paginaConn = new Controllore();
         
-        private static bool attivo = true;
+        public bool attivo = true;
 
-        private FileStream fs;
-        private StreamReader reader;
-        private StreamWriter writer;
-        private string macchina;
+        public FileStream fs;
+        public StreamReader reader;
+        public StreamWriter writer;
+        public string macchina;
 
-        private static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width+1000, Screen.AllScreens[0].Bounds.Height+800);
+        public Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width+1000, Screen.AllScreens[0].Bounds.Height+800);
 
-        private EventArgs COMANDO;
+        public EventArgs COMANDO;
 
-        private Label label1;
-        private Label label2;
-        private Label label3;
-        private Label label4;
-        private Label label5;
-        private Button button1;
+        public Label label1;
+        public Label label2;
+        public Label label3;
+        public Label label4;
+        public Label label5;
+        public Button button1;
     }
 }
 

@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using System.Reflection;
 
 namespace StanetRemoteControl
 {
@@ -30,14 +31,14 @@ namespace StanetRemoteControl
                 this.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
                 this.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
 
-                pictureBox1.Width = this.Width;
-                pictureBox1.Height = this.Height;
-                pictureBox1.SetBounds(0,0,this.Width,this.Height);
+                pictureBox1.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100 - 100;
+                pictureBox1.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100 - 80;
+                pictureBox1.SetBounds(0,0, Screen.PrimaryScreen.Bounds.Width * 60 / 100 - 100, Screen.PrimaryScreen.Bounds.Height * 60 / 100 - 80);
                 pictureBox1.BackColor = Color.Black;
                 pictureBox1.Visible = true;
-                
+
                     attivo = true;
-                    while ( attivo && connUscita.Screen != BitConverter.GetBytes(0)) 
+                    while (attivo && connUscita.Screen != BitConverter.GetBytes(0))
                     {
                         connUscita.Screen = serv.GET(connUscita.Command, connUscita.ID);
                         if (connUscita.Screen != null)
@@ -48,11 +49,12 @@ namespace StanetRemoteControl
                             else
                             { pictureBox1.Image = (Image)(new Bitmap(BytesToImage(connUscita.Screen), pictureBox1.Width, BytesToImage(connUscita.Screen).Height * pictureBox1.Width / BytesToImage(connUscita.Screen).Width)); }
                         }
-                        else 
+                        else
                         {
                             if (connUscita.Screen == BitConverter.GetBytes(0)) { attivo = false; this.Dispose(); }//Connessione chiusa dal controllato
                         }
                     }
+                    
                 
             }
         }

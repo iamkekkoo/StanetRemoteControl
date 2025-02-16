@@ -30,10 +30,13 @@ namespace StanetRemoteControl
             Controllato pagina = new Controllato();
 
             Application.EnableVisualStyles();
-            new Thread(delegate () { Application.Run(pagina); }).Start() ;
 
             /*L'esecuzione delle operazioni ha inizio*/
             pagina.inizioControllato.Start();
+
+            Application.Run(pagina);
+
+            
         }
     }
 }
