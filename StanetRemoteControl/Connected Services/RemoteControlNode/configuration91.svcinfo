@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="9.1" CheckSum="KURH4LYd6PCPGiGI4hNJl2neGDd2aXHi8uf9w9wJbzI=">
+<SavedWcfConfigurationInformation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="9.1" CheckSum="ZsOycgylkD0bJ9pwyNPdO1w5/tnwt87vhNPXdspKxVc=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_IService1">
       <properties>
@@ -221,10 +221,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_IService1" contract="RemoteControlNode.IService1" bindingType="basicHttpBinding" address="http://remotecontrolhub.azurewebsites.net/Service1.svc" bindingConfiguration="BasicHttpBinding_IService1">
+    <endpoint name="BasicHttpBinding_IService1" contract="RemoteControlNode.IService1" bindingType="basicHttpBinding" address="http://francescostdev.azurewebsites.net/Service1.svc" bindingConfiguration="BasicHttpBinding_IService1">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://remotecontrolhub.azurewebsites.net/Service1.svc</serializedValue>
+          <serializedValue>http://francescostdev.azurewebsites.net/Service1.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
@@ -306,10 +306,10 @@
         </property>
       </properties>
     </endpoint>
-    <endpoint name="BasicHttpsBinding_IService11" contract="RemoteControlNode.IService1" bindingType="basicHttpBinding" address="https://remotecontrolhub.azurewebsites.net/Service1.svc" bindingConfiguration="BasicHttpsBinding_IService11">
+    <endpoint name="BasicHttpsBinding_IService11" contract="RemoteControlNode.IService1" bindingType="basicHttpBinding" address="https://francescostdev.azurewebsites.net/Service1.svc" bindingConfiguration="BasicHttpsBinding_IService11">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>https://remotecontrolhub.azurewebsites.net/Service1.svc</serializedValue>
+          <serializedValue>https://francescostdev.azurewebsites.net/Service1.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />

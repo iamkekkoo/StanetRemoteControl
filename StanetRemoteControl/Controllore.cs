@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StanetRemoteControl
@@ -21,35 +22,53 @@ namespace StanetRemoteControl
             connUscita = serv.ChiediAccesso(textBox1.Text, textBox2.Text, IdMacchina);
             if (connUscita.ID != 0) 
             {
+                var b = true;
+
                 textBox1.Size = new Size(0, 0);
                 textBox2.Size = new Size(0, 0);
                 button1.Size = new Size(0, 0);
                 label1.Size = new Size(0, 0);
 
-                this.Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
-                this.Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
-
-                pictureBox1.Width = this.Width;
-                pictureBox1.Height = this.Height;
-                pictureBox1.SetBounds(0,0,this.Width,this.Height);
+                this.BackColor = Color.Black;
 
                 pictureBox1.Visible = true;
-                new Thread(delegate ()
+
+                connUscita.Screen = serv.GET(connUscita.Command, connUscita.ID);
+
+                if (connUscita.Screen != null && connUscita.Screen != BitConverter.GetBytes(-1))
+                {
+                    if (this.Width >= this.Height)
+                    {
+                        ResizePictureBox((BytesToImage(connUscita.Screen).Width / BytesToImage(connUscita.Screen).Height) * pictureBox1.Height, this.Height);
+                    }
+                    else
+                    {
+                        ResizePictureBox(this.Width, (BytesToImage(connUscita.Screen).Height / BytesToImage(connUscita.Screen).Width) * pictureBox1.Width);
+                    }
+                    
+                }
+                else
+                {
+                    if (connUscita.Screen == BitConverter.GetBytes(-1)) { b = false; this.Dispose(); }//Connessione chiusa dal controllato
+                }
+
+                new Thread(async delegate ()
                 {
                     converter = new ImageConverter();
-                    var b = true;
                     while ( b ) 
                     {
                         connUscita.Screen = serv.GET(connUscita.Command, connUscita.ID);
 
-                        //ImagePacket packet = System.Text.Json.JsonSerializer.Deserialize<ImagePacket>(connUscita.Screen);
-
-                        //byte[] receive_bytes = packet.GetRawData();
-                        // conver bytes to Image
-                        //Image receive_image = BytesToImage(packet.GetRawData());
-
                         if (connUscita.Screen != null && connUscita.Screen != BitConverter.GetBytes(-1))
                         {
+                            if (this.Width >= this.Height)
+                            {
+                                await ResizePictureBox((BytesToImage(connUscita.Screen).Width / BytesToImage(connUscita.Screen).Height) * pictureBox1.Height, this.Height);
+                            }
+                            else
+                            {
+                                await ResizePictureBox(this.Width, (BytesToImage(connUscita.Screen).Height / BytesToImage(connUscita.Screen).Width) * pictureBox1.Width);
+                            }
                             pictureBox1.Image = ResizeImage(BytesToImage(connUscita.Screen), pictureBox1.Width, pictureBox1.Height);
                         }
                         else 
@@ -58,6 +77,8 @@ namespace StanetRemoteControl
                         }
                     }
                 }).Start();
+
+                if (connUscita.Screen == BitConverter.GetBytes(-1)) { this.Close(); this.Dispose(); }//Connessione chiusa dal controllato 
             }
         }
 
@@ -91,6 +112,11 @@ namespace StanetRemoteControl
             }
 
             return destImage;
+        }
+
+        private Task ResizePictureBox(int width, int height) 
+        {
+            pictureBox1.Width = width; pictureBox1.Height = height; return Task.CompletedTask;
         }
 
         public static Image BytesToImage(byte[] value)

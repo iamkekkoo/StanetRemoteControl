@@ -4,7 +4,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using StanetRemoteControl.RemoteControlNode;
@@ -34,7 +33,6 @@ namespace StanetRemoteControl
             }
 
             connIngresso = paginaConn.serv.ApriConnessione(mac);
-
             /*Se la connessione è disponibile parte il thread di condivisione dello schermo (e lettura dei comandi)*/
             new Thread(delegate() 
             {
@@ -45,7 +43,7 @@ namespace StanetRemoteControl
                     Graphics.FromImage(immagine).CopyFromScreen(0, 0, 0, 0, rec.Size);
                     connIngresso.Screen = imageToByteArray(immagine);
                     connIngresso.Command = paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
-                    //pictureBox1.Image = ResizeImage(immagine, pictureBox1.Width+1, pictureBox1.Height+1);
+
                     /*esegue operazione a seconda del comando*/
                     switch (connIngresso.Command) 
                     {
