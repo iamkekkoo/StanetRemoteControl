@@ -25,41 +25,18 @@ namespace StanetRemoteControl
             /*Variabili*/
             Application.SetCompatibleTextRenderingDefault(false);
 
-            FileStream fs;
-            StreamReader reader;
-            string macchina;
+            
+            /*crea la pagina e la inserisce nell'applicazione corrente*/
+            Controllato pagina = new Controllato();
 
-            string path = AppDomain.CurrentDomain.BaseDirectory;
-            string dir = path + "\\StanetRemoteControl";
-            string filename = dir + "\\Macchina.txt";
-            /*-----------------------*/
+            Application.EnableVisualStyles();
 
+            /*L'esecuzione delle operazioni ha inizio*/
+            pagina.inizioControllato.Start();
 
-            /*Lavoro sulle directory per leggere il file Macchina*/
-            if (!Directory.Exists(dir)) 
-            {
-                Directory.CreateDirectory(dir);
-            }
-            fs = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            reader = new StreamReader(fs);
-            macchina = reader.ReadToEnd();
+            Application.Run(pagina);
 
             
-            Controllato pagina = new Controllato(macchina);
-
-            /*Qui devo registrare la macchina creata da pagina su file*/
-
-            /*--------------------------------------------------------*/
-
-            reader.Dispose();
-            fs.Dispose();
-             
-            pagina.MioId = pagina.mac.User;
-            pagina.MiaPsw = pagina.mac.Password;
-                      
-
-            Application.EnableVisualStyles();            
-            Application.Run(pagina);
         }
     }
 }

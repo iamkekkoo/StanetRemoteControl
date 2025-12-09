@@ -5,6 +5,11 @@ using System.Windows.Forms;
 using System.Text.Json;
 using System.Windows.Forms.VisualStyles;
 using StanetRemoteControl.RemoteControlNode;
+using System.IO;
+using System.Windows;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace StanetRemoteControl
 {
@@ -21,8 +26,14 @@ namespace StanetRemoteControl
         /// <param name="disposing">ha valore true se le risorse gestite devono essere eliminate, false in caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
-            connIngresso.Screen = BitConverter.GetBytes(-1);
-            paginaConn.serv.POST(connIngresso.Screen, connIngresso.ID);
+            attivo = false;
+
+            foreach (var Conn in connIngresso) 
+            {
+                Conn.conn.Screen = BitConverter.GetBytes(0);
+                Controllore.serv.POST(Conn.conn.Screen, Conn.conn.ID);
+            }
+
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -44,8 +55,6 @@ namespace StanetRemoteControl
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // label5
@@ -101,7 +110,7 @@ namespace StanetRemoteControl
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F);
-            this.button1.Location = new System.Drawing.Point(316, 315);
+            this.button1.Location = new System.Drawing.Point(302, 349);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(296, 96);
@@ -110,14 +119,6 @@ namespace StanetRemoteControl
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(659, 360);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(229, 190);
-            this.pictureBox1.TabIndex = 6;
-            this.pictureBox1.TabStop = false;
-            // 
             // Controllato
             // 
             this.AcceptButton = this.button1;
@@ -125,7 +126,6 @@ namespace StanetRemoteControl
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(900, 562);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
@@ -135,7 +135,6 @@ namespace StanetRemoteControl
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "Controllato";
             this.Text = "Stanet Remote Control";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -163,23 +162,27 @@ namespace StanetRemoteControl
         }
 
         public Macchina mac = new Macchina();
-        public Connessione connIngresso = new Connessione();
+        public List<(Connessione conn, Thread t)> connIngresso = new List<(Connessione, Thread)>();
+        public Thread inizioControllato;
         public Controllore paginaConn = new Controllore();
+        
+        public bool attivo = true;
 
-        public Rectangle rec = new Rectangle(0, 0, SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height);
-        public Bitmap immagine;
+        public FileStream fs;
+        public StreamReader reader;
+        public StreamWriter writer;
+        public string macchina;
+
+        public Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width+1000, Screen.AllScreens[0].Bounds.Height+800);
 
         public EventArgs COMANDO;
 
-        public ImageConverter converter;
-
-        private Label label1;
-        private Label label2;
-        private Label label3;
-        private Label label4;
-        private Label label5;
-        private Button button1;
-        private PictureBox pictureBox1;
+        public Label label1;
+        public Label label2;
+        public Label label3;
+        public Label label4;
+        public Label label5;
+        public Button button1;
     }
 }
 
