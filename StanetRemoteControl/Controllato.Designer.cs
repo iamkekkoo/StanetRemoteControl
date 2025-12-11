@@ -30,7 +30,7 @@ namespace StanetRemoteControl
 
             foreach (var Conn in connIngresso) 
             {
-                Conn.conn.Screen = BitConverter.GetBytes(0);
+                Conn.conn.Screen = BitConverter.GetBytes(100);
                 Controllore.serv.POST(Conn.conn.Screen, Conn.conn.ID);
             }
 
@@ -55,6 +55,8 @@ namespace StanetRemoteControl
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            pictureBox1 = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // label5
@@ -62,9 +64,10 @@ namespace StanetRemoteControl
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.Color.Red;
-            this.label5.Location = new System.Drawing.Point(14, 530);
+            this.label5.Location = new System.Drawing.Point(9, 344);
+            this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(0, 26);
+            this.label5.Size = new System.Drawing.Size(0, 18);
             this.label5.TabIndex = 5;
             // 
             // label1
@@ -72,9 +75,10 @@ namespace StanetRemoteControl
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Monotype Corsiva", 36F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(111, 99);
+            this.label1.Location = new System.Drawing.Point(74, 64);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(284, 85);
+            this.label1.Size = new System.Drawing.Size(194, 57);
             this.label1.TabIndex = 0;
             this.label1.Text = "Il tuo ID";
             // 
@@ -82,9 +86,10 @@ namespace StanetRemoteControl
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(128, 189);
+            this.label2.Location = new System.Drawing.Point(85, 123);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(0, 46);
+            this.label2.Size = new System.Drawing.Size(0, 31);
             this.label2.TabIndex = 1;
             // 
             // label4
@@ -92,9 +97,10 @@ namespace StanetRemoteControl
             this.label4.AutoSize = true;
             this.label4.BackColor = System.Drawing.Color.Transparent;
             this.label4.Font = new System.Drawing.Font("Monotype Corsiva", 36F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(501, 99);
+            this.label4.Location = new System.Drawing.Point(334, 64);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(292, 85);
+            this.label4.Size = new System.Drawing.Size(196, 57);
             this.label4.TabIndex = 2;
             this.label4.Text = "Password";
             // 
@@ -102,39 +108,51 @@ namespace StanetRemoteControl
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(548, 189);
+            this.label3.Location = new System.Drawing.Point(365, 123);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(0, 46);
+            this.label3.Size = new System.Drawing.Size(0, 31);
             this.label3.TabIndex = 3;
             // 
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F);
-            this.button1.Location = new System.Drawing.Point(302, 349);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.button1.Location = new System.Drawing.Point(201, 227);
+            this.button1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(296, 96);
+            this.button1.Size = new System.Drawing.Size(197, 62);
             this.button1.TabIndex = 4;
             this.button1.Text = "Connetti";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Location = new System.Drawing.Point(13, 190);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new System.Drawing.Size(183, 163);
+            pictureBox1.TabIndex = 6;
+            pictureBox1.TabStop = false;
+            pictureBox1.BackColor = Color.White;
+            // 
             // Controllato
             // 
             this.AcceptButton = this.button1;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(900, 562);
+            this.ClientSize = new System.Drawing.Size(600, 365);
+            this.Controls.Add(pictureBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "Controllato";
             this.Text = "Stanet Remote Control";
+            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -161,19 +179,19 @@ namespace StanetRemoteControl
             set { label5.Text = value; }
         }
 
-        public Macchina mac = new Macchina();
-        public List<(Connessione conn, Thread t)> connIngresso = new List<(Connessione, Thread)>();
-        public Thread inizioControllato;
+        public static Macchina mac = new Macchina();
+        public static List<(Connessione conn, System.Threading.Tasks.Task t)> connIngresso = new List<(Connessione, Task)>();
         public Controllore paginaConn = new Controllore();
-        
-        public bool attivo = true;
+        public static byte[] bx;
+        public static bool attivo = true;
 
         public FileStream fs;
         public StreamReader reader;
         public StreamWriter writer;
         public string macchina;
 
-        public Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width+1000, Screen.AllScreens[0].Bounds.Height+800);
+        public Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
+        
 
         public EventArgs COMANDO;
 
@@ -183,6 +201,7 @@ namespace StanetRemoteControl
         public Label label4;
         public Label label5;
         public Button button1;
+        public static PictureBox pictureBox1;
     }
 }
 

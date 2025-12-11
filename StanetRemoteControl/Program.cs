@@ -1,14 +1,14 @@
 ﻿using StanetRemoteControl.RemoteControlNode;
 using System;
-using System.Windows.Forms;
-using System.Text.Json;
-using System.IO;
 using System.Drawing;
-using System.Threading;
-
-using System.Text;
+using System.IO;
 using System.Net.Http.Headers;
 using System.Security;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace StanetRemoteControl
 {
@@ -22,21 +22,11 @@ namespace StanetRemoteControl
         [STAThread]
         static void Main()
         {
-            /*Variabili*/
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            
-            /*crea la pagina e la inserisce nell'applicazione corrente*/
-            Controllato pagina = new Controllato();
-
             Application.EnableVisualStyles();
-
-            /*L'esecuzione delle operazioni ha inizio*/
-            pagina.inizioControllato.Start();
-
-            Application.Run(pagina);
-
+            Application.SetCompatibleTextRenderingDefault(false);
             
+            Application.Run(new Controllato());
+
         }
     }
 }

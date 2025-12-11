@@ -2,12 +2,10 @@
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
-using System.IO.Pipelines;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,116 +18,147 @@ namespace StanetRemoteControl
         public Controllato()
         {
             InitializeComponent();
-            byte[] bx;
 
-            //Thread di connessione lato controllato
-            Thread avviaConnessione = new Thread(delegate ()
-                {
-                var b = true;
-                while (b)
-                {
-                    //Graphics.FromImage(immagine).CopyFromScreen(0, 0, immagine.Width, immagine.Height, immagine.Size);
-                    bx = CaptureFullScreen();
-                    connIngresso[id].conn.Command = Controllore.serv.POST(bx, connIngresso[ThreadID].conn.ID);
-                    /*esegue operazione a seconda del comando*/
-                    if (connIngresso[ThreadID].conn.Command != null)
-                    {
-                        if (connIngresso[ThreadID].conn.Command.CompareTo("FINE") == 0)
-                        {
-                            /*comunicazione terminata dal controllore*/
-                            b = false;
-                        }
-                        else
-                        {
-                            /*prova a deserializzare in tutti i tipi possibili (in caso di eccezione passa al tipo successivo)*/
-                            try
-                            {
-                                // Tentativo: comando di tipo MOUSE
-                                var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(connIngresso[ThreadID].conn.Command);
-                                if (mouseCmd != null && mouseCmd.Type == "MOUSE")
-                                {
-                                    EseguiMouse(mouseCmd);
-                                    continue;
-                                }
-                            }
-                            catch (Exception e) { }
-
-                            try
-                            {
-                                // Tentativo: comando di tipo KEY
-                                var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(connIngresso[ThreadID].conn.Command);
-                                if (keyCmd != null && keyCmd.Type == "KEY")
-                                {
-                                    EseguiKey(keyCmd);
-                                    continue;
-                                }
-                            }
-                            catch (Exception e) { }
-                        }
-                    }
-                }
-            });
-
-            /*Thread di avvio del controllato*/
-            Thread inizioControllato = new Thread(delegate ()
-            {
-                /*il thread aggiunge una connessione allo stack ogni volta che l'ultima dello stack viene impegnata (multiconnessione lato ricevitore)*/
-                do
-                {
-                    connIngresso.Add((Controllore.serv.ApriConnessione(mac), avviaConnessione));
-
-                    do
-                    {
-                        Controllore.serv.POST(BitConverter.GetBytes(1), connIngresso[connIngresso.Count - 1].conn.ID);
-                    } while (connIngresso[connIngresso.Count - 1].conn.ID_Controllore != 0);
-
-                    connIngresso[connIngresso.Count - 1].t.Start();
-
-                } while (attivo);
-            });
-
-            /*cerca macchina registrata*/
-            string dir = AppDomain.CurrentDomain.BaseDirectory + "StanetRemoteControl";
-            string filename = dir + "\\Macchina.txt";
-
-            /*Lavoro sulle directory per leggere il file Macchina*/
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            /*Lettura*/
-            fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Read);
-            reader = new StreamReader(fs);
-            macchina = reader.ReadToEnd();
-            fs.Flush();
-            reader.Dispose();
-            fs.Dispose();
-
-            /*Scrittura*/
-            fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Write);
-            writer = new StreamWriter(fs);
-            if (macchina.CompareTo("") == 0)
-            {
-                //file appena creato -> vuoto
-                //Se non presente la registra
-                mac = Controllore.serv.RegistraMacchina(new Macchina());
-                writer.Write(JsonConvert.SerializeObject(mac));
-            }
-            else
-            {
-                /*altrimenti utilizza la macchina registrata*/
-                mac = JsonConvert.DeserializeObject<Macchina>(macchina);
-            }
-            fs.Flush();
-            writer.Dispose();
-            fs.Dispose();
-
-            MioId = mac.User;
-            MiaPsw = mac.Password;
+            this.Load += Controllato_Load;
 
             return;
         }
+
+        private void CaricaMacchina()
+        {
+            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StanetRemoteControl");
+            string filename = Path.Combine(dir, "Macchina.txt");
+
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            if (!File.Exists(filename))
+                File.WriteAllText(filename, "");
+
+            // Lettura
+            string macchina = File.ReadAllText(filename);
+
+            if (string.IsNullOrEmpty(macchina))
+            {
+                mac = Controllore.serv.RegistraMacchina(new Macchina());
+                File.WriteAllText(filename, JsonConvert.SerializeObject(mac));
+            }
+            else
+            {
+                mac = JsonConvert.DeserializeObject<Macchina>(macchina);
+            }
+
+            MioId = mac.User;
+            MiaPsw = mac.Password;
+        }
+
+        private void Controllato_Load(object sender, EventArgs e)
+        {
+            CaricaMacchina();
+            _ = InizioControllatoAsync();  // ✔️ ORA È SICURO!
+        }
+
+        //Thread di connessione lato controllato
+        /*Thread di avvio del controllato*/
+        public async Task InizioControllatoAsync()
+        {
+            // Prima connessione
+            Connessione connessione = new Connessione();
+            string attesa = "";
+
+            // Ciclo principale per gestire multiconnessioni lato ricevitore
+            while (attivo)
+            {
+                connessione = Controllore.serv.ApriConnessione(mac);
+
+                // Avvia connessione in modo asincrono
+                var taskConn = Task.Run(() => avviaConnessione(connessione));
+                connIngresso.Add((connessione, taskConn));
+
+                // Ciclo interno per POST finché ID_Controllore != 0
+                do
+                {
+                    attesa = Controllore.serv.POST(BitConverter.GetBytes(1), connessione.ID);
+
+                    // Non blocca il thread, solo attende in modo asincrono
+                    await Task.Delay(400);
+                }while (string.IsNullOrEmpty(attesa) || attesa.CompareTo("3000") != 0) ;
+                
+                // Task già avviato con Task.Run, non serve Start
+            }
+        }
+
+
+        public async Task avviaConnessione(Connessione conn)
+        {
+            bool b = true;
+            while (b)
+            {
+                // Cattura dello schermo
+                var screenshot = CapturePrimaryScreen();
+
+                // CLONA IL BITMAP prima di assegnarlo alla UI
+                var safeImage = (Bitmap)screenshot.Clone();
+
+                // CLONA IL BITMAP prima di assegnarlo alla UI
+                var sendImage = (Bitmap)screenshot.Clone();
+
+                // Aggiornamento UI in modo thread-safe
+                if (pictureBox1.InvokeRequired)
+                {
+                    pictureBox1.Invoke(new Action(() =>
+                    {
+                        pictureBox1.Image = safeImage;
+                    }));
+                }
+                else
+                {
+                    pictureBox1.Image = safeImage;
+                }
+
+                // Invia screenshot al server e riceve comando
+                conn.Command = await Task.Run(() => Controllore.serv.POST(BitmapToBytes(sendImage), conn.ID));
+
+                if (!string.IsNullOrEmpty(conn.Command))
+                {
+                    if (conn.Command.CompareTo("FINE") == 0)
+                    {
+                        // comunicazione terminata dal controllore
+                        b = false;
+                    }
+                    else
+                    {
+                        // Tentativo di deserializzare in MouseCommand
+                        try
+                        {
+                            var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(conn.Command);
+                            if (mouseCmd != null && mouseCmd.Type == "MOUSE")
+                            {
+                                EseguiMouse(mouseCmd);
+                                continue;
+                            }
+                        }
+                        catch { }
+
+                        // Tentativo di deserializzare in KeyCommand
+                        try
+                        {
+                            var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(conn.Command);
+                            if (keyCmd != null && keyCmd.Type == "KEY")
+                            {
+                                EseguiKey(keyCmd);
+                                continue;
+                            }
+                        }
+                        catch { }
+                    }
+                }
+
+                // Attesa asincrona di 400 ms senza bloccare il thread
+                await Task.Delay(400);
+            }
+        }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -142,33 +171,33 @@ namespace StanetRemoteControl
             }).Start();
         }
 
-        public byte[] CaptureFullScreen()
+        static Bitmap CapturePrimaryScreen()
         {
-            // Ottieni risoluzione schermo
-            int width = Screen.PrimaryScreen.Bounds.Width;
-            int height = Screen.PrimaryScreen.Bounds.Height;
+            var screen = Screen.PrimaryScreen;
+            var bmp = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
 
-            using (Bitmap bmp = new Bitmap(width, height))
+            using (var g = Graphics.FromImage(bmp))
             {
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.CopyFromScreen(0, 0, 0, 0, bmp.Size);
-                }
-
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    return ms.ToArray();
-                }
+                g.CopyFromScreen(
+                    screen.Bounds.Left,
+                    screen.Bounds.Top,
+                    0,
+                    0,
+                    screen.Bounds.Size
+                );
+                g.Flush();
             }
+            
+            return bmp;
         }
 
-
-        public byte[] imageToByteArray(Image imageIn)
+        public static byte[] BitmapToBytes(Bitmap bmp)
         {
-            MemoryStream ms = new MemoryStream();
-            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-            return ms.ToArray();
+            using (var ms = new MemoryStream())
+            {
+                bmp.Save(ms, ImageFormat.Jpeg);
+                return ms.ToArray();
+            }
         }
 
         private static byte[] Compress(byte[] data)
@@ -181,12 +210,11 @@ namespace StanetRemoteControl
             return output.ToArray();
         }
 
-
-        void EseguiMouse(MouseCommand cmd)
+        static void EseguiMouse(MouseCommand cmd)
         {
             if (cmd.Action == "MOVE")
             {
-                Cursor.Position = new Point(cmd.X, cmd.Y);
+                Cursor.Position = new System.Drawing.Point(cmd.X, cmd.Y);
             }
             else
             {
@@ -198,7 +226,7 @@ namespace StanetRemoteControl
         [DllImport("user32.dll")]
         static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, UIntPtr dwExtraInfo);
 
-        uint GetMouseEvent(string action)
+        static uint GetMouseEvent(string action)
         {
             switch (action)
             {
@@ -215,7 +243,7 @@ namespace StanetRemoteControl
         [DllImport("user32.dll")]
         static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
-        void EseguiKey(KeyCommand cmd)
+        static void EseguiKey(KeyCommand cmd)
         {
             byte key = ConvertKey(cmd.Key);
 
@@ -231,7 +259,7 @@ namespace StanetRemoteControl
         }
 
         // Mappa basilare, si può estendere
-        byte ConvertKey(string key)
+        static byte ConvertKey(string key)
         {
             return (byte)Keys.Parse(typeof(Keys), key, true);
         }
@@ -251,5 +279,4 @@ namespace StanetRemoteControl
         public string Key { get; set; }   // "A", "ENTER", "CTRL+C", ecc.
         public string Action { get; set; } // "DOWN", "UP", "PRESS"
     }
-
 }

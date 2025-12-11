@@ -46,37 +46,37 @@ namespace StanetRemoteControl
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.Error = new System.Windows.Forms.Label();
-            pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox1
             // 
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F);
-            this.textBox1.Location = new System.Drawing.Point(90, 119);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.textBox1.Location = new System.Drawing.Point(60, 77);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(281, 62);
+            this.textBox1.Size = new System.Drawing.Size(189, 44);
             this.textBox1.TabIndex = 0;
             // 
             // textBox2
             // 
             this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F);
-            this.textBox2.Location = new System.Drawing.Point(522, 119);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.textBox2.Location = new System.Drawing.Point(348, 77);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(281, 62);
+            this.textBox2.Size = new System.Drawing.Size(189, 44);
             this.textBox2.TabIndex = 1;
             // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(792, 506);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.button1.Location = new System.Drawing.Point(528, 329);
+            this.button1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(96, 41);
+            this.button1.Size = new System.Drawing.Size(64, 27);
             this.button1.TabIndex = 2;
             this.button1.Text = "Invio";
             this.button1.UseVisualStyleBackColor = true;
@@ -87,54 +87,52 @@ namespace StanetRemoteControl
             this.Error.AutoSize = true;
             this.Error.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
             this.Error.ForeColor = System.Drawing.Color.Red;
-            this.Error.Location = new System.Drawing.Point(14, 530);
+            this.Error.Location = new System.Drawing.Point(9, 344);
+            this.Error.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Error.Name = "Error";
-            this.Error.Size = new System.Drawing.Size(0, 20);
+            this.Error.Size = new System.Drawing.Size(0, 13);
             this.Error.TabIndex = 3;
             // 
             // pictureBox1
             // 
-            pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            pictureBox1.Location = new System.Drawing.Point(14, 530);
-            pictureBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new System.Drawing.Size(38, 21);
-            pictureBox1.TabIndex = 4;
-            pictureBox1.TabStop = false;
-
-            pictureBox1.MouseClick += (sender, e) => { connUscita.Command = JsonConvert.SerializeObject(e); serv.GET(connUscita.Command, connUscita.ID); };
-            pictureBox1.MouseDoubleClick += (sender, e) => { connUscita.Command = JsonConvert.SerializeObject(e); serv.GET(connUscita.Command, connUscita.ID); };
-            pictureBox1.PreviewKeyDown += (sender, e) => { connUscita.Command = JsonConvert.SerializeObject(e); serv.GET(connUscita.Command, connUscita.ID); };
+            this.pictureBox1.BackColor = System.Drawing.Color.White;
+            this.pictureBox1.Location = new System.Drawing.Point(9, 158);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(371, 200);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox1.TabIndex = 4;
+            this.pictureBox1.TabStop = false;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(21, 506);
+            this.label1.Location = new System.Drawing.Point(14, 329);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 20);
+            this.label1.Size = new System.Drawing.Size(0, 13);
             this.label1.TabIndex = 5;
             // 
             // Controllore
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(900, 562);
+            this.ClientSize = new System.Drawing.Size(600, 365);
             this.Controls.Add(this.label1);
-            this.Controls.Add(pictureBox1);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.Error);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "Controllore";
             this.Text = "Stanet Remote Control";
-            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-            this.Resize += (sender, e) => { pictureBox1.Width = this.Width; pictureBox1.Height = this.Height; };
-            
+
         }
 
         #endregion
@@ -143,7 +141,6 @@ namespace StanetRemoteControl
         public static IService1 serv = new RemoteControlNode.Service1Client();
         private Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
-        private ImageConverter converter;
         private static bool attivo = true;
 
 
@@ -152,6 +149,6 @@ namespace StanetRemoteControl
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label Error;
         private System.Windows.Forms.Label label1;
-        private static PictureBox pictureBox1;
+        private PictureBox pictureBox1;
     }
 }

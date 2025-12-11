@@ -1,78 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="https://francescostdev.azurewebsites.net/Service1.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/RemoteControlHub" />
-  <xs:element name="RegistraMacchina">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="mac" nillable="true" type="q1:Macchina" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="RegistraMacchinaResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="RegistraMacchinaResult" nillable="true" type="q2:Macchina" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ApriConnessione">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="mac" nillable="true" type="q3:Macchina" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ApriConnessioneResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="ApriConnessioneResult" nillable="true" type="q4:Connessione" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ChiediAccesso">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="user" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="psw" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="mioId" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ChiediAccessoResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="ChiediAccessoResult" nillable="true" type="q5:Connessione" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GET">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="cmd" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="IdConnessione" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GETResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="GETResult" nillable="true" type="xs:base64Binary" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="POST">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="Screen" nillable="true" type="xs:base64Binary" />
-        <xs:element minOccurs="0" name="IdConnessione" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="POSTResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="POSTResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/RemoteControlHub" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/RemoteControlHub" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="Macchina">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
+      <xs:element minOccurs="0" name="IP" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PASS" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="User" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Macchina" nillable="true" type="tns:Macchina" />
+  <xs:complexType name="Connessione">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Command" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Error" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
+      <xs:element minOccurs="0" name="ID_Controllato" type="xs:long" />
+      <xs:element minOccurs="0" name="ID_Controllore" type="xs:long" />
+      <xs:element minOccurs="0" name="Screen" nillable="true" type="xs:base64Binary" />
+      <xs:element minOccurs="0" name="Time" nillable="true" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Connessione" nillable="true" type="tns:Connessione" />
 </xs:schema>
