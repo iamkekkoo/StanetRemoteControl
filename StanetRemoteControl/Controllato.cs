@@ -127,9 +127,6 @@ namespace StanetRemoteControl
                         catch { }
                     }
                 }
-
-                // Attesa asincrona di 400 ms senza bloccare il thread
-                //await Task.Delay(400);
             }
         }
 
