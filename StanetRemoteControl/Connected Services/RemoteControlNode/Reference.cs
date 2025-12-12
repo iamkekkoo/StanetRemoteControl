@@ -312,6 +312,12 @@ namespace StanetRemoteControl.RemoteControlNode {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/POST", ReplyAction="http://tempuri.org/IService1/POSTResponse")]
         System.Threading.Tasks.Task<string> POSTAsync(byte[] Screen, long IdConnessione);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CheckConnesso", ReplyAction="http://tempuri.org/IService1/CheckConnessoResponse")]
+        bool CheckConnesso(long mioId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CheckConnesso", ReplyAction="http://tempuri.org/IService1/CheckConnessoResponse")]
+        System.Threading.Tasks.Task<bool> CheckConnessoAsync(long mioId);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -379,6 +385,14 @@ namespace StanetRemoteControl.RemoteControlNode {
         
         public System.Threading.Tasks.Task<string> POSTAsync(byte[] Screen, long IdConnessione) {
             return base.Channel.POSTAsync(Screen, IdConnessione);
+        }
+        
+        public bool CheckConnesso(long mioId) {
+            return base.Channel.CheckConnesso(mioId);
+        }
+        
+        public System.Threading.Tasks.Task<bool> CheckConnessoAsync(long mioId) {
+            return base.Channel.CheckConnessoAsync(mioId);
         }
     }
 }

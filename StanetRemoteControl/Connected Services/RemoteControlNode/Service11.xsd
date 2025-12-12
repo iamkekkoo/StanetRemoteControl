@@ -75,4 +75,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="CheckConnesso">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="mioId" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CheckConnessoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="CheckConnessoResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

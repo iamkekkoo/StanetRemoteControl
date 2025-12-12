@@ -30,7 +30,7 @@ namespace StanetRemoteControl
 
             foreach (var Conn in connIngresso) 
             {
-                Conn.conn.Screen = BitConverter.GetBytes(100);
+                Conn.conn.Screen = BitConverter.GetBytes(1);
                 Controllore.serv.POST(Conn.conn.Screen, Conn.conn.ID);
             }
 
