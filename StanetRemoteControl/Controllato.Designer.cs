@@ -30,7 +30,7 @@ namespace StanetRemoteControl
 
             foreach (var Conn in connIngresso) 
             {
-                Conn.conn.Screen = BitConverter.GetBytes(100);
+                Conn.conn.Screen = BitConverter.GetBytes(1);
                 Controllore.serv.POST(Conn.conn.Screen, Conn.conn.ID);
             }
 
@@ -190,7 +190,7 @@ namespace StanetRemoteControl
         public StreamWriter writer;
         public string macchina;
 
-        public Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
+        public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
         
 
         public EventArgs COMANDO;

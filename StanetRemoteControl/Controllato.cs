@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NPOI.Util;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Drawing;
@@ -62,29 +63,23 @@ namespace StanetRemoteControl
         /*Thread di avvio del controllato*/
         public async Task InizioControllatoAsync()
         {
-            // Prima connessione
-            Connessione connessione = new Connessione();
-            string attesa = "";
+            Connessione connessione;
 
             // Ciclo principale per gestire multiconnessioni lato ricevitore
             while (attivo)
             {
                 connessione = Controllore.serv.ApriConnessione(mac);
 
-                // Avvia connessione in modo asincrono
-                var taskConn = Task.Run(() => avviaConnessione(connessione));
-                connIngresso.Add((connessione, taskConn));
-
-                // Ciclo interno per POST finché ID_Controllore != 0
+                // Ciclo interno per CheckConnesso finché ID_Controllore != 0 (CheckConnesso = true)
                 do
                 {
-                    attesa = Controllore.serv.POST(BitConverter.GetBytes(1), connessione.ID);
+                    // Non blocca il thread, solo attende in modo asincrono finchè un controllore non si connette
+                    //await Task.Delay(80);
+                }while (!(await Controllore.serv.CheckConnessoAsync(connessione.ID))) ;
 
-                    // Non blocca il thread, solo attende in modo asincrono
-                    await Task.Delay(400);
-                }while (string.IsNullOrEmpty(attesa) || attesa.CompareTo("3000") != 0) ;
-                
-                // Task già avviato con Task.Run, non serve Start
+                // Avvia connessione in modo asincrono
+                var taskConn = Task.Run(() => avviaConnessione(connessione.Copy()));
+                connIngresso.Add((connessione.Copy(), taskConn));
             }
         }
 
@@ -94,30 +89,9 @@ namespace StanetRemoteControl
             bool b = true;
             while (b)
             {
-                // Cattura dello schermo
-                var screenshot = CapturePrimaryScreen();
-
-                // CLONA IL BITMAP prima di assegnarlo alla UI
-                var safeImage = (Bitmap)screenshot.Clone();
-
-                // CLONA IL BITMAP prima di assegnarlo alla UI
-                var sendImage = (Bitmap)screenshot.Clone();
-
-                // Aggiornamento UI in modo thread-safe
-                if (pictureBox1.InvokeRequired)
-                {
-                    pictureBox1.Invoke(new Action(() =>
-                    {
-                        pictureBox1.Image = safeImage;
-                    }));
-                }
-                else
-                {
-                    pictureBox1.Image = safeImage;
-                }
-
+                conn.Screen = await Task.Run(() => BitmapToBytes(Task.Run(() => CapturePrimaryScreen()).Result));
                 // Invia screenshot al server e riceve comando
-                conn.Command = await Task.Run(() => Controllore.serv.POST(BitmapToBytes(sendImage), conn.ID));
+                conn.Command = await Controllore.serv.POSTAsync(conn.Screen, conn.ID);
 
                 if (!string.IsNullOrEmpty(conn.Command))
                 {
@@ -155,7 +129,7 @@ namespace StanetRemoteControl
                 }
 
                 // Attesa asincrona di 400 ms senza bloccare il thread
-                await Task.Delay(400);
+                //await Task.Delay(400);
             }
         }
 
@@ -191,7 +165,7 @@ namespace StanetRemoteControl
             return bmp;
         }
 
-        public static byte[] BitmapToBytes(Bitmap bmp)
+        public byte[] BitmapToBytes(Bitmap bmp)
         {
             using (var ms = new MemoryStream())
             {

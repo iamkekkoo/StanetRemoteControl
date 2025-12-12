@@ -142,7 +142,7 @@ namespace StanetRemoteControl
         private Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
         private static bool attivo = true;
-
+        public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
