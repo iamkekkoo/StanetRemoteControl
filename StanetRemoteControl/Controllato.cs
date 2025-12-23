@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNet.SignalR.Client;
+using Newtonsoft.Json;
 using NPOI.Util;
 using StanetRemoteControl.RemoteControlNode;
 using System;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
+
 namespace StanetRemoteControl
 {
     public partial class Controllato : Form
@@ -19,10 +21,61 @@ namespace StanetRemoteControl
         public Controllato()
         {
             InitializeComponent();
-
             this.Load += Controllato_Load;
+            
+            
 
             return;
+        }
+        private async Task InizializzaSignalR()
+        {
+            connection = new HubConnection("https://francescostdev.azurewebsites.net");
+            hub = connection.CreateHubProxy("ScreenHub");
+
+            // Ricezione comandi
+            hub.On<string>("ReceiveCommand", cmdJson =>
+            {
+                Task.Run(() => HandleCommand(cmdJson));
+            });
+
+            // Riconnessione
+            connection.Closed += async () =>
+            {
+                await Task.Delay(2000);
+                try
+                {
+                    await connection.Start();
+                    await hub.Invoke("JoinConnection", connessione.ID);
+                }
+                catch { }
+            };
+
+            await connection.Start();
+            await hub.Invoke("JoinConnection", connessione.ID);
+
+            // Avvia streaming
+            _ = StartStreaming(cts.Token);
+        }
+
+        private async Task StartStreaming(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                if (connection.State == ConnectionState.Connected)
+                {
+                    try
+                    {
+                        var screenBytes = CaptureScreenBytes();
+                        if (screenBytes != null && screenBytes.Length > 0)
+                        {
+                            await hub.Invoke("SendScreen", connessione.ID, screenBytes);
+                        }
+                    }
+                    catch { /* ignora eccezioni temporanee */ }
+                }
+
+                await Task.Delay(100); // 10 fps
+            }
         }
 
         private void CaricaMacchina()
@@ -56,56 +109,63 @@ namespace StanetRemoteControl
         private void Controllato_Load(object sender, EventArgs e)
         {
             CaricaMacchina();
-            _ = InizioControllatoAsync();  // ✔️ ORA È SICURO!
+
+            connessione = Controllore.serv.ApriConnessione(mac);
+            cts = new CancellationTokenSource();
+            _ = InizializzaSignalR();
+
+            //_ = InizioControllatoAsync();  // ✔️ ORA È SICURO!
         }
 
         //Thread di connessione lato controllato
         /*Thread di avvio del controllato*/
-        public async Task InizioControllatoAsync()
-        {
-            Connessione connessione;
+        //public async Task InizioControllatoAsync()
+        //{
 
             // Ciclo principale per gestire multiconnessioni lato ricevitore
-            while (attivo)
-            {
-                connessione = Controllore.serv.ApriConnessione(mac);
+            //while (attivo)
+            //{
+                
 
                 // Ciclo interno per CheckConnesso finché ID_Controllore != 0 (CheckConnesso = true)
-                do
-                {
+                //do
+                //{
                     // Non blocca il thread, solo attende in modo asincrono finchè un controllore non si connette
-                    //await Task.Delay(80);
-                }while (!(await Controllore.serv.CheckConnessoAsync(connessione.ID))) ;
+                    //await Task.Delay(200);
+                //}while (!(await Controllore.serv.CheckConnessoAsync(connessione.ID))) ;
 
                 // Avvia connessione in modo asincrono
-                var taskConn = Task.Run(() => avviaConnessione(connessione.Copy()));
-                connIngresso.Add((connessione.Copy(), taskConn));
-            }
-        }
+                //var taskConn = Task.Run(() => avviaConnessione(connessione.Copy()));
+                //connIngresso.Add((connessione.Copy(), taskConn));
+            //}
+        //}
 
 
-        public async Task avviaConnessione(Connessione conn)
+
+        /*public async Task avviaConnessione(Connessione conn)
         {
             bool b = true;
-            while (b)
-            {
-                conn.Screen = await Task.Run(() => BitmapToBytes(Task.Run(() => CapturePrimaryScreen()).Result));
-                // Invia screenshot al server e riceve comando
-                conn.Command = await Controllore.serv.POSTAsync(conn.Screen, conn.ID);
 
-                if (!string.IsNullOrEmpty(conn.Command))
+            while (b)
+            {*/
+                // Invia screenshot al server e riceve comando
+                //conn.Command = await Controllore.serv.POSTAsync(BitmapToBytes(CapturePrimaryScreen()), conn.ID);
+                //await connection.InvokeAsync("SendScreen", conn.ID, BitmapToBytes(CapturePrimaryScreen()));
+                //await Task.Delay(50);
+                /*if (!string.IsNullOrEmpty(conn.Command))
                 {
                     if (conn.Command.CompareTo("FINE") == 0)
                     {
-                        // comunicazione terminata dal controllore
+                        comunicazione terminata dal controllore
                         b = false;
                     }
                     else
                     {
-                        // Tentativo di deserializzare in MouseCommand
+                        Tentativo di deserializzare in MouseCommand
                         try
                         {
                             var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(conn.Command);
+                            
                             if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                             {
                                 EseguiMouse(mouseCmd);
@@ -114,10 +174,11 @@ namespace StanetRemoteControl
                         }
                         catch { }
 
-                        // Tentativo di deserializzare in KeyCommand
+                        Tentativo di deserializzare in KeyCommand
                         try
                         {
                             var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(conn.Command);
+                            
                             if (keyCmd != null && keyCmd.Type == "KEY")
                             {
                                 EseguiKey(keyCmd);
@@ -126,9 +187,10 @@ namespace StanetRemoteControl
                         }
                         catch { }
                     }
-                }
-            }
-        }
+                }*/
+
+         /*   }
+        }*/
 
 
         private void button1_Click(object sender, EventArgs e)
@@ -140,6 +202,48 @@ namespace StanetRemoteControl
                 paginaConn.IdMacchina = mac.ID;
                 Application.Run(paginaConn);
             }).Start();
+        }
+
+        private byte[] CaptureScreenBytes()
+        {
+            try
+            {
+                var screen = Screen.PrimaryScreen.Bounds;
+                var bmp = new Bitmap(screen.Width, screen.Height);
+                var g = Graphics.FromImage(bmp);
+                g.CopyFromScreen(screen.Left, screen.Top, 0, 0, bmp.Size);
+
+                var ms = new MemoryStream();
+                var enc = ImageCodecInfo.GetImageEncoders()[1]; // JPEG
+                var ep = new EncoderParameters(1);
+                ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
+                bmp.Save(ms, enc, ep);
+                return ms.ToArray();
+            }
+            catch { return null; }
+        }
+
+        private void HandleCommand(string cmdJson)
+        {
+            try
+            {
+                var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
+                if (mouseCmd != null && mouseCmd.Type == "MOUSE")
+                {
+                    mouseCmd.X = mouseCmd.X * Screen.PrimaryScreen.Bounds.Width / 1000;
+                    mouseCmd.Y = mouseCmd.Y * Screen.PrimaryScreen.Bounds.Height / 1000;
+                    EseguiMouse(mouseCmd);
+                    return;
+                }
+
+                var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(cmdJson);
+                if (keyCmd != null && keyCmd.Type == "KEY")
+                {
+                    EseguiKey(keyCmd);
+                    return;
+                }
+            }
+            catch { }
         }
 
         static Bitmap CapturePrimaryScreen()
@@ -167,6 +271,7 @@ namespace StanetRemoteControl
             using (var ms = new MemoryStream())
             {
                 bmp.Save(ms, ImageFormat.Jpeg);
+                ms.Flush();
                 return ms.ToArray();
             }
         }

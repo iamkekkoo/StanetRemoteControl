@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNet.SignalR.Client;
+using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Drawing;
@@ -22,8 +23,6 @@ namespace StanetRemoteControl
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            attivo = false;
-
             connUscita.Command = "FINE";
             serv.GET(connUscita.Command, connUscita.ID);
 
@@ -36,12 +35,18 @@ namespace StanetRemoteControl
 
         #region Windows Form Designer generated code
 
+
+
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
+            this.KeyPreview = true;
+            this.KeyDown += Controllore_KeyDown;
+            this.KeyUp += Controllore_KeyUp;
+
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -103,6 +108,12 @@ namespace StanetRemoteControl
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.Dock = DockStyle.Fill; // opzionale, fa riempire tutta la finestra
+            pictureBox1.MouseMove += PictureBox1_MouseMove;
+            pictureBox1.MouseDown += PictureBox1_MouseDown;
+            pictureBox1.MouseUp += PictureBox1_MouseUp;
+
             // 
             // label1
             // 
@@ -135,14 +146,113 @@ namespace StanetRemoteControl
 
         }
 
+        private void PictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            
+
+            int x = e.X * 1000 / pictureBox1.Width;
+            int y = e.Y * 1000 / pictureBox1.Height;
+
+            var cmd = new MouseCommand
+            {
+                Type = "MOUSE",
+                X = x,
+                Y = y,
+                Action = "MOVE"
+            };
+
+            SendMouseCommand(cmd);
+        }
+
+        private void PictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            string action = e.Button == MouseButtons.Left ? "LEFT_DOWN" :
+                            e.Button == MouseButtons.Right ? "RIGHT_DOWN" : "MIDDLE_DOWN";
+
+            var cmd = new MouseCommand
+            {
+                Type = "MOUSE",
+                X = e.X * 1000 / pictureBox1.Width,
+                Y = e.Y * 1000 / pictureBox1.Height,
+                Action = action
+            };
+
+            SendMouseCommand(cmd);
+        }
+
+        private void PictureBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            string action = e.Button == MouseButtons.Left ? "LEFT_UP" :
+                            e.Button == MouseButtons.Right ? "RIGHT_UP" : "MIDDLE_UP";
+
+            var cmd = new MouseCommand
+            {
+                Type = "MOUSE",
+                X = e.X * 1000 / pictureBox1.Width,
+                Y = e.Y * 1000 / pictureBox1.Height,
+                Action = action
+            };
+
+            SendMouseCommand(cmd);
+        }
+
+        private void Controllore_KeyDown(object sender, KeyEventArgs e)
+        {
+            var cmd = new KeyCommand
+            {
+                Type = "KEY",
+                Key = e.KeyCode.ToString(),
+                Action = "DOWN"
+            };
+            SendKeyCommand(cmd);
+        }
+
+        private void Controllore_KeyUp(object sender, KeyEventArgs e)
+        {
+            var cmd = new KeyCommand
+            {
+                Type = "KEY",
+                Key = e.KeyCode.ToString(),
+                Action = "UP"
+            };
+            SendKeyCommand(cmd);
+        }
+
+
+
+        private void SendMouseCommand(MouseCommand cmd)
+        {
+            if (hub == null || connection == null || connection.State != ConnectionState.Connected)
+            { return; }
+
+            try
+            {
+                hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+            }
+            catch { }
+        }
+        private void SendKeyCommand(KeyCommand cmd)
+        {
+            if (hub == null || connection == null || connection.State != ConnectionState.Connected)
+            { return; }
+
+            try
+            {
+                hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+            }
+            catch { }
+        }
         #endregion
-        
+
 
         public static IService1 serv = new RemoteControlNode.Service1Client();
         private Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
-        private static bool attivo = true;
+        //private static bool attivo = true;
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
+        private HubConnection connection;
+        private IHubProxy hub;
+        private bool connected = false;
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
