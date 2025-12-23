@@ -25,7 +25,7 @@ namespace StanetRemoteControl
         {
             connection = new HubConnection("https://francescostdev.azurewebsites.net");
             hub = connection.CreateHubProxy("ScreenHub");
-            pictureBox1.BackColor = Color.Black;
+            
             // Ricezione screen
             hub.On<byte[]>("ReceiveScreen", screenBytes =>
             {
@@ -37,7 +37,7 @@ namespace StanetRemoteControl
                 }));
             });
 
-            // riconnessione semplice
+            // riconnessione semplice a SignalR
             connection.Closed += async () =>
             {
                 await Task.Delay(2000);
@@ -64,6 +64,8 @@ namespace StanetRemoteControl
             {
                 Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
                 Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
+
+                pictureBox1.Width = Width; pictureBox1.Height = Height;
 
                 pictureBox1.Visible = true;
 
