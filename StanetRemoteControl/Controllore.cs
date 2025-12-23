@@ -37,7 +37,7 @@ namespace StanetRemoteControl
                 }));
             });
 
-            // riconnessione semplice
+            // riconnessione semplice a SignalR
             connection.Closed += async () =>
             {
                 await Task.Delay(2000);
