@@ -1,15 +1,16 @@
-﻿using System;
-using System.Drawing;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Text.Json;
-using System.Windows.Forms.VisualStyles;
+﻿using Microsoft.AspNet.SignalR.Client;
 using StanetRemoteControl.RemoteControlNode;
-using System.IO;
-using System.Windows;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace StanetRemoteControl
 {
@@ -26,14 +27,6 @@ namespace StanetRemoteControl
         /// <param name="disposing">ha valore true se le risorse gestite devono essere eliminate, false in caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
-            attivo = false;
-
-            foreach (var Conn in connIngresso) 
-            {
-                Conn.conn.Screen = BitConverter.GetBytes(1);
-                Controllore.serv.POST(Conn.conn.Screen, Conn.conn.ID);
-            }
-
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -180,10 +173,14 @@ namespace StanetRemoteControl
         }
 
         public static Macchina mac = new Macchina();
-        public static List<(Connessione conn, System.Threading.Tasks.Task t)> connIngresso = new List<(Connessione, Task)>();
+        public static List<Connessione> connIngresso = new List<Connessione>();
         public Controllore paginaConn = new Controllore();
         public static byte[] bx;
         public static bool attivo = true;
+        private HubConnection connection;
+        private IHubProxy hub;
+        private CancellationTokenSource cts;
+        private Connessione connessione;
 
         public FileStream fs;
         public StreamReader reader;

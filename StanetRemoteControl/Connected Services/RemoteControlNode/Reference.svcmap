@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="ace229f8-765f-4f07-8856-9b872214e752" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="6413b1dc-8339-4ecd-98e2-4d80779f7b3f" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,11 +22,11 @@
     <MetadataSource Address="https://francescostdev.azurewebsites.net/service1.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Service11.xsd" MetadataType="Schema" ID="3c255495-9447-4221-8361-703f1d18ce4f" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?xsd=xsd0" />
-    <MetadataFile FileName="Service111.xsd" MetadataType="Schema" ID="3e1307e2-ae70-489d-8ceb-c177b00cee97" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?xsd=xsd2" />
-    <MetadataFile FileName="Service112.xsd" MetadataType="Schema" ID="bd702ad4-ee94-441d-bf80-3d52a4794c0e" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?xsd=xsd1" />
-    <MetadataFile FileName="Service11.disco" MetadataType="Disco" ID="92b9b459-914a-4620-a6ec-e35cecd0bb57" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?disco" />
-    <MetadataFile FileName="Service11.wsdl" MetadataType="Wsdl" ID="95be67a6-c77f-4cb0-b1e5-c2bb9197f8dd" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?wsdl" />
+    <MetadataFile FileName="Service1.xsd" MetadataType="Schema" ID="226a9bd3-acba-412f-a1a5-6a46d350ab4b" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?xsd=xsd0" />
+    <MetadataFile FileName="Service11.xsd" MetadataType="Schema" ID="947d2e80-7b15-456c-a005-f7051347bcfe" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?xsd=xsd2" />
+    <MetadataFile FileName="Service12.xsd" MetadataType="Schema" ID="913976c0-f89d-46ab-bb49-f6fc7c223ced" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?xsd=xsd1" />
+    <MetadataFile FileName="Service1.disco" MetadataType="Disco" ID="cdfb83ec-6ef7-403e-817e-13fbd0b4e1d4" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?disco" />
+    <MetadataFile FileName="Service1.wsdl" MetadataType="Wsdl" ID="07dcf98f-5041-4141-9363-144045b8dad9" SourceId="1" SourceUrl="https://francescostdev.azurewebsites.net/Service1.svc?wsdl" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
