@@ -33,7 +33,7 @@ namespace StanetRemoteControl
                 pictureBox1.BeginInvoke(new Action(() =>
                 {
                     pictureBox1.Image?.Dispose();
-                    pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(screenBytes), pictureBox1.Width, pictureBox1.Height);
+                    pictureBox1.Image = (Bitmap)ResizeImage((Bitmap)BytesToImage(screenBytes), pictureBox1.Width, pictureBox1.Height).Clone();
                 }));
             });
 
@@ -65,7 +65,10 @@ namespace StanetRemoteControl
                 Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
                 Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
                 this.BackColor = Color.Black;
+                //proviamo cosi
                 pictureBox1.Width = Width * 60 / 100; pictureBox1.Height = Height * 60 / 100;
+
+
 
                 pictureBox1.Visible = true;
 
