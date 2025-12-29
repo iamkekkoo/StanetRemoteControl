@@ -64,8 +64,8 @@ namespace StanetRemoteControl
             {
                 Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
                 Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
-
-                pictureBox1.Width = Width; pictureBox1.Height = Height;
+                this.BackColor = Color.Black;
+                pictureBox1.Width = Width * 60 / 100; pictureBox1.Height = Height * 60 / 100;
 
                 pictureBox1.Visible = true;
 
