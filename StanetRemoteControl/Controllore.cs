@@ -33,7 +33,7 @@ namespace StanetRemoteControl
                 pictureBox1.BeginInvoke(new Action(() =>
                 {
                     pictureBox1.Image?.Dispose();
-                    pictureBox1.Image = (Bitmap)BytesToImage(screenBytes);
+                    pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(screenBytes), pictureBox1.Width, pictureBox1.Height);
                 }));
             });
 
