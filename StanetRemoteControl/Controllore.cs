@@ -62,9 +62,13 @@ namespace StanetRemoteControl
             
             if (connUscita.ID != 0) 
             {
+                textBox1.Size = new Size(0, 0);
+                textBox2.Size = new Size(0, 0);
+                button1.Size = new Size(0, 0);
+
                 Width = Screen.PrimaryScreen.Bounds.Width * 60 / 100;
                 Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
-                this.BackColor = Color.Black;
+                
                 //proviamo cosi
                 pictureBox1.Width = Width * 60 / 100; pictureBox1.Height = Height * 60 / 100;
 
