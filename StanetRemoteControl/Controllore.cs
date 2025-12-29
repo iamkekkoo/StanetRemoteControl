@@ -33,7 +33,7 @@ namespace StanetRemoteControl
                 pictureBox1.BeginInvoke(new Action(() =>
                 {
                     pictureBox1.Image?.Dispose();
-                    pictureBox1.Image = (Bitmap)ResizeImage((Bitmap)BytesToImage(screenBytes), pictureBox1.Width, pictureBox1.Height).Clone();
+                    pictureBox1.Image = (Bitmap)BytesToImage(screenBytes);
                 }));
             });
 
@@ -70,7 +70,7 @@ namespace StanetRemoteControl
                 Height = Screen.PrimaryScreen.Bounds.Height * 60 / 100;
                 
                 //proviamo cosi
-                pictureBox1.Width = Width * 60 / 100; pictureBox1.Height = Height * 60 / 100;
+                pictureBox1.Width = Width; pictureBox1.Height = Height;
 
 
 
@@ -120,8 +120,8 @@ namespace StanetRemoteControl
                 (float)maxW / src.Width,
                 (float)maxH / src.Height);
 
-            int w = (int)(src.Width * ratio);
-            int h = (int)(src.Height * ratio);
+            int w = (int)(maxW * ratio);
+            int h = (int)(maxH * ratio);
 
             var bmp = new Bitmap(w, h);
             using (var g = Graphics.FromImage(bmp))

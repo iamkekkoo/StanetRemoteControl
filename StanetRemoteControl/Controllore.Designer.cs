@@ -106,7 +106,7 @@ namespace StanetRemoteControl
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
-            //pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.Dock = DockStyle.Fill; // opzionale, fa riempire tutta la finestra
             pictureBox1.MouseMove += PictureBox1_MouseMove;
             pictureBox1.MouseDown += PictureBox1_MouseDown;
