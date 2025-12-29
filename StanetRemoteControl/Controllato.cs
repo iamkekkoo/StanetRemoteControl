@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -208,20 +209,38 @@ namespace StanetRemoteControl
         {
             try
             {
-                var screen = Screen.PrimaryScreen.Bounds;
-                var bmp = new Bitmap(screen.Width, screen.Height);
+                var g0 = Graphics.FromHwnd(IntPtr.Zero);
+
+                float scaleX = g0.DpiX / 96f;
+                float scaleY = g0.DpiY / 96f;
+
+                var bounds = Screen.PrimaryScreen.Bounds;
+
+                int width = (int)(bounds.Width * scaleX);
+                int height = (int)(bounds.Height * scaleY);
+
+                var bmp = new Bitmap(width, height);
                 var g = Graphics.FromImage(bmp);
-                g.CopyFromScreen(screen.Left, screen.Top, 0, 0, bmp.Size);
+
+                g.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bmp.Size);
 
                 var ms = new MemoryStream();
-                var enc = ImageCodecInfo.GetImageEncoders()[1]; // JPEG
+                var enc = ImageCodecInfo.GetImageEncoders()
+                                        .First(e => e.MimeType == "image/jpeg");
+
                 var ep = new EncoderParameters(1);
-                ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
+                ep.Param[0] = new EncoderParameter(
+                    System.Drawing.Imaging.Encoder.Quality, 50L);
+
                 bmp.Save(ms, enc, ep);
                 return ms.ToArray();
             }
-            catch { return null; }
+            catch
+            {
+                return null;
+            }
         }
+
 
         private void HandleCommand(string cmdJson)
         {
