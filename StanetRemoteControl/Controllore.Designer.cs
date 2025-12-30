@@ -107,7 +107,7 @@ namespace StanetRemoteControl
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
             
-            //pictureBox1.Dock = DockStyle.Fill; // opzionale, fa riempire tutta la finestra
+            pictureBox1.Dock = DockStyle.Fill; // opzionale, fa riempire tutta la finestra
             pictureBox1.MouseMove += PictureBox1_MouseMove;
             pictureBox1.MouseDown += PictureBox1_MouseDown;
             pictureBox1.MouseUp += PictureBox1_MouseUp;

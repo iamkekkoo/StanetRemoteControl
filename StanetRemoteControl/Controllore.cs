@@ -116,18 +116,11 @@ namespace StanetRemoteControl
 
         private static Bitmap ResizeImage(Bitmap src, int maxW, int maxH)
         {
-            float ratio = Math.Min(
-                (float)maxW / src.Width,
-                (float)maxH / src.Height);
-
-            int w = (int)(maxW * ratio);
-            int h = (int)(maxH * ratio);
-
-            var bmp = new Bitmap(w, h);
+            var bmp = new Bitmap(maxW, maxH);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.DrawImage(src, 0, 0, w, h);
+                g.DrawImage(src, 0, 0, maxW, maxH);
             }
 
             src.Dispose();
