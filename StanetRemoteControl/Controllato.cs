@@ -209,22 +209,21 @@ namespace StanetRemoteControl
         {
             try
             {
-                var g0 = Graphics.FromHwnd(IntPtr.Zero);
-
-                float scaleX = g0.DpiX / 96f;
-                float scaleY = g0.DpiY / 96f;
-
                 var bounds = Screen.PrimaryScreen.Bounds;
 
-                int width = (int)(bounds.Width * scaleX);
-                int height = (int)(bounds.Height * scaleY);
-
-                var bmp = new Bitmap(width, height);
+                var bmp = new Bitmap(bounds.Width, bounds.Height);
                 var g = Graphics.FromImage(bmp);
 
-                g.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bmp.Size);
+                g.CopyFromScreen(
+                    bounds.Left,
+                    bounds.Top,
+                    0,
+                    0,
+                    bounds.Size,
+                    CopyPixelOperation.SourceCopy);
 
                 var ms = new MemoryStream();
+
                 var enc = ImageCodecInfo.GetImageEncoders()
                                         .First(e => e.MimeType == "image/jpeg");
 
@@ -240,6 +239,7 @@ namespace StanetRemoteControl
                 return null;
             }
         }
+
 
 
         private void HandleCommand(string cmdJson)
