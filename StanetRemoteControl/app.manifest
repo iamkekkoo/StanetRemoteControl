@@ -53,14 +53,16 @@
        Imposta l'applicazione in modo riconosca i percorsi lunghi. Vedere https://docs.microsoft.com/windows/win32/fileio/maximum-file-path-limitation -->
 	<application xmlns="urn:schemas-microsoft-com:asm.v3">
 		<windowsSettings>
-			<dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
-				PerMonitorV2
-			</dpiAware>
-			<longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
-				true
-			</longPathAware>
+
+			<!-- DPI AWARENESS CORRETTA -->
+			<dpiAwareness>PerMonitorV2</dpiAwareness>
+
+			<!-- OK: percorsi lunghi -->
+			<longPathAware>true</longPathAware>
+
 		</windowsSettings>
 	</application>
+
 
 
 	<!-- Abilita i temi per finestre di dialogo e controlli comuni di Windows (Windows XP e versioni successive) -->

@@ -209,9 +209,13 @@ namespace StanetRemoteControl
         {
             try
             {
-                var bounds = Screen.PrimaryScreen.Bounds;
+                var bounds = SystemInformation.VirtualScreen;
 
-                var bmp = new Bitmap(bounds.Width, bounds.Height);
+                var bmp = new Bitmap(
+                    bounds.Width,
+                    bounds.Height,
+                    PixelFormat.Format24bppRgb);
+
                 var g = Graphics.FromImage(bmp);
 
                 g.CopyFromScreen(
@@ -239,6 +243,7 @@ namespace StanetRemoteControl
                 return null;
             }
         }
+
 
 
 
