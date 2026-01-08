@@ -66,7 +66,7 @@ namespace StanetRemoteControl
                 {
                     try
                     {
-                        var screenBytes = CaptureScreenBytes();
+                        var screenBytes = CaptureScreenBytes(schermo);
                         if (screenBytes != null && screenBytes.Length > 0)
                         {
                             await hub.Invoke("SendScreen", connessione.ID, screenBytes);
@@ -75,7 +75,7 @@ namespace StanetRemoteControl
                     catch { /* ignora eccezioni temporanee */ }
                 }
 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(16); // 60 fps
             }
         }
 
@@ -205,47 +205,47 @@ namespace StanetRemoteControl
             }).Start();
         }
 
-        private byte[] CaptureScreenBytes()
+        private byte[] CaptureScreenBytes(int monitorIndex)
         {
             try
             {
-                var bounds = SystemInformation.VirtualScreen;
+                Screen[] screens = Screen.AllScreens;
 
-                var bmp = new Bitmap(
-                    bounds.Width,
-                    bounds.Height,
-                    PixelFormat.Format24bppRgb);
+                if (monitorIndex < 0 || monitorIndex >= screens.Length)
+                    return null; // indice non valido
 
-                var g = Graphics.FromImage(bmp);
+                // Spazio virtuale totale
+                Rectangle virtualBounds = SystemInformation.VirtualScreen;
 
-                g.CopyFromScreen(
-                    bounds.Left,
-                    bounds.Top,
-                    0,
-                    0,
-                    bounds.Size,
-                    CopyPixelOperation.SourceCopy);
+                // Monitor scelto
+                Screen screen = screens[monitorIndex];
+                Rectangle bounds = screen.Bounds;
 
-                var ms = new MemoryStream();
+                // Bitmap grande quanto lo spazio virtuale
+                using (var bmp = new Bitmap(virtualBounds.Width, virtualBounds.Height, PixelFormat.Format24bppRgb))
+                using (var g = Graphics.FromImage(bmp))
+                {
+                    // Copia tutto lo spazio virtuale
+                    g.CopyFromScreen(virtualBounds.Left, virtualBounds.Top, 0, 0, virtualBounds.Size, CopyPixelOperation.SourceCopy);
 
-                var enc = ImageCodecInfo.GetImageEncoders()
-                                        .First(e => e.MimeType == "image/jpeg");
+                    // Ritaglia la porzione del monitor scelto
+                    using (Bitmap monitorBmp = bmp.Clone(new Rectangle(bounds.X - virtualBounds.X, bounds.Y - virtualBounds.Y, bounds.Width, bounds.Height), bmp.PixelFormat))
+                    using (var ms = new MemoryStream())
+                    {
+                        var enc = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");
+                        var ep = new EncoderParameters(1);
+                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
 
-                var ep = new EncoderParameters(1);
-                ep.Param[0] = new EncoderParameter(
-                    System.Drawing.Imaging.Encoder.Quality, 50L);
-
-                bmp.Save(ms, enc, ep);
-                return ms.ToArray();
+                        monitorBmp.Save(ms, enc, ep);
+                        return ms.ToArray();
+                    }
+                }
             }
             catch
             {
                 return null;
             }
         }
-
-
-
 
         private void HandleCommand(string cmdJson)
         {
@@ -254,10 +254,13 @@ namespace StanetRemoteControl
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
+                    if (mouseCmd.X > 0) { 
                     mouseCmd.X = mouseCmd.X * Screen.PrimaryScreen.Bounds.Width / 1000;
                     mouseCmd.Y = mouseCmd.Y * Screen.PrimaryScreen.Bounds.Height / 1000;
                     EseguiMouse(mouseCmd);
-                    return;
+                    }
+                    else { schermo = -mouseCmd.X; }
+                        return;
                 }
 
                 var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(cmdJson);

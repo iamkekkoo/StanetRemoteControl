@@ -186,6 +186,7 @@ namespace StanetRemoteControl
         public StreamReader reader;
         public StreamWriter writer;
         public string macchina;
+        public int schermo = 0;
 
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
         
