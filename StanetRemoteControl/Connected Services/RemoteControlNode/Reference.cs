@@ -23,22 +23,19 @@ namespace StanetRemoteControl.RemoteControlNode {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string EmailField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private long IDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string IPField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string PASSField;
+        private System.Nullable<long> IdSottoscrizioneField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string PasswordField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string UserField;
+        private string UserNameField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -47,19 +44,6 @@ namespace StanetRemoteControl.RemoteControlNode {
             }
             set {
                 this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Email {
-            get {
-                return this.EmailField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
-                    this.EmailField = value;
-                    this.RaisePropertyChanged("Email");
-                }
             }
         }
         
@@ -90,14 +74,14 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string PASS {
+        public System.Nullable<long> IdSottoscrizione {
             get {
-                return this.PASSField;
+                return this.IdSottoscrizioneField;
             }
             set {
-                if ((object.ReferenceEquals(this.PASSField, value) != true)) {
-                    this.PASSField = value;
-                    this.RaisePropertyChanged("PASS");
+                if ((this.IdSottoscrizioneField.Equals(value) != true)) {
+                    this.IdSottoscrizioneField = value;
+                    this.RaisePropertyChanged("IdSottoscrizione");
                 }
             }
         }
@@ -116,14 +100,14 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string User {
+        public string UserName {
             get {
-                return this.UserField;
+                return this.UserNameField;
             }
             set {
-                if ((object.ReferenceEquals(this.UserField, value) != true)) {
-                    this.UserField = value;
-                    this.RaisePropertyChanged("User");
+                if ((object.ReferenceEquals(this.UserNameField, value) != true)) {
+                    this.UserNameField = value;
+                    this.RaisePropertyChanged("UserName");
                 }
             }
         }
@@ -148,10 +132,7 @@ namespace StanetRemoteControl.RemoteControlNode {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string CommandField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ErrorField;
+        private string ErroreField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private long IDField;
@@ -161,9 +142,6 @@ namespace StanetRemoteControl.RemoteControlNode {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private long ID_ControlloreField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private byte[] ScreenField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Nullable<System.DateTime> TimeField;
@@ -179,27 +157,14 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Command {
+        public string Errore {
             get {
-                return this.CommandField;
+                return this.ErroreField;
             }
             set {
-                if ((object.ReferenceEquals(this.CommandField, value) != true)) {
-                    this.CommandField = value;
-                    this.RaisePropertyChanged("Command");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Error {
-            get {
-                return this.ErrorField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ErrorField, value) != true)) {
-                    this.ErrorField = value;
-                    this.RaisePropertyChanged("Error");
+                if ((object.ReferenceEquals(this.ErroreField, value) != true)) {
+                    this.ErroreField = value;
+                    this.RaisePropertyChanged("Errore");
                 }
             }
         }
@@ -239,19 +204,6 @@ namespace StanetRemoteControl.RemoteControlNode {
                 if ((this.ID_ControlloreField.Equals(value) != true)) {
                     this.ID_ControlloreField = value;
                     this.RaisePropertyChanged("ID_Controllore");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public byte[] Screen {
-            get {
-                return this.ScreenField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ScreenField, value) != true)) {
-                    this.ScreenField = value;
-                    this.RaisePropertyChanged("Screen");
                 }
             }
         }
@@ -300,24 +252,6 @@ namespace StanetRemoteControl.RemoteControlNode {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/ChiediAccesso", ReplyAction="http://tempuri.org/IService1/ChiediAccessoResponse")]
         System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GET", ReplyAction="http://tempuri.org/IService1/GETResponse")]
-        byte[] GET(string cmd, long IdConnessione);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GET", ReplyAction="http://tempuri.org/IService1/GETResponse")]
-        System.Threading.Tasks.Task<byte[]> GETAsync(string cmd, long IdConnessione);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/POST", ReplyAction="http://tempuri.org/IService1/POSTResponse")]
-        string POST(byte[] Screen, long IdConnessione);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/POST", ReplyAction="http://tempuri.org/IService1/POSTResponse")]
-        System.Threading.Tasks.Task<string> POSTAsync(byte[] Screen, long IdConnessione);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CheckConnesso", ReplyAction="http://tempuri.org/IService1/CheckConnessoResponse")]
-        bool CheckConnesso(long mioId);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/CheckConnesso", ReplyAction="http://tempuri.org/IService1/CheckConnessoResponse")]
-        System.Threading.Tasks.Task<bool> CheckConnessoAsync(long mioId);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -369,30 +303,6 @@ namespace StanetRemoteControl.RemoteControlNode {
         
         public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId) {
             return base.Channel.ChiediAccessoAsync(user, psw, mioId);
-        }
-        
-        public byte[] GET(string cmd, long IdConnessione) {
-            return base.Channel.GET(cmd, IdConnessione);
-        }
-        
-        public System.Threading.Tasks.Task<byte[]> GETAsync(string cmd, long IdConnessione) {
-            return base.Channel.GETAsync(cmd, IdConnessione);
-        }
-        
-        public string POST(byte[] Screen, long IdConnessione) {
-            return base.Channel.POST(Screen, IdConnessione);
-        }
-        
-        public System.Threading.Tasks.Task<string> POSTAsync(byte[] Screen, long IdConnessione) {
-            return base.Channel.POSTAsync(Screen, IdConnessione);
-        }
-        
-        public bool CheckConnesso(long mioId) {
-            return base.Channel.CheckConnesso(mioId);
-        }
-        
-        public System.Threading.Tasks.Task<bool> CheckConnessoAsync(long mioId) {
-            return base.Channel.CheckConnessoAsync(mioId);
         }
     }
 }

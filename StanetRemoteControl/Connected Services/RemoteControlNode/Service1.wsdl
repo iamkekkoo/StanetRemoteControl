@@ -50,24 +50,6 @@
   <wsdl:message name="IService1_ChiediAccesso_OutputMessage">
     <wsdl:part name="parameters" element="tns:ChiediAccessoResponse" />
   </wsdl:message>
-  <wsdl:message name="IService1_GET_InputMessage">
-    <wsdl:part name="parameters" element="tns:GET" />
-  </wsdl:message>
-  <wsdl:message name="IService1_GET_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GETResponse" />
-  </wsdl:message>
-  <wsdl:message name="IService1_POST_InputMessage">
-    <wsdl:part name="parameters" element="tns:POST" />
-  </wsdl:message>
-  <wsdl:message name="IService1_POST_OutputMessage">
-    <wsdl:part name="parameters" element="tns:POSTResponse" />
-  </wsdl:message>
-  <wsdl:message name="IService1_CheckConnesso_InputMessage">
-    <wsdl:part name="parameters" element="tns:CheckConnesso" />
-  </wsdl:message>
-  <wsdl:message name="IService1_CheckConnesso_OutputMessage">
-    <wsdl:part name="parameters" element="tns:CheckConnessoResponse" />
-  </wsdl:message>
   <wsdl:portType name="IService1">
     <wsdl:operation name="RegistraMacchina">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/RegistraMacchina" message="tns:IService1_RegistraMacchina_InputMessage" />
@@ -80,18 +62,6 @@
     <wsdl:operation name="ChiediAccesso">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/ChiediAccesso" message="tns:IService1_ChiediAccesso_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService1/ChiediAccessoResponse" message="tns:IService1_ChiediAccesso_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GET">
-      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GET" message="tns:IService1_GET_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GETResponse" message="tns:IService1_GET_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="POST">
-      <wsdl:input wsaw:Action="http://tempuri.org/IService1/POST" message="tns:IService1_POST_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IService1/POSTResponse" message="tns:IService1_POST_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="CheckConnesso">
-      <wsdl:input wsaw:Action="http://tempuri.org/IService1/CheckConnesso" message="tns:IService1_CheckConnesso_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IService1/CheckConnessoResponse" message="tns:IService1_CheckConnesso_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_IService1" type="tns:IService1">
@@ -123,33 +93,6 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GET">
-      <soap:operation soapAction="http://tempuri.org/IService1/GET" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="POST">
-      <soap:operation soapAction="http://tempuri.org/IService1/POST" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="CheckConnesso">
-      <soap:operation soapAction="http://tempuri.org/IService1/CheckConnesso" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="BasicHttpsBinding_IService1" type="tns:IService1">
     <wsp:PolicyReference URI="#BasicHttpsBinding_IService1_policy" />
@@ -174,33 +117,6 @@
     </wsdl:operation>
     <wsdl:operation name="ChiediAccesso">
       <soap:operation soapAction="http://tempuri.org/IService1/ChiediAccesso" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GET">
-      <soap:operation soapAction="http://tempuri.org/IService1/GET" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="POST">
-      <soap:operation soapAction="http://tempuri.org/IService1/POST" style="document" />
-      <wsdl:input>
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="CheckConnesso">
-      <soap:operation soapAction="http://tempuri.org/IService1/CheckConnesso" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
