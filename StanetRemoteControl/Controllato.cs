@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,8 +82,9 @@ namespace StanetRemoteControl
 
         private void CaricaMacchina()
         {
-            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StanetRemoteControl");
-            string filename = Path.Combine(dir, "Macchina.txt");
+            // Lettura
+            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StanetRemoteControl");
+            var filename = Path.Combine(dir, "Macchina.txt");
 
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
@@ -90,12 +92,12 @@ namespace StanetRemoteControl
             if (!File.Exists(filename))
                 File.WriteAllText(filename, "");
 
-            // Lettura
             string macchina = File.ReadAllText(filename);
 
+            // Scrittura
             if (string.IsNullOrEmpty(macchina))
             {
-                mac = Controllore.serv.RegistraMacchina(new Macchina());
+                mac = Controllore.serv.RegistraMacchina(new Macchina() { ID = 0, UserName = null, Password = null, IP = GetPublicIpAsync().Result, IdSottoscrizione = null });
                 File.WriteAllText(filename, JsonConvert.SerializeObject(mac));
             }
             else
@@ -103,7 +105,7 @@ namespace StanetRemoteControl
                 mac = JsonConvert.DeserializeObject<Macchina>(macchina);
             }
 
-            MioId = mac.User;
+            MioId = mac.UserName;
             MiaPsw = mac.Password;
         }
 
@@ -365,6 +367,13 @@ namespace StanetRemoteControl
         static byte ConvertKey(string key)
         {
             return (byte)Keys.Parse(typeof(Keys), key, true);
+        }
+
+        // Ottiene IP pubblico
+        async Task<string> GetPublicIpAsync()
+        {
+            HttpClient client = new HttpClient();
+            return (await client.GetStringAsync("https://api.ipify.org")).Trim();
         }
 
     }

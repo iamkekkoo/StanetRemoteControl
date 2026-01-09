@@ -45,48 +45,4 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GET">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="cmd" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="IdConnessione" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GETResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="GETResult" nillable="true" type="xs:base64Binary" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="POST">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="Screen" nillable="true" type="xs:base64Binary" />
-        <xs:element minOccurs="0" name="IdConnessione" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="POSTResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="POSTResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CheckConnesso">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="mioId" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CheckConnessoResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="CheckConnessoResult" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
 </xs:schema>

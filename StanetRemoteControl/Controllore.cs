@@ -82,36 +82,6 @@ namespace StanetRemoteControl
             }
         }
 
-        public async Task AggiornaPictureBoxAsync() 
-        {
-            bool attivo = true;
-            while (attivo)
-            {
-                try
-                {
-                    connUscita.Screen = await serv.GETAsync(connUscita.Command, connUscita.ID);
-                    await Task.Delay(5);
-                    if (connUscita.Screen != null && connUscita.Screen != await Task.Run(() => BitConverter.GetBytes(1)))
-                     {
-                        immagine = await Task.Run(() => (Bitmap)BytesToImage(connUscita.Screen));
-                        await Task.Delay(5);
-                        /*resize dell'immagine rispetto alla grandezza della finestra (lasciando le proporzioni dell'immagine)*/
-                        if (pictureBox1.Width >= pictureBox1.Height)
-                        { pictureBox1.Image = await Task.Run(() => (Image)(new Bitmap(immagine, immagine.Width * pictureBox1.Height / immagine.Height, pictureBox1.Height))); await Task.Delay(5); }
-                        else
-                        { pictureBox1.Image = await Task.Run(() => (Image)(new Bitmap(immagine, pictureBox1.Width, immagine.Height * pictureBox1.Width / immagine.Width))); await Task.Delay(5); }
-
-                    }
-                    else
-                    {
-                        if (connUscita.Screen == BitConverter.GetBytes(1)) { attivo = false; this.Dispose(); } //Connessione chiusa dal controllato
-                    }
-                }
-                catch (Exception E) { }
-                await Task.Delay(5);
-            }
-        }
-
         // ====== UTILS ======
 
         private static Bitmap ResizeImage(Bitmap src, int maxW, int maxH)
