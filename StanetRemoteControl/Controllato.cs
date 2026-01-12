@@ -247,6 +247,7 @@ namespace StanetRemoteControl
         const int INPUT_KEYBOARD = 1;
         const uint KEYEVENTF_KEYUP = 0x0002;
         const uint KEYEVENTF_SCANCODE = 0x0008;
+        const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
 
         [StructLayout(LayoutKind.Sequential)]
         struct INPUT
@@ -292,14 +293,21 @@ namespace StanetRemoteControl
             {
                 ushort scanCode = (ushort)MapVirtualKey((uint)key, 0);
 
+                uint flags = KEYEVENTF_SCANCODE;
+                if (keyUp) flags |= KEYEVENTF_KEYUP;
+
+                // tasti estesi (frecce, INS, DEL, HOME, END, ecc.)
+                if (IsExtendedKey(key))
+                    flags |= KEYEVENTF_EXTENDEDKEY;
+
                 inputs.Add(new INPUT
                 {
                     type = INPUT_KEYBOARD,
                     ki = new KEYBDINPUT
                     {
-                        wVk = 0, // IMPORTANTISSIMO
+                        wVk = 0,
                         wScan = scanCode,
-                        dwFlags = KEYEVENTF_SCANCODE | (keyUp ? KEYEVENTF_KEYUP : 0),
+                        dwFlags = flags,
                         time = 0,
                         dwExtraInfo = IntPtr.Zero
                     }
@@ -308,6 +316,30 @@ namespace StanetRemoteControl
 
             SendInput((uint)inputs.Count, inputs.ToArray(), Marshal.SizeOf(typeof(INPUT)));
         }
+
+        static bool IsExtendedKey(Keys key)
+        {
+            switch (key)
+            {
+                case Keys.Insert:
+                case Keys.Delete:
+                case Keys.Home:
+                case Keys.End:
+                case Keys.PageUp:
+                case Keys.PageDown:
+                case Keys.Right:
+                case Keys.Left:
+                case Keys.Up:
+                case Keys.Down:
+                case Keys.NumLock:
+                case Keys.PrintScreen:
+                case Keys.Divide:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
 
 
     }
