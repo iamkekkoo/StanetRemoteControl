@@ -24,8 +24,6 @@ namespace StanetRemoteControl
         {
             InitializeComponent();
             this.Load += Controllato_Load;
-            
-            
 
             return;
         }
@@ -117,85 +115,7 @@ namespace StanetRemoteControl
             connessione = Controllore.serv.ApriConnessione(mac);
             cts = new CancellationTokenSource();
             _ = InizializzaSignalR();
-
-            //_ = InizioControllatoAsync();  // ✔️ ORA È SICURO!
         }
-
-        //Thread di connessione lato controllato
-        /*Thread di avvio del controllato*/
-        //public async Task InizioControllatoAsync()
-        //{
-
-            // Ciclo principale per gestire multiconnessioni lato ricevitore
-            //while (attivo)
-            //{
-                
-
-                // Ciclo interno per CheckConnesso finché ID_Controllore != 0 (CheckConnesso = true)
-                //do
-                //{
-                    // Non blocca il thread, solo attende in modo asincrono finchè un controllore non si connette
-                    //await Task.Delay(200);
-                //}while (!(await Controllore.serv.CheckConnessoAsync(connessione.ID))) ;
-
-                // Avvia connessione in modo asincrono
-                //var taskConn = Task.Run(() => avviaConnessione(connessione.Copy()));
-                //connIngresso.Add((connessione.Copy(), taskConn));
-            //}
-        //}
-
-
-
-        /*public async Task avviaConnessione(Connessione conn)
-        {
-            bool b = true;
-
-            while (b)
-            {*/
-                // Invia screenshot al server e riceve comando
-                //conn.Command = await Controllore.serv.POSTAsync(BitmapToBytes(CapturePrimaryScreen()), conn.ID);
-                //await connection.InvokeAsync("SendScreen", conn.ID, BitmapToBytes(CapturePrimaryScreen()));
-                //await Task.Delay(50);
-                /*if (!string.IsNullOrEmpty(conn.Command))
-                {
-                    if (conn.Command.CompareTo("FINE") == 0)
-                    {
-                        comunicazione terminata dal controllore
-                        b = false;
-                    }
-                    else
-                    {
-                        Tentativo di deserializzare in MouseCommand
-                        try
-                        {
-                            var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(conn.Command);
-                            
-                            if (mouseCmd != null && mouseCmd.Type == "MOUSE")
-                            {
-                                EseguiMouse(mouseCmd);
-                                continue;
-                            }
-                        }
-                        catch { }
-
-                        Tentativo di deserializzare in KeyCommand
-                        try
-                        {
-                            var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(conn.Command);
-                            
-                            if (keyCmd != null && keyCmd.Type == "KEY")
-                            {
-                                EseguiKey(keyCmd);
-                                continue;
-                            }
-                        }
-                        catch { }
-                    }
-                }*/
-
-         /*   }
-        }*/
-
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -274,36 +194,6 @@ namespace StanetRemoteControl
                 }
             }
             catch { }
-        }
-
-        static Bitmap CapturePrimaryScreen()
-        {
-            var screen = Screen.PrimaryScreen;
-            var bmp = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
-
-            using (var g = Graphics.FromImage(bmp))
-            {
-                g.CopyFromScreen(
-                    screen.Bounds.Left,
-                    screen.Bounds.Top,
-                    0,
-                    0,
-                    screen.Bounds.Size
-                );
-                g.Flush();
-            }
-            
-            return bmp;
-        }
-
-        public byte[] BitmapToBytes(Bitmap bmp)
-        {
-            using (var ms = new MemoryStream())
-            {
-                bmp.Save(ms, ImageFormat.Jpeg);
-                ms.Flush();
-                return ms.ToArray();
-            }
         }
 
         private static byte[] Compress(byte[] data)
