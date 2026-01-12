@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using NPOI.Util;
 using StanetRemoteControl.RemoteControlNode;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -236,29 +237,78 @@ namespace StanetRemoteControl
             }
         }
 
-        [DllImport("user32.dll")]
-        static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+        const int INPUT_KEYBOARD = 1;
+        const uint KEYEVENTF_KEYUP = 0x0002;
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct INPUT
+        {
+            public uint type;
+            public InputUnion U;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        struct InputUnion
+        {
+            [FieldOffset(0)]
+            public KEYBDINPUT ki;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct KEYBDINPUT
+        {
+            public ushort wVk;
+            public ushort wScan;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
 
         static void EseguiKey(KeyCommand cmd)
         {
-            byte key = ConvertKey(cmd.Key);
+            var keys = cmd.Key
+                .Split(new[] { '+' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(k => (ushort)(Keys)Enum.Parse(typeof(Keys), k.Trim(), true))
+                .ToList();
 
             if (cmd.Action == "DOWN")
-                keybd_event(key, 0, 0, 0);
+                Send(keys, false);
             else if (cmd.Action == "UP")
-                keybd_event(key, 0, 2, 0);
+                Send(keys, true);
             else if (cmd.Action == "PRESS")
             {
-                keybd_event(key, 0, 0, 0);
-                keybd_event(key, 0, 2, 0);
+                Send(keys, false);
+                Send(keys, true);
             }
         }
 
-        // Mappa basilare, si può estendere
-        static byte ConvertKey(string key)
+        static void Send(List<ushort> keys, bool keyUp)
         {
-            return (byte)(int)Enum.Parse(typeof(Keys), key, true);
+            var inputs = new List<INPUT>();
+            var ordered = keyUp ? keys.AsEnumerable().Reverse() : keys;
+
+            foreach (var key in ordered)
+            {
+                inputs.Add(new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    U = new InputUnion
+                    {
+                        ki = new KEYBDINPUT
+                        {
+                            wVk = key,
+                            dwFlags = keyUp ? KEYEVENTF_KEYUP : 0
+                        }
+                    }
+                });
+            }
+
+            SendInput((uint)inputs.Count, inputs.ToArray(), Marshal.SizeOf(typeof(INPUT)));
         }
+
 
     }
     public class MouseCommand
