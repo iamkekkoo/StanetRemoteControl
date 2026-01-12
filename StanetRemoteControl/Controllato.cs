@@ -370,24 +370,6 @@ namespace StanetRemoteControl
             return (byte)Keys.Parse(typeof(Keys), key, true);
         }
 
-        // Ottiene IP pubblico
-        async Task<string> GetPublicIpAsync()
-        {
-            try
-            {
-                 HttpClient client = new HttpClient
-                {
-                    Timeout = TimeSpan.FromSeconds(3)
-                };
-
-                return (await client.GetStringAsync("https://checkip.amazonaws.com")).Trim();
-            }
-            catch
-            {
-                return null; // nessun blocco
-            }
-        }
-
     }
     public class MouseCommand
     {
