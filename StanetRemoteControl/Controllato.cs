@@ -237,23 +237,21 @@ namespace StanetRemoteControl
             }
         }
 
+
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
+        [DllImport("user32.dll")]
+        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
         const int INPUT_KEYBOARD = 1;
         const uint KEYEVENTF_KEYUP = 0x0002;
+        const uint KEYEVENTF_SCANCODE = 0x0008;
 
         [StructLayout(LayoutKind.Sequential)]
         struct INPUT
         {
-            public uint type;
-            public InputUnion U;
-        }
-
-        [StructLayout(LayoutKind.Explicit)]
-        struct InputUnion
-        {
-            [FieldOffset(0)]
+            public int type;
             public KEYBDINPUT ki;
         }
 
@@ -271,7 +269,7 @@ namespace StanetRemoteControl
         {
             var keys = cmd.Key
                 .Split(new[] { '+' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(k => (ushort)(Keys)Enum.Parse(typeof(Keys), k.Trim(), true))
+                .Select(k => (Keys)Enum.Parse(typeof(Keys), k.Trim(), true))
                 .ToList();
 
             if (cmd.Action == "DOWN")
@@ -285,23 +283,25 @@ namespace StanetRemoteControl
             }
         }
 
-        static void Send(List<ushort> keys, bool keyUp)
+        static void Send(List<Keys> keys, bool keyUp)
         {
-            var inputs = new List<INPUT>();
             var ordered = keyUp ? keys.AsEnumerable().Reverse() : keys;
+            var inputs = new List<INPUT>();
 
             foreach (var key in ordered)
             {
+                ushort scanCode = (ushort)MapVirtualKey((uint)key, 0);
+
                 inputs.Add(new INPUT
                 {
                     type = INPUT_KEYBOARD,
-                    U = new InputUnion
+                    ki = new KEYBDINPUT
                     {
-                        ki = new KEYBDINPUT
-                        {
-                            wVk = key,
-                            dwFlags = keyUp ? KEYEVENTF_KEYUP : 0
-                        }
+                        wVk = 0, // IMPORTANTISSIMO
+                        wScan = scanCode,
+                        dwFlags = KEYEVENTF_SCANCODE | (keyUp ? KEYEVENTF_KEYUP : 0),
+                        time = 0,
+                        dwExtraInfo = IntPtr.Zero
                     }
                 });
             }
