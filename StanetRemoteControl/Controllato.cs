@@ -74,7 +74,7 @@ namespace StanetRemoteControl
                     catch { /* ignora eccezioni temporanee */ }
                 }
 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(16); // 60 fps
             }
         }
 
@@ -257,7 +257,7 @@ namespace StanetRemoteControl
         // Mappa basilare, si può estendere
         static byte ConvertKey(string key)
         {
-            return (byte)Keys.Parse(typeof(Keys), key, true);
+            return (byte)(int)Enum.Parse(typeof(Keys), key, true);
         }
 
     }
