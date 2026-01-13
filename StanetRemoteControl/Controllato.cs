@@ -392,7 +392,8 @@ namespace StanetRemoteControl
                 case "PREVIOUS": return 0xB1;
 
                 default:
-                    return (ushort)Enum.Parse(typeof(Keys), key, true);
+                    Keys k = (Keys)Enum.Parse(typeof(Keys), key, true);
+                    return (ushort)k;
             }
         }
 
