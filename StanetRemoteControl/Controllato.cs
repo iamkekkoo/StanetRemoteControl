@@ -237,23 +237,16 @@ namespace StanetRemoteControl
             }
         }
 
-
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
-
-        [DllImport("user32.dll")]
-        static extern uint MapVirtualKey(uint uCode, uint uMapType);
-
         const int INPUT_KEYBOARD = 1;
         const uint KEYEVENTF_KEYUP = 0x0002;
-        const uint KEYEVENTF_SCANCODE = 0x0008;
-        const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
 
         [StructLayout(LayoutKind.Sequential)]
         struct INPUT
         {
-            public int type;
+            public uint type;
             public KEYBDINPUT ki;
         }
 
@@ -270,33 +263,32 @@ namespace StanetRemoteControl
         static readonly HashSet<ushort> PressedKeys = new HashSet<ushort>();
         static readonly object KeyLock = new object();
 
-
         static void EseguiKey(KeyCommand cmd)
         {
-            if (cmd == null || cmd.Type != "KEY")
+            if (cmd == null || cmd.Type != "KEY" || string.IsNullOrWhiteSpace(cmd.Key))
                 return;
-            
+
             List<ushort> keys = cmd.Key
                 .Split('+')
                 .Select(k => ParseVirtualKey(k))
                 .ToList();
-            Console.WriteLine("è arrivato: " + cmd.Key);
+
             if (cmd.Action == "DOWN")
             {
-                SendKeys(keys, false);
+                SendKeyList(keys, false);
             }
             else if (cmd.Action == "UP")
             {
-                SendKeys(keys, true);
+                SendKeyList(keys, true);
             }
             else if (cmd.Action == "PRESS")
             {
-                SendKeys(keys, false);
-                SendKeys(keys, true);
+                SendKeyList(keys, false);
+                SendKeyList(keys, true);
             }
         }
 
-        static void SendKeys(List<ushort> keys, bool keyUp)
+        static void SendKeyList(List<ushort> keys, bool keyUp)
         {
             IEnumerable<ushort> ordered = keyUp ? keys.AsEnumerable().Reverse() : keys;
             List<INPUT> inputs = new List<INPUT>();
@@ -313,8 +305,8 @@ namespace StanetRemoteControl
 
                     INPUT input = new INPUT();
                     input.type = INPUT_KEYBOARD;
-                    input.ki.wVk = vk;
-                    input.ki.wScan = 0;
+                    input.ki.wVk = vk;     // <-- VK PURO
+                    input.ki.wScan = 0;    // <-- NON USATO
                     input.ki.dwFlags = keyUp ? KEYEVENTF_KEYUP : 0;
                     input.ki.time = 0;
                     input.ki.dwExtraInfo = IntPtr.Zero;
@@ -345,7 +337,6 @@ namespace StanetRemoteControl
 
                     SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
                 }
-
                 PressedKeys.Clear();
             }
         }
@@ -360,6 +351,7 @@ namespace StanetRemoteControl
                 case "CONTROL": return 0x11;
                 case "SHIFT": return 0x10;
                 case "ALT": return 0x12;
+
                 case "ENTER": return 0x0D;
                 case "ESC":
                 case "ESCAPE": return 0x1B;
@@ -380,7 +372,7 @@ namespace StanetRemoteControl
                 case "PAGEUP": return 0x21;
                 case "PAGEDOWN": return 0x22;
 
-                // 🔊 MULTIMEDIA
+                // MULTIMEDIA
                 case "VOLUMEUP": return 0xAF;
                 case "VOLUMEDOWN": return 0xAE;
                 case "MUTE": return 0xAD;
@@ -397,62 +389,6 @@ namespace StanetRemoteControl
             }
         }
 
-
-        static void Send(List<Keys> keys, bool keyUp)
-        {
-            var ordered = keyUp ? keys.AsEnumerable().Reverse() : keys;
-            var inputs = new List<INPUT>();
-
-            foreach (var key in ordered)
-            {
-                ushort scanCode = (ushort)MapVirtualKey((uint)key, 0);
-
-                uint flags = KEYEVENTF_SCANCODE;
-                if (keyUp) flags |= KEYEVENTF_KEYUP;
-
-                // tasti estesi (frecce, INS, DEL, HOME, END, ecc.)
-                if (IsExtendedKey(key))
-                    flags |= KEYEVENTF_EXTENDEDKEY;
-
-                inputs.Add(new INPUT
-                {
-                    type = INPUT_KEYBOARD,
-                    ki = new KEYBDINPUT
-                    {
-                        wVk = 0,
-                        wScan = scanCode,
-                        dwFlags = flags,
-                        time = 0,
-                        dwExtraInfo = IntPtr.Zero
-                    }
-                });
-            }
-
-            SendInput((uint)inputs.Count, inputs.ToArray(), Marshal.SizeOf(typeof(INPUT)));
-        }
-
-        static bool IsExtendedKey(Keys key)
-        {
-            switch (key)
-            {
-                case Keys.Insert:
-                case Keys.Delete:
-                case Keys.Home:
-                case Keys.End:
-                case Keys.PageUp:
-                case Keys.PageDown:
-                case Keys.Right:
-                case Keys.Left:
-                case Keys.Up:
-                case Keys.Down:
-                case Keys.NumLock:
-                case Keys.PrintScreen:
-                case Keys.Divide:
-                    return true;
-                default:
-                    return false;
-            }
-        }
 
 
 

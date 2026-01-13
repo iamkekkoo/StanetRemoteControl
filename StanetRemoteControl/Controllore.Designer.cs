@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StanetRemoteControl
@@ -223,6 +224,7 @@ namespace StanetRemoteControl
             try
             {
                 hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+                Task.Delay(100);
             }
             catch { }
         }
@@ -234,6 +236,7 @@ namespace StanetRemoteControl
             try
             {
                 hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+                
             }
             catch { }
         }
