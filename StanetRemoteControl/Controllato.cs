@@ -275,12 +275,12 @@ namespace StanetRemoteControl
         {
             if (cmd == null || cmd.Type != "KEY")
                 return;
-
+            
             List<ushort> keys = cmd.Key
                 .Split('+')
                 .Select(k => ParseVirtualKey(k))
                 .ToList();
-
+            Console.WriteLine("è arrivato: " + cmd.Key);
             if (cmd.Action == "DOWN")
             {
                 SendKeys(keys, false);
