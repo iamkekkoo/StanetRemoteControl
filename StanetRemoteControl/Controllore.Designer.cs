@@ -151,8 +151,8 @@ namespace StanetRemoteControl
             var cmd = new MouseCommand
             {
                 Type = "MOUSE",
-                X = x * 1000 / pictureBox1.Width,
-                Y = y * 1000 / pictureBox1.Height,
+                X = x,
+                Y = y,
                 Action = "MOVE"
             };
 
