@@ -240,13 +240,17 @@ namespace StanetRemoteControl
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
+        [DllImport("user32.dll")]
+        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
         const int INPUT_KEYBOARD = 1;
         const uint KEYEVENTF_KEYUP = 0x0002;
+        const uint KEYEVENTF_SCANCODE = 0x0008;
 
         [StructLayout(LayoutKind.Sequential)]
         struct INPUT
         {
-            public uint type;
+            public int type;
             public KEYBDINPUT ki;
         }
 
@@ -260,137 +264,50 @@ namespace StanetRemoteControl
             public IntPtr dwExtraInfo;
         }
 
-        static readonly HashSet<ushort> PressedKeys = new HashSet<ushort>();
-        static readonly object KeyLock = new object();
+        static void SendKeyScanCode(Keys key, bool keyUp)
+        {
+            ushort scanCode = (ushort)MapVirtualKey((uint)key, 0);
+
+            INPUT input = new INPUT();
+            input.type = INPUT_KEYBOARD;
+            input.ki.wVk = 0;                // ← VK NON USATO
+            input.ki.wScan = scanCode;       // ← SCANCODE
+            input.ki.dwFlags = KEYEVENTF_SCANCODE | (keyUp ? KEYEVENTF_KEYUP : 0);
+            input.ki.time = 0;
+            input.ki.dwExtraInfo = IntPtr.Zero;
+
+            SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+        }
 
         static void EseguiKey(KeyCommand cmd)
         {
-            if (cmd == null || cmd.Type != "KEY" || string.IsNullOrWhiteSpace(cmd.Key))
+            if (cmd == null || cmd.Type != "KEY")
                 return;
 
-            List<ushort> keys = cmd.Key
+            var keys = cmd.Key
                 .Split('+')
-                .Select(k => ParseVirtualKey(k))
+                .Select(k => (Keys)Enum.Parse(typeof(Keys), k.Trim(), true))
                 .ToList();
 
             if (cmd.Action == "DOWN")
             {
-                SendKeyList(keys, false);
+                foreach (var k in keys)
+                    SendKeyScanCode(k, false);
             }
             else if (cmd.Action == "UP")
             {
-                SendKeyList(keys, true);
+                foreach (var k in keys.AsEnumerable().Reverse())
+                    SendKeyScanCode(k, true);
             }
             else if (cmd.Action == "PRESS")
             {
-                SendKeyList(keys, false);
-                SendKeyList(keys, true);
+                foreach (var k in keys)
+                    SendKeyScanCode(k, false);
+
+                foreach (var k in keys.AsEnumerable().Reverse())
+                    SendKeyScanCode(k, true);
             }
         }
-
-        static void SendKeyList(List<ushort> keys, bool keyUp)
-        {
-            IEnumerable<ushort> ordered = keyUp ? keys.AsEnumerable().Reverse() : keys;
-            List<INPUT> inputs = new List<INPUT>();
-
-            lock (KeyLock)
-            {
-                foreach (ushort vk in ordered)
-                {
-                    if (!keyUp && PressedKeys.Contains(vk))
-                        continue;
-
-                    if (keyUp && !PressedKeys.Contains(vk))
-                        continue;
-
-                    INPUT input = new INPUT();
-                    input.type = INPUT_KEYBOARD;
-                    input.ki.wVk = vk;     // <-- VK PURO
-                    input.ki.wScan = 0;    // <-- NON USATO
-                    input.ki.dwFlags = keyUp ? KEYEVENTF_KEYUP : 0;
-                    input.ki.time = 0;
-                    input.ki.dwExtraInfo = IntPtr.Zero;
-
-                    inputs.Add(input);
-
-                    if (keyUp)
-                        PressedKeys.Remove(vk);
-                    else
-                        PressedKeys.Add(vk);
-                }
-            }
-
-            if (inputs.Count > 0)
-                SendInput((uint)inputs.Count, inputs.ToArray(), Marshal.SizeOf(typeof(INPUT)));
-        }
-
-        static void ReleaseAllKeys()
-        {
-            lock (KeyLock)
-            {
-                foreach (ushort vk in PressedKeys.ToList())
-                {
-                    INPUT input = new INPUT();
-                    input.type = INPUT_KEYBOARD;
-                    input.ki.wVk = vk;
-                    input.ki.dwFlags = KEYEVENTF_KEYUP;
-
-                    SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
-                }
-                PressedKeys.Clear();
-            }
-        }
-
-        static ushort ParseVirtualKey(string key)
-        {
-            key = key.Trim().ToUpper();
-
-            switch (key)
-            {
-                case "CTRL":
-                case "CONTROL": return 0x11;
-                case "SHIFT": return 0x10;
-                case "ALT": return 0x12;
-
-                case "ENTER": return 0x0D;
-                case "ESC":
-                case "ESCAPE": return 0x1B;
-                case "TAB": return 0x09;
-                case "SPACE": return 0x20;
-
-                case "LEFT": return 0x25;
-                case "UP": return 0x26;
-                case "RIGHT": return 0x27;
-                case "DOWN": return 0x28;
-
-                case "DELETE":
-                case "DEL": return 0x2E;
-                case "INSERT":
-                case "INS": return 0x2D;
-                case "HOME": return 0x24;
-                case "END": return 0x23;
-                case "PAGEUP": return 0x21;
-                case "PAGEDOWN": return 0x22;
-
-                // MULTIMEDIA
-                case "VOLUMEUP": return 0xAF;
-                case "VOLUMEDOWN": return 0xAE;
-                case "MUTE": return 0xAD;
-                case "PLAY":
-                case "PLAYPAUSE": return 0xB3;
-                case "STOP": return 0xB2;
-                case "NEXT": return 0xB0;
-                case "PREV":
-                case "PREVIOUS": return 0xB1;
-
-                default:
-                    Keys k = (Keys)Enum.Parse(typeof(Keys), key, true);
-                    return (ushort)k;
-            }
-        }
-
-
-
 
     }
     public class MouseCommand
