@@ -190,6 +190,7 @@ namespace StanetRemoteControl
                 var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(cmdJson);
                 if (keyCmd != null && keyCmd.Type == "KEY")
                 {
+                    Console.WriteLine(cmdJson);
                     EseguiKey(keyCmd);
                     return;
                 }
@@ -237,24 +238,39 @@ namespace StanetRemoteControl
             }
         }
 
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+        static readonly Dictionary<string, ushort> KeyMap = new Dictionary<string, ushort>()
+        {
+            { "A", (ushort)Keys.A },
+            { "B", (ushort)Keys.B },
+            { "C", (ushort)Keys.C },
+            { "ENTER", (ushort)Keys.Enter },
+            { "ESC", (ushort)Keys.Escape },
+            { "TAB", (ushort)Keys.Tab },
+            { "CTRL", (ushort)Keys.ControlKey },
+            { "SHIFT", (ushort)Keys.ShiftKey },
+            { "ALT", (ushort)Keys.Menu },
+            { "SPACE", (ushort)Keys.Space },
+            { "F4", (ushort)Keys.F4 }
+        };
 
         [DllImport("user32.dll")]
-        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
         const int INPUT_KEYBOARD = 1;
         const uint KEYEVENTF_KEYUP = 0x0002;
-        const uint KEYEVENTF_SCANCODE = 0x0008;
 
-        [StructLayout(LayoutKind.Sequential)]
         struct INPUT
         {
             public int type;
-            public KEYBDINPUT ki;
+            public InputUnion u;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Explicit)]
+        struct InputUnion
+        {
+            [FieldOffset(0)] public KEYBDINPUT ki;
+        }
+
         struct KEYBDINPUT
         {
             public ushort wVk;
@@ -264,53 +280,88 @@ namespace StanetRemoteControl
             public IntPtr dwExtraInfo;
         }
 
-        static void SendKeyScanCode(Keys key, bool keyUp)
+        static void KeyDown(ushort key)
         {
-            ushort scanCode = (ushort)MapVirtualKey((uint)key, 0);
-
-            INPUT input = new INPUT();
-            input.type = INPUT_KEYBOARD;
-            input.ki.wVk = 0;                // ← VK NON USATO
-            input.ki.wScan = scanCode;       // ← SCANCODE
-            input.ki.dwFlags = KEYEVENTF_SCANCODE | (keyUp ? KEYEVENTF_KEYUP : 0);
-            input.ki.time = 0;
-            input.ki.dwExtraInfo = IntPtr.Zero;
-
-            SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
+            SendInput(1, new[]
+            {
+        new INPUT
+        {
+            type = INPUT_KEYBOARD,
+            u = new InputUnion
+            {
+                ki = new KEYBDINPUT { wVk = key }
+            }
+        }
+    }, Marshal.SizeOf(typeof(INPUT)));
         }
 
-        static void EseguiKey(KeyCommand cmd)
+        static void KeyUp(ushort key)
         {
-            if (cmd == null || cmd.Type != "KEY")
+            SendInput(1, new[]
+            {
+        new INPUT
+        {
+            type = INPUT_KEYBOARD,
+            u = new InputUnion
+            {
+                ki = new KEYBDINPUT
+                {
+                    wVk = key,
+                    dwFlags = KEYEVENTF_KEYUP
+                }
+            }
+        }
+    }, Marshal.SizeOf(typeof(INPUT)));
+        }
+
+        static void KeyPress(ushort key)
+        {
+            KeyDown(key);
+            KeyUp(key);
+        }
+
+        static void EseguiKey(KeyCommand command)
+        {
+            if (command.Type != "KEY")
                 return;
 
-            var keys = cmd.Key
-                .Split('+')
-                .Select(k => (Keys)Enum.Parse(typeof(Keys), k.Trim(), true))
-                .ToList();
+            string[] keys = command.Key.Split('+');
 
-            if (cmd.Action == "DOWN")
+            // PREMERE MODIFICATORI
+            for (int i = 0; i < keys.Length - 1; i++)
             {
-                foreach (var k in keys)
-                    SendKeyScanCode(k, false);
+                ushort vk = KeyMap[keys[i]];
+                KeyDown(vk);
             }
-            else if (cmd.Action == "UP")
-            {
-                foreach (var k in keys.AsEnumerable().Reverse())
-                    SendKeyScanCode(k, true);
-            }
-            else if (cmd.Action == "PRESS")
-            {
-                foreach (var k in keys)
-                    SendKeyScanCode(k, false);
 
-                foreach (var k in keys.AsEnumerable().Reverse())
-                    SendKeyScanCode(k, true);
+            ushort mainKey = KeyMap[keys[keys.Length - 1]];
+
+
+            switch (command.Action)
+            {
+                case "DOWN":
+                    KeyDown(mainKey);
+                    break;
+
+                case "UP":
+                    KeyUp(mainKey);
+                    break;
+
+                case "PRESS":
+                    KeyPress(mainKey);
+                    break;
             }
+
+            // RILASCIARE MODIFICATORI
+            for (int i = keys.Length - 2; i >= 0; i--)
+            {
+                ushort vk = KeyMap[keys[i]];
+                KeyUp(vk);
+            }
+
         }
-
     }
-    public class MouseCommand
+public class MouseCommand
     {
         public string Type { get; set; }  // "MOUSE"
         public int X { get; set; }
