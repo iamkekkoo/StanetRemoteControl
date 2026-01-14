@@ -238,21 +238,6 @@ namespace StanetRemoteControl
             }
         }
 
-        static readonly Dictionary<string, ushort> KeyMap = new Dictionary<string, ushort>()
-        {
-            { "A", (ushort)Keys.A },
-            { "B", (ushort)Keys.B },
-            { "C", (ushort)Keys.C },
-            { "ENTER", (ushort)Keys.Enter },
-            { "ESC", (ushort)Keys.Escape },
-            { "TAB", (ushort)Keys.Tab },
-            { "CTRL", (ushort)Keys.ControlKey },
-            { "SHIFT", (ushort)Keys.ShiftKey },
-            { "ALT", (ushort)Keys.Menu },
-            { "SPACE", (ushort)Keys.Space },
-            { "F4", (ushort)Keys.F4 }
-        };
-
         [DllImport("user32.dll")]
         static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
@@ -280,38 +265,81 @@ namespace StanetRemoteControl
             public IntPtr dwExtraInfo;
         }
 
+        // ------------------- Mappa tasti -------------------
+        static readonly Dictionary<string, ushort> KeyMap = new Dictionary<string, ushort>()
+        {
+            { "A", (ushort)Keys.A },
+            { "B", (ushort)Keys.B },
+            { "C", (ushort)Keys.C },
+            { "D", (ushort)Keys.D },
+            { "E", (ushort)Keys.E },
+            { "F", (ushort)Keys.F },
+            { "G", (ushort)Keys.G },
+            { "H", (ushort)Keys.H },
+            { "I", (ushort)Keys.I },
+            { "J", (ushort)Keys.J },
+            { "K", (ushort)Keys.K },
+            { "L", (ushort)Keys.L },
+            { "M", (ushort)Keys.M },
+            { "N", (ushort)Keys.N },
+            { "O", (ushort)Keys.O },
+            { "P", (ushort)Keys.P },
+            { "Q", (ushort)Keys.Q },
+            { "R", (ushort)Keys.R },
+            { "S", (ushort)Keys.S },
+            { "T", (ushort)Keys.T },
+            { "U", (ushort)Keys.U },
+            { "V", (ushort)Keys.V },
+            { "W", (ushort)Keys.W },
+            { "X", (ushort)Keys.X },
+            { "Y", (ushort)Keys.Y },
+            { "Z", (ushort)Keys.Z },
+            { "ENTER", (ushort)Keys.Enter },
+            { "ESC", (ushort)Keys.Escape },
+            { "TAB", (ushort)Keys.Tab },
+            { "SPACE", (ushort)Keys.Space },
+            { "CTRL", (ushort)Keys.ControlKey },
+            { "SHIFT", (ushort)Keys.ShiftKey },
+            { "ALT", (ushort)Keys.Menu },
+            { "F1", (ushort)Keys.F1 },
+            { "F2", (ushort)Keys.F2 },
+            { "F3", (ushort)Keys.F3 },
+            { "F4", (ushort)Keys.F4 },
+            { "F5", (ushort)Keys.F5 },
+            { "F6", (ushort)Keys.F6 },
+            { "F7", (ushort)Keys.F7 },
+            { "F8", (ushort)Keys.F8 },
+            { "F9", (ushort)Keys.F9 },
+            { "F10", (ushort)Keys.F10 },
+            { "F11", (ushort)Keys.F11 },
+            { "F12", (ushort)Keys.F12 }
+        };
+
+        // ------------------- Funzioni invio tasto -------------------
         static void KeyDown(ushort key)
         {
-            SendInput(1, new[]
+            INPUT input = new INPUT
             {
-        new INPUT
-        {
-            type = INPUT_KEYBOARD,
-            u = new InputUnion
-            {
-                ki = new KEYBDINPUT { wVk = key }
-            }
-        }
-    }, Marshal.SizeOf(typeof(INPUT)));
+                type = INPUT_KEYBOARD,
+                u = new InputUnion
+                {
+                    ki = new KEYBDINPUT { wVk = key }
+                }
+            };
+            SendInput(1, new INPUT[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
         static void KeyUp(ushort key)
         {
-            SendInput(1, new[]
+            INPUT input = new INPUT
             {
-        new INPUT
-        {
-            type = INPUT_KEYBOARD,
-            u = new InputUnion
-            {
-                ki = new KEYBDINPUT
+                type = INPUT_KEYBOARD,
+                u = new InputUnion
                 {
-                    wVk = key,
-                    dwFlags = KEYEVENTF_KEYUP
+                    ki = new KEYBDINPUT { wVk = key, dwFlags = KEYEVENTF_KEYUP }
                 }
-            }
-        }
-    }, Marshal.SizeOf(typeof(INPUT)));
+            };
+            SendInput(1, new INPUT[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
         static void KeyPress(ushort key)
@@ -320,45 +348,48 @@ namespace StanetRemoteControl
             KeyUp(key);
         }
 
+        // ------------------- Gestione KeyCommand -------------------
         static void EseguiKey(KeyCommand command)
         {
-            if (command.Type != "KEY")
+            if (command.Type != "KEY" || string.IsNullOrEmpty(command.Key))
                 return;
 
             string[] keys = command.Key.Split('+');
 
-            // PREMERE MODIFICATORI
+            // Premere modificatori
             for (int i = 0; i < keys.Length - 1; i++)
             {
-                ushort vk = KeyMap[keys[i]];
-                KeyDown(vk);
+                if (KeyMap.ContainsKey(keys[i].ToUpper()))
+                    KeyDown(KeyMap[keys[i].ToUpper()]);
             }
 
-            ushort mainKey = KeyMap[keys[keys.Length - 1]];
+            // Tasto principale
+            string mainKeyStr = keys[keys.Length - 1].ToUpper();
+            if (!KeyMap.ContainsKey(mainKeyStr))
+                return;
 
+            ushort mainKey = KeyMap[mainKeyStr];
 
-            switch (command.Action)
+            switch (command.Action.ToUpper())
             {
                 case "DOWN":
                     KeyDown(mainKey);
                     break;
-
                 case "UP":
                     KeyUp(mainKey);
                     break;
-
+                default:
                 case "PRESS":
                     KeyPress(mainKey);
                     break;
             }
 
-            // RILASCIARE MODIFICATORI
+            // Rilasciare modificatori
             for (int i = keys.Length - 2; i >= 0; i--)
             {
-                ushort vk = KeyMap[keys[i]];
-                KeyUp(vk);
+                if (KeyMap.ContainsKey(keys[i].ToUpper()))
+                    KeyUp(KeyMap[keys[i].ToUpper()]);
             }
-
         }
     }
 public class MouseCommand
