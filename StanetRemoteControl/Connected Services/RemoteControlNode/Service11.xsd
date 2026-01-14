@@ -20,4 +20,20 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Connessione" nillable="true" type="tns:Connessione" />
+  <xs:complexType name="ArrayOfContatto">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Contatto" nillable="true" type="tns:Contatto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfContatto" nillable="true" type="tns:ArrayOfContatto" />
+  <xs:complexType name="Contatto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="IdGruppo" type="xs:long" />
+      <xs:element minOccurs="0" name="Nome" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="NomeGruppo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="UserName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Contatto" nillable="true" type="tns:Contatto" />
 </xs:schema>

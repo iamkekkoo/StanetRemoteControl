@@ -45,4 +45,109 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetRubrica">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="mac" nillable="true" type="q6:Macchina" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetRubricaResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="GetRubricaResult" nillable="true" type="q7:ArrayOfContatto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AggiungiGruppo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IdSottoscrizione" type="xs:long" />
+        <xs:element minOccurs="0" name="NomeGruppo" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AggiungiGruppoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="AggiungiGruppoResult" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RimuoviGruppo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IdGruppo" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RimuoviGruppoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RimuoviGruppoResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RinominaGruppo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IdGruppo" type="xs:long" />
+        <xs:element minOccurs="0" name="NuovoNomeGruppo" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RinominaGruppoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RinominaGruppoResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AggiungiContattoAGruppo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="mac" nillable="true" type="q8:Macchina" />
+        <xs:element minOccurs="0" name="IdGruppo" type="xs:long" />
+        <xs:element minOccurs="0" name="NomeMacchina" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AggiungiContattoAGruppoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="AggiungiContattoAGruppoResult" nillable="true" type="q9:Contatto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RimuoviContattoDaGruppo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="mac" nillable="true" type="q10:Macchina" />
+        <xs:element minOccurs="0" name="IdGruppo" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RimuoviContattoDaGruppoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RimuoviContattoDaGruppoResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RinominaContattoInGruppo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/RemoteControlHub" minOccurs="0" name="mac" nillable="true" type="q11:Macchina" />
+        <xs:element minOccurs="0" name="IdGruppo" type="xs:long" />
+        <xs:element minOccurs="0" name="NuovoNomeMacchina" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RinominaContattoInGruppoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RinominaContattoInGruppoResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

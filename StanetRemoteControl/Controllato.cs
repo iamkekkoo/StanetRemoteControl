@@ -69,13 +69,13 @@ namespace StanetRemoteControl
                         var screenBytes = CaptureScreenBytes(schermo);
                         if (screenBytes != null && screenBytes.Length > 0)
                         {
-                            await hub.Invoke("SendScreen", connessione.ID, screenBytes);
+                            await hub.Invoke("SendScreen", mac.ID, screenBytes);
                         }
                     }
                     catch { /* ignora eccezioni temporanee */ }
                 }
 
-                await Task.Delay(16); // 60 fps
+                await Task.Delay(66); // 15 fps
             }
         }
 
@@ -178,13 +178,14 @@ namespace StanetRemoteControl
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
-                    if (mouseCmd.X > 0) { 
+                    if (mouseCmd.X == 0) { schermo = schermo - 1; Task.Delay(1500); }
+                    else if (mouseCmd.X == Screen.AllScreens[schermo].Bounds.Width) { schermo = schermo + 1; Task.Delay(1500); }
+                    else { 
                     mouseCmd.X = mouseCmd.X * Screen.PrimaryScreen.Bounds.Width / 1000;
                     mouseCmd.Y = mouseCmd.Y * Screen.PrimaryScreen.Bounds.Height / 1000;
                     EseguiMouse(mouseCmd);
                     }
-                    else { schermo = schermo -1; }
-                        return;
+                    return;
                 }
 
                 var keyCmd = JsonConvert.DeserializeObject<KeyCommand>(cmdJson);
@@ -392,13 +393,13 @@ namespace StanetRemoteControl
             }
         }
     }
-public class MouseCommand
-    {
-        public string Type { get; set; }  // "MOUSE"
-        public int X { get; set; }
-        public int Y { get; set; }
-        public string Action { get; set; }  // "MOVE", "LEFT_DOWN", "LEFT_UP", etc.
-    }
+    public class MouseCommand
+        {
+            public string Type { get; set; }  // "MOUSE"
+            public int X { get; set; }
+            public int Y { get; set; }
+            public string Action { get; set; }  // "MOVE", "LEFT_DOWN", "LEFT_UP", etc.
+        }
 
     public class KeyCommand
     {

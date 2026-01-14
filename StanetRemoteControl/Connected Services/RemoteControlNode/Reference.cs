@@ -231,6 +231,115 @@ namespace StanetRemoteControl.RemoteControlNode {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Contatto", Namespace="http://schemas.datacontract.org/2004/07/RemoteControlHub")]
+    [System.SerializableAttribute()]
+    public partial class Contatto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private long IdGruppoField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NomeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NomeGruppoField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string PasswordField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string UserNameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public long IdGruppo {
+            get {
+                return this.IdGruppoField;
+            }
+            set {
+                if ((this.IdGruppoField.Equals(value) != true)) {
+                    this.IdGruppoField = value;
+                    this.RaisePropertyChanged("IdGruppo");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Nome {
+            get {
+                return this.NomeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NomeField, value) != true)) {
+                    this.NomeField = value;
+                    this.RaisePropertyChanged("Nome");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string NomeGruppo {
+            get {
+                return this.NomeGruppoField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NomeGruppoField, value) != true)) {
+                    this.NomeGruppoField = value;
+                    this.RaisePropertyChanged("NomeGruppo");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Password {
+            get {
+                return this.PasswordField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PasswordField, value) != true)) {
+                    this.PasswordField = value;
+                    this.RaisePropertyChanged("Password");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string UserName {
+            get {
+                return this.UserNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UserNameField, value) != true)) {
+                    this.UserNameField = value;
+                    this.RaisePropertyChanged("UserName");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="RemoteControlNode.IService1")]
     public interface IService1 {
@@ -252,6 +361,48 @@ namespace StanetRemoteControl.RemoteControlNode {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/ChiediAccesso", ReplyAction="http://tempuri.org/IService1/ChiediAccessoResponse")]
         System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetRubrica", ReplyAction="http://tempuri.org/IService1/GetRubricaResponse")]
+        StanetRemoteControl.RemoteControlNode.Contatto[] GetRubrica(StanetRemoteControl.RemoteControlNode.Macchina mac);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetRubrica", ReplyAction="http://tempuri.org/IService1/GetRubricaResponse")]
+        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto[]> GetRubricaAsync(StanetRemoteControl.RemoteControlNode.Macchina mac);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AggiungiGruppo", ReplyAction="http://tempuri.org/IService1/AggiungiGruppoResponse")]
+        long AggiungiGruppo(long IdSottoscrizione, string NomeGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AggiungiGruppo", ReplyAction="http://tempuri.org/IService1/AggiungiGruppoResponse")]
+        System.Threading.Tasks.Task<long> AggiungiGruppoAsync(long IdSottoscrizione, string NomeGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RimuoviGruppo", ReplyAction="http://tempuri.org/IService1/RimuoviGruppoResponse")]
+        string RimuoviGruppo(long IdGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RimuoviGruppo", ReplyAction="http://tempuri.org/IService1/RimuoviGruppoResponse")]
+        System.Threading.Tasks.Task<string> RimuoviGruppoAsync(long IdGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RinominaGruppo", ReplyAction="http://tempuri.org/IService1/RinominaGruppoResponse")]
+        string RinominaGruppo(long IdGruppo, string NuovoNomeGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RinominaGruppo", ReplyAction="http://tempuri.org/IService1/RinominaGruppoResponse")]
+        System.Threading.Tasks.Task<string> RinominaGruppoAsync(long IdGruppo, string NuovoNomeGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AggiungiContattoAGruppo", ReplyAction="http://tempuri.org/IService1/AggiungiContattoAGruppoResponse")]
+        StanetRemoteControl.RemoteControlNode.Contatto AggiungiContattoAGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AggiungiContattoAGruppo", ReplyAction="http://tempuri.org/IService1/AggiungiContattoAGruppoResponse")]
+        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto> AggiungiContattoAGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RimuoviContattoDaGruppo", ReplyAction="http://tempuri.org/IService1/RimuoviContattoDaGruppoResponse")]
+        string RimuoviContattoDaGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RimuoviContattoDaGruppo", ReplyAction="http://tempuri.org/IService1/RimuoviContattoDaGruppoResponse")]
+        System.Threading.Tasks.Task<string> RimuoviContattoDaGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RinominaContattoInGruppo", ReplyAction="http://tempuri.org/IService1/RinominaContattoInGruppoResponse")]
+        string RinominaContattoInGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RinominaContattoInGruppo", ReplyAction="http://tempuri.org/IService1/RinominaContattoInGruppoResponse")]
+        System.Threading.Tasks.Task<string> RinominaContattoInGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -303,6 +454,62 @@ namespace StanetRemoteControl.RemoteControlNode {
         
         public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId) {
             return base.Channel.ChiediAccessoAsync(user, psw, mioId);
+        }
+        
+        public StanetRemoteControl.RemoteControlNode.Contatto[] GetRubrica(StanetRemoteControl.RemoteControlNode.Macchina mac) {
+            return base.Channel.GetRubrica(mac);
+        }
+        
+        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto[]> GetRubricaAsync(StanetRemoteControl.RemoteControlNode.Macchina mac) {
+            return base.Channel.GetRubricaAsync(mac);
+        }
+        
+        public long AggiungiGruppo(long IdSottoscrizione, string NomeGruppo) {
+            return base.Channel.AggiungiGruppo(IdSottoscrizione, NomeGruppo);
+        }
+        
+        public System.Threading.Tasks.Task<long> AggiungiGruppoAsync(long IdSottoscrizione, string NomeGruppo) {
+            return base.Channel.AggiungiGruppoAsync(IdSottoscrizione, NomeGruppo);
+        }
+        
+        public string RimuoviGruppo(long IdGruppo) {
+            return base.Channel.RimuoviGruppo(IdGruppo);
+        }
+        
+        public System.Threading.Tasks.Task<string> RimuoviGruppoAsync(long IdGruppo) {
+            return base.Channel.RimuoviGruppoAsync(IdGruppo);
+        }
+        
+        public string RinominaGruppo(long IdGruppo, string NuovoNomeGruppo) {
+            return base.Channel.RinominaGruppo(IdGruppo, NuovoNomeGruppo);
+        }
+        
+        public System.Threading.Tasks.Task<string> RinominaGruppoAsync(long IdGruppo, string NuovoNomeGruppo) {
+            return base.Channel.RinominaGruppoAsync(IdGruppo, NuovoNomeGruppo);
+        }
+        
+        public StanetRemoteControl.RemoteControlNode.Contatto AggiungiContattoAGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina) {
+            return base.Channel.AggiungiContattoAGruppo(mac, IdGruppo, NomeMacchina);
+        }
+        
+        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto> AggiungiContattoAGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina) {
+            return base.Channel.AggiungiContattoAGruppoAsync(mac, IdGruppo, NomeMacchina);
+        }
+        
+        public string RimuoviContattoDaGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo) {
+            return base.Channel.RimuoviContattoDaGruppo(mac, IdGruppo);
+        }
+        
+        public System.Threading.Tasks.Task<string> RimuoviContattoDaGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo) {
+            return base.Channel.RimuoviContattoDaGruppoAsync(mac, IdGruppo);
+        }
+        
+        public string RinominaContattoInGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina) {
+            return base.Channel.RinominaContattoInGruppo(mac, IdGruppo, NuovoNomeMacchina);
+        }
+        
+        public System.Threading.Tasks.Task<string> RinominaContattoInGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina) {
+            return base.Channel.RinominaContattoInGruppoAsync(mac, IdGruppo, NuovoNomeMacchina);
         }
     }
 }

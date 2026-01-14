@@ -50,6 +50,48 @@
   <wsdl:message name="IService1_ChiediAccesso_OutputMessage">
     <wsdl:part name="parameters" element="tns:ChiediAccessoResponse" />
   </wsdl:message>
+  <wsdl:message name="IService1_GetRubrica_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetRubrica" />
+  </wsdl:message>
+  <wsdl:message name="IService1_GetRubrica_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetRubricaResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_AggiungiGruppo_InputMessage">
+    <wsdl:part name="parameters" element="tns:AggiungiGruppo" />
+  </wsdl:message>
+  <wsdl:message name="IService1_AggiungiGruppo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AggiungiGruppoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RimuoviGruppo_InputMessage">
+    <wsdl:part name="parameters" element="tns:RimuoviGruppo" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RimuoviGruppo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RimuoviGruppoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RinominaGruppo_InputMessage">
+    <wsdl:part name="parameters" element="tns:RinominaGruppo" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RinominaGruppo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RinominaGruppoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_AggiungiContattoAGruppo_InputMessage">
+    <wsdl:part name="parameters" element="tns:AggiungiContattoAGruppo" />
+  </wsdl:message>
+  <wsdl:message name="IService1_AggiungiContattoAGruppo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AggiungiContattoAGruppoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RimuoviContattoDaGruppo_InputMessage">
+    <wsdl:part name="parameters" element="tns:RimuoviContattoDaGruppo" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RimuoviContattoDaGruppo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RimuoviContattoDaGruppoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RinominaContattoInGruppo_InputMessage">
+    <wsdl:part name="parameters" element="tns:RinominaContattoInGruppo" />
+  </wsdl:message>
+  <wsdl:message name="IService1_RinominaContattoInGruppo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RinominaContattoInGruppoResponse" />
+  </wsdl:message>
   <wsdl:portType name="IService1">
     <wsdl:operation name="RegistraMacchina">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/RegistraMacchina" message="tns:IService1_RegistraMacchina_InputMessage" />
@@ -62,6 +104,34 @@
     <wsdl:operation name="ChiediAccesso">
       <wsdl:input wsaw:Action="http://tempuri.org/IService1/ChiediAccesso" message="tns:IService1_ChiediAccesso_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IService1/ChiediAccessoResponse" message="tns:IService1_ChiediAccesso_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetRubrica">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/GetRubrica" message="tns:IService1_GetRubrica_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/GetRubricaResponse" message="tns:IService1_GetRubrica_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AggiungiGruppo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/AggiungiGruppo" message="tns:IService1_AggiungiGruppo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/AggiungiGruppoResponse" message="tns:IService1_AggiungiGruppo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RimuoviGruppo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/RimuoviGruppo" message="tns:IService1_RimuoviGruppo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/RimuoviGruppoResponse" message="tns:IService1_RimuoviGruppo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RinominaGruppo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/RinominaGruppo" message="tns:IService1_RinominaGruppo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/RinominaGruppoResponse" message="tns:IService1_RinominaGruppo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AggiungiContattoAGruppo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/AggiungiContattoAGruppo" message="tns:IService1_AggiungiContattoAGruppo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/AggiungiContattoAGruppoResponse" message="tns:IService1_AggiungiContattoAGruppo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RimuoviContattoDaGruppo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/RimuoviContattoDaGruppo" message="tns:IService1_RimuoviContattoDaGruppo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/RimuoviContattoDaGruppoResponse" message="tns:IService1_RimuoviContattoDaGruppo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RinominaContattoInGruppo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService1/RinominaContattoInGruppo" message="tns:IService1_RinominaContattoInGruppo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService1/RinominaContattoInGruppoResponse" message="tns:IService1_RinominaContattoInGruppo_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_IService1" type="tns:IService1">
@@ -93,6 +163,69 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetRubrica">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetRubrica" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AggiungiGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/AggiungiGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RimuoviGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RimuoviGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RinominaGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RinominaGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AggiungiContattoAGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/AggiungiContattoAGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RimuoviContattoDaGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RimuoviContattoDaGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RinominaContattoInGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RinominaContattoInGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="BasicHttpsBinding_IService1" type="tns:IService1">
     <wsp:PolicyReference URI="#BasicHttpsBinding_IService1_policy" />
@@ -117,6 +250,69 @@
     </wsdl:operation>
     <wsdl:operation name="ChiediAccesso">
       <soap:operation soapAction="http://tempuri.org/IService1/ChiediAccesso" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetRubrica">
+      <soap:operation soapAction="http://tempuri.org/IService1/GetRubrica" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AggiungiGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/AggiungiGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RimuoviGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RimuoviGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RinominaGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RinominaGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AggiungiContattoAGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/AggiungiContattoAGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RimuoviContattoDaGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RimuoviContattoDaGruppo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RinominaContattoInGruppo">
+      <soap:operation soapAction="http://tempuri.org/IService1/RinominaContattoInGruppo" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

@@ -308,6 +308,9 @@
     <None Include="Connected Services\RemoteControlNode\StanetRemoteControl.RemoteControlNode.Connessione.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Connected Services\RemoteControlNode\StanetRemoteControl.RemoteControlNode.Contatto.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Connected Services\RemoteControlNode\StanetRemoteControl.RemoteControlNode.Macchina.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
