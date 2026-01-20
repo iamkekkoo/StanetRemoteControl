@@ -246,7 +246,7 @@ namespace StanetRemoteControl
         public static IService1 serv = new RemoteControlNode.Service1Client();
         private Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
-
+        byte[] _latestFrame = null;
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
         private HubConnection connection;
         private IHubProxy hub;
