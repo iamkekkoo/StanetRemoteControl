@@ -36,8 +36,7 @@ namespace StanetRemoteControl
             // Ricezione comandi
             hub.On<string>("ReceiveCommand", cmdJson =>
             {
-                
-                    Task.Run(() => HandleCommand(cmdJson));
+                HandleCommand(cmdJson);
                 
             });
 
@@ -77,7 +76,7 @@ namespace StanetRemoteControl
                     catch { /* ignora eccezioni temporanee */ }
                 }
 
-                await Task.Delay(100); // 15 fps
+                await Task.Delay(66); // 15 fps
             }
         }
 
