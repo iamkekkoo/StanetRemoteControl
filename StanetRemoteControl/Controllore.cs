@@ -4,6 +4,7 @@ using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -29,10 +30,8 @@ namespace StanetRemoteControl
 
             // Ricezione screen
             hub.On<byte[]>("ReceiveScreen", screenBytes => {
-                pictureBox1.Image.Dispose();
-                pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(screenBytes), pictureBox1.Width, pictureBox1.Height);
-                Console.WriteLine("picturebox aggiornata");
-            });  
+                _latestFrame = screenBytes;
+            });
 
             // riconnessione semplice a SignalR
             connection.Closed += async () =>
@@ -49,8 +48,19 @@ namespace StanetRemoteControl
             await connection.Start();
             await hub.Invoke("JoinConnection", connUscita.ID);
             Console.WriteLine("connessione riuscita");
+            await AggiornaPicturebox();
 
-            
+
+        }
+
+        private Task AggiornaPicturebox() 
+        {
+            while (true) 
+            {
+                pictureBox1.Image.Dispose();
+                pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
+                Console.WriteLine("picturebox aggiornata");
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
