@@ -31,9 +31,13 @@ namespace StanetRemoteControl
             // Ricezione screen
             hub.On<byte[]>("ReceiveScreen", screenBytes => {
                 _latestFrame = screenBytes;
-                pictureBox1.Image.Dispose();
-                pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
-                Console.WriteLine("picturebox aggiornata");
+
+                pictureBox1.Invoke((MethodInvoker)(() =>
+                {
+                    pictureBox1.Image?.Dispose();
+                    pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
+                    Console.WriteLine("picturebox aggiornata");
+                }));               
             });
 
             // riconnessione semplice a SignalR
