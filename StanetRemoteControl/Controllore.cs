@@ -25,16 +25,14 @@ namespace StanetRemoteControl
         {
             connection = new HubConnection("https://francescostdev.azurewebsites.net");
             hub = connection.CreateHubProxy("ScreenHub");
-            
+
 
             // Ricezione screen
-            hub.On<byte[]>("ReceiveScreen", bytes => _latestFrame = bytes);
-
-            System.Windows.Forms.Timer timer1 = new System.Windows.Forms.Timer();
-            timer1.Interval = 33; // 30 FPS circa
-            timer1.Tick += Timer1_Tick;
-            timer1.Start();
-
+            hub.On<byte[]>("ReceiveScreen", screenBytes => {
+                pictureBox1.Image.Dispose();
+                pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(screenBytes), pictureBox1.Width, pictureBox1.Height);
+                Console.WriteLine("picturebox aggiornata");
+            });  
 
             // riconnessione semplice a SignalR
             connection.Closed += async () =>
@@ -51,24 +49,8 @@ namespace StanetRemoteControl
             await connection.Start();
             await hub.Invoke("JoinConnection", connUscita.ID);
             Console.WriteLine("connessione riuscita");
-        }
 
-        private void Timer1_Tick(object sender, EventArgs e)
-        {
-            if (_latestFrame == null) return; // niente frame da mostrare
-
-            // Salvo immagine precedente per fare dispose
-            Image oldImage = pictureBox1.Image;
-
-            try
-            {
-                // Trasforma byte[] in Image, poi resize
-                pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
-            }
-            finally
-            {
-                oldImage?.Dispose(); // evita memory leak
-            }
+            
         }
 
         private void button1_Click(object sender, EventArgs e)
