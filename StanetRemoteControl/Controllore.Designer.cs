@@ -236,7 +236,7 @@ namespace StanetRemoteControl
             try
             {
                 hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
-                
+                Task.Delay(100);
             }
             catch { }
         }
@@ -246,7 +246,7 @@ namespace StanetRemoteControl
         public static IService1 serv = new RemoteControlNode.Service1Client();
         private Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
-        //private static bool attivo = true;
+
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
         private HubConnection connection;
         private IHubProxy hub;
