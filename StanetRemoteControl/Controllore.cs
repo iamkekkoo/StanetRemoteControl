@@ -30,11 +30,10 @@ namespace StanetRemoteControl
             hub.On<byte[]>("ReceiveScreen", screenBytes =>
             {
                 // UI thread
-                var timer = new System.Windows.Forms.Timer { Interval = 33 };
-                timer.Tick += (s, e) => {
+                
                     pictureBox1.Image?.Dispose();
                     pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(screenBytes), pictureBox1.Width, pictureBox1.Height);
-                }; timer.Start();
+                
 
             });
 

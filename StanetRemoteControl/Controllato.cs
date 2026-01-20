@@ -36,10 +36,9 @@ namespace StanetRemoteControl
             // Ricezione comandi
             hub.On<string>("ReceiveCommand", cmdJson =>
             {
-                var timer = new System.Windows.Forms.Timer { Interval = 33 };
-                timer.Tick += (s, e) => {
+                
                     Task.Run(() => HandleCommand(cmdJson));
-                }; timer.Start();
+                
             });
 
             // Riconnessione
