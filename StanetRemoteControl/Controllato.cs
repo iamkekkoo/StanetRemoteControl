@@ -34,13 +34,7 @@ namespace StanetRemoteControl
             hub = connection.CreateHubProxy("ScreenHub");
 
             // Ricezione comandi
-            hub.On<string>("ReceiveCommand", cmdJson =>
-            {
-                lock (_frameLock)
-                {
-                    _latestCommand = cmdJson;
-                }                
-            });
+            hub.On<string>("ReceiveCommand", cmdJson => {HandleCommand(cmdJson);});
 
             // Riconnessione
             connection.Closed += async () =>
@@ -59,7 +53,6 @@ namespace StanetRemoteControl
 
             // Avvia streaming
             _ = StartStreaming(cts.Token);
-            StartCommandTimer();
         }
 
         private async Task StartStreaming(CancellationToken token)
@@ -70,7 +63,7 @@ namespace StanetRemoteControl
                 {
                     try
                     {
-                        var screenBytes = CaptureScreenBytes(schermo);
+                        var screenBytes = Compress(CaptureScreenBytes(schermo));
                         if (screenBytes != null && screenBytes.Length > 0)
                         {
                             await hub.Invoke("SendScreen", mac.ID, screenBytes);
@@ -202,30 +195,6 @@ namespace StanetRemoteControl
             }
             catch { }
         }
-
-        private void StartCommandTimer()
-        {
-            _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 100; // ~30 FPS
-            _renderTimer.Tick += RenderCommand;
-            _renderTimer.Start();
-        }
-
-        private void RenderCommand(object sender, EventArgs e)
-        {
-            string command;
-
-            lock (_frameLock)
-            {
-                if (_latestCommand == null)
-                    return;
-
-                command = _latestCommand;
-            }
-
-            HandleCommand(command);
-        }
-
 
         private static byte[] Compress(byte[] data)
         {

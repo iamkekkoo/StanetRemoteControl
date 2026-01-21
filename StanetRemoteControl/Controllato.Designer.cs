@@ -189,9 +189,6 @@ namespace StanetRemoteControl
         public int schermo = 0;
 
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
-        private string _latestCommand;
-        private readonly object _frameLock = new object();
-        private System.Windows.Forms.Timer _renderTimer;
 
         public EventArgs COMANDO;
 
