@@ -47,13 +47,13 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await hub.Invoke("JoinConnection", connessione.ID);
+                    await hub.Invoke("JoinConnection", mac.ID);
                 }
                 catch { }
             };
 
             await connection.Start();
-            await hub.Invoke("JoinConnection", connessione.ID);
+            await hub.Invoke("JoinConnection", mac.ID);
 
             // Avvia streaming
             _ = StartStreaming(cts.Token);

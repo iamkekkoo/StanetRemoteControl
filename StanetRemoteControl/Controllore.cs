@@ -32,7 +32,7 @@ namespace StanetRemoteControl
             hub.On<byte[]>("ReceiveScreen", screenBytes => {
                 _latestFrame = screenBytes;
 
-                pictureBox1.Invoke((MethodInvoker)(() =>
+                pictureBox1.Invoke(new Action(() =>
                 {
                     pictureBox1.Image?.Dispose();
                     pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
@@ -47,13 +47,13 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await hub.Invoke("JoinConnection", connUscita.ID);
+                    await hub.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
 
             await connection.Start();
-            await hub.Invoke("JoinConnection", connUscita.ID);
+            await hub.Invoke("JoinConnection", connUscita.ID_Controllato);
             Console.WriteLine("connessione riuscita");
         }
 

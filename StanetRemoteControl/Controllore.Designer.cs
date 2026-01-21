@@ -223,7 +223,7 @@ namespace StanetRemoteControl
 
             try
             {
-                hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+                hub.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd));
                 Task.Delay(100);
             }
             catch { }
@@ -235,7 +235,7 @@ namespace StanetRemoteControl
 
             try
             {
-                hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+                hub.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd));
                 Task.Delay(100);
             }
             catch { }
