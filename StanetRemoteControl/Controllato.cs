@@ -63,7 +63,7 @@ namespace StanetRemoteControl
                 {
                     try
                     {
-                        var screenBytes = Compress(CaptureScreenBytes(schermo));
+                        var screenBytes = CaptureScreenBytes(schermo);
                         if (screenBytes != null && screenBytes.Length > 0)
                         {
                             await hub.Invoke("SendScreen", mac.ID, screenBytes);
