@@ -84,7 +84,7 @@ namespace StanetRemoteControl
         private void StartRenderTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 16; // ~15 FPS
+            _renderTimer.Interval = 33; // ~30 FPS
             _renderTimer.Tick += RenderFrame;
             _renderTimer.Start();
         }

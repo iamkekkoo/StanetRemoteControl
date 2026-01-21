@@ -36,8 +36,10 @@ namespace StanetRemoteControl
             // Ricezione comandi
             hub.On<string>("ReceiveCommand", cmdJson =>
             {
-                HandleCommand(cmdJson);
-                
+                lock (_frameLock)
+                {
+                    _latestCommand = cmdJson;
+                }                
             });
 
             // Riconnessione
@@ -57,6 +59,7 @@ namespace StanetRemoteControl
 
             // Avvia streaming
             _ = StartStreaming(cts.Token);
+            StartCommandTimer();
         }
 
         private async Task StartStreaming(CancellationToken token)
@@ -199,6 +202,30 @@ namespace StanetRemoteControl
             }
             catch { }
         }
+
+        private void StartCommandTimer()
+        {
+            _renderTimer = new System.Windows.Forms.Timer();
+            _renderTimer.Interval = 33; // ~30 FPS
+            _renderTimer.Tick += RenderCommand;
+            _renderTimer.Start();
+        }
+
+        private void RenderCommand(object sender, EventArgs e)
+        {
+            string command;
+
+            lock (_frameLock)
+            {
+                if (_latestCommand == null)
+                    return;
+
+                command = _latestCommand;
+            }
+
+            HandleCommand(command);
+        }
+
 
         private static byte[] Compress(byte[] data)
         {
