@@ -76,7 +76,7 @@ namespace StanetRemoteControl
                     catch { /* ignora eccezioni temporanee */ }
                 }
 
-                await Task.Delay(33); // 30 fps
+                await Task.Delay(100); // 30 fps
             }
         }
 
