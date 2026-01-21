@@ -104,7 +104,7 @@ namespace StanetRemoteControl
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
-            
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.Dock = DockStyle.Fill; // opzionale, fa riempire tutta la finestra
             pictureBox1.MouseMove += PictureBox1_MouseMove;
             pictureBox1.MouseDown += PictureBox1_MouseDown;
@@ -223,7 +223,7 @@ namespace StanetRemoteControl
 
             try
             {
-                hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+                hub.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd));
                 Task.Delay(100);
             }
             catch { }
@@ -235,7 +235,7 @@ namespace StanetRemoteControl
 
             try
             {
-                hub.Invoke("SendCommand", connUscita.ID, JsonConvert.SerializeObject(cmd));
+                hub.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd));
                 Task.Delay(100);
             }
             catch { }
@@ -247,6 +247,8 @@ namespace StanetRemoteControl
         private Connessione connUscita = new Connessione();
         public Int64 IdMacchina;
         byte[] _latestFrame = null;
+        private readonly object _frameLock = new object();
+        private System.Windows.Forms.Timer _renderTimer;
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
         private HubConnection connection;
         private IHubProxy hub;

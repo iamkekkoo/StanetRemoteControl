@@ -30,14 +30,10 @@ namespace StanetRemoteControl
 
             // Ricezione screen
             hub.On<byte[]>("ReceiveScreen", screenBytes => {
-                _latestFrame = screenBytes;
-
-                pictureBox1.Invoke((MethodInvoker)(() =>
+                lock (_frameLock)
                 {
-                    pictureBox1.Image?.Dispose();
-                    pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
-                    Console.WriteLine("picturebox aggiornata");
-                }));               
+                    _latestFrame = screenBytes;
+                }            
             });
 
             // riconnessione semplice a SignalR
@@ -47,14 +43,15 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await hub.Invoke("JoinConnection", connUscita.ID);
+                    await hub.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
 
             await connection.Start();
-            await hub.Invoke("JoinConnection", connUscita.ID);
+            await hub.Invoke("JoinConnection", connUscita.ID_Controllato);
             Console.WriteLine("connessione riuscita");
+            StartRenderTimer();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -83,6 +80,35 @@ namespace StanetRemoteControl
 
             }
         }
+
+        private void StartRenderTimer()
+        {
+            _renderTimer = new System.Windows.Forms.Timer();
+            _renderTimer.Interval = 33; // ~30 FPS
+            _renderTimer.Tick += RenderFrame;
+            _renderTimer.Start();
+        }
+
+        private void RenderFrame(object sender, EventArgs e)
+        {
+            byte[] frame;
+
+            lock (_frameLock)
+            {
+                if (_latestFrame == null)
+                    return;
+
+                frame = _latestFrame;
+            }
+
+            using (var bmp = (Bitmap)BytesToImage(frame))
+            {
+                pictureBox1.Image?.Dispose();
+                pictureBox1.Image = (Bitmap)BytesToImage(_latestFrame);
+                Console.WriteLine("picturebox aggiornata");
+            }
+        }
+
 
         // ====== UTILS ======
 
