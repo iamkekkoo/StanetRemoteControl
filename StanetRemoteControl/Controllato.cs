@@ -31,10 +31,26 @@ namespace StanetRemoteControl
         private async Task InizializzaSignalR()
         {
             connection = new HubConnection("https://francescostdev.azurewebsites.net");
-            hub = connection.CreateHubProxy("ScreenHub");
+
+            /*Divido inoltro screen, ricezione comandi importanti (tastiera e MouseClick) e MouseMove in 3 hub differenti a differente gestione*/
+            HubSchermo = connection.CreateHubProxy("ScreenHub");
+            HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
+            HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
 
             // Ricezione comandi
-            hub.On<string>("ReceiveCommand", cmdJson => {HandleCommand(cmdJson);});
+            {
+                /*Comandi importanti*/
+                HubPreciousCommand.On<string>("ReceiveCommand", cmdJson => { HandleCommand(cmdJson); });
+
+                /*Gestione comandi MouseMove (timer)*/
+                HubMouseMove.On<string>("ReceiveCommand", cmdJson =>
+                {
+                    lock (_commandLock)
+                    {
+                        _LatestMouseMoveCommandString = cmdJson;
+                    }
+                });
+            }
 
             // Riconnessione
             connection.Closed += async () =>
@@ -43,16 +59,41 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await hub.Invoke("JoinConnection", mac.ID);
+                    await HubSchermo.Invoke("JoinConnection", mac.ID);
+                }
+                catch { }
+            };
+            connection.Closed += async () =>
+            {
+                await Task.Delay(2000);
+                try
+                {
+                    await connection.Start();
+                    await HubPreciousCommand.Invoke("JoinConnection", mac.ID);
+                }
+                catch { }
+            };
+            connection.Closed += async () =>
+            {
+                await Task.Delay(2000);
+                try
+                {
+                    await connection.Start();
+                    await HubMouseMove.Invoke("JoinConnection", mac.ID);
                 }
                 catch { }
             };
 
             await connection.Start();
-            await hub.Invoke("JoinConnection", mac.ID);
+            await HubSchermo.Invoke("JoinConnection", mac.ID);
+            await HubPreciousCommand.Invoke("JoinConnection", mac.ID);
+            await HubMouseMove.Invoke("JoinConnection", mac.ID);
 
             // Avvia streaming
             _ = StartStreaming(cts.Token);
+
+            // Avvia timer ricezione comandi MouseMove
+            StartMouseMoveCommandTimer();
         }
 
         private async Task StartStreaming(CancellationToken token)
@@ -66,14 +107,37 @@ namespace StanetRemoteControl
                         var screenBytes = CaptureScreenBytes(schermo);
                         if (screenBytes != null && screenBytes.Length > 0)
                         {
-                            await hub.Invoke("SendScreen", mac.ID, screenBytes);
+                            await HubSchermo.Invoke("SendScreen", mac.ID, screenBytes);
                         }
                     }
                     catch { /* ignora eccezioni temporanee */ }
                 }
 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(66); // 15 fps
             }
+        }
+
+        private void StartMouseMoveCommandTimer()
+        {
+            _renderTimer = new System.Windows.Forms.Timer();
+            _renderTimer.Interval = 33; // ~30 FPS
+            _renderTimer.Tick += RenderMouseMove;
+            _renderTimer.Start();
+        }
+
+        private void RenderMouseMove(object sender, EventArgs e)
+        {
+            string command;
+
+            lock (_commandLock)
+            {
+                if (_LatestMouseMoveCommandString == null)
+                    return;
+
+                command = _LatestMouseMoveCommandString;
+            }
+
+            HandleCommand(command);
         }
 
         private void CaricaMacchina()

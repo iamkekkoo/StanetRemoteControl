@@ -178,7 +178,12 @@ namespace StanetRemoteControl
         public static byte[] bx;
         public static bool attivo = true;
         private HubConnection connection;
-        private IHubProxy hub;
+        private IHubProxy HubSchermo;
+        private IHubProxy HubPreciousCommand;
+        private IHubProxy HubMouseMove;
+        private string _LatestMouseMoveCommandString = null;
+        private readonly object _commandLock = new object();
+        private System.Windows.Forms.Timer _renderTimer;
         private CancellationTokenSource cts;
         private Connessione connessione;
 

@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static NPOI.HSSF.Util.HSSFColor;
+using static NPOI.POIFS.Crypt.CryptoFunctions;
 
 
 namespace StanetRemoteControl
@@ -24,12 +25,8 @@ namespace StanetRemoteControl
 
         private async Task InizializzaSignalR()
         {
-            connection = new HubConnection("https://francescostdev.azurewebsites.net");
-            hub = connection.CreateHubProxy("ScreenHub");
-
-
             // Ricezione screen
-            hub.On<byte[]>("ReceiveScreen", screenBytes => {
+            HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
                 lock (_frameLock)
                 {
                     _latestFrame = screenBytes;
@@ -43,15 +40,16 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await hub.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
 
             await connection.Start();
-            await hub.Invoke("JoinConnection", connUscita.ID_Controllato);
+            await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
             Console.WriteLine("connessione riuscita");
             StartRenderTimer();
+            StartSendMouseMoveCommandTimer();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -89,6 +87,14 @@ namespace StanetRemoteControl
             _renderTimer.Start();
         }
 
+        private void StartSendMouseMoveCommandTimer()
+        {
+            _renderTimer = new System.Windows.Forms.Timer();
+            _renderTimer.Interval = 33; // ~30 FPS
+            _renderTimer.Tick += SendMouseMoveCommand;
+            _renderTimer.Start();
+        }
+
         private void RenderFrame(object sender, EventArgs e)
         {
             byte[] frame;
@@ -108,7 +114,10 @@ namespace StanetRemoteControl
                 Console.WriteLine("picturebox aggiornata");
             }
         }
-
+        private void SendMouseMoveCommand(object sender, EventArgs e)
+        {
+            HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, _LastMouseMoveCommandToSend);
+        }
 
         // ====== UTILS ======
 

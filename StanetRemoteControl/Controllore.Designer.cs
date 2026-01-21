@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -214,29 +215,26 @@ namespace StanetRemoteControl
             SendKeyCommand(cmd);
         }
 
-
-
         private void SendMouseCommand(MouseCommand cmd)
         {
-            if (hub == null || connection == null || connection.State != ConnectionState.Connected)
+            if (HubMouseMove == null ||  HubPreciousCommand == null || connection == null || connection.State != ConnectionState.Connected)
             { return; }
 
             try
             {
-                hub.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd));
-                Task.Delay(100);
+                if (cmd.Action.CompareTo("MOVE") == 0) { _LastMouseMoveCommandToSend = JsonConvert.SerializeObject(cmd); }
+                else { HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd)); }
             }
             catch { }
         }
         private void SendKeyCommand(KeyCommand cmd)
         {
-            if (hub == null || connection == null || connection.State != ConnectionState.Connected)
+            if (HubPreciousCommand == null || connection == null || connection.State != ConnectionState.Connected)
             { return; }
 
             try
             {
-                hub.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd));
-                Task.Delay(100);
+                HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd));
             }
             catch { }
         }
@@ -250,8 +248,12 @@ namespace StanetRemoteControl
         private readonly object _frameLock = new object();
         private System.Windows.Forms.Timer _renderTimer;
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
-        private HubConnection connection;
-        private IHubProxy hub;
+        private static HubConnection connection = new HubConnection("https://francescostdev.azurewebsites.net");
+        private IHubProxy HubSchermo = connection.CreateHubProxy("ScreenHub");
+        private IHubProxy HubPreciousCommand;
+        private IHubProxy HubMouseMove;
+        private CancellationTokenSource cts = new CancellationTokenSource();
+        private string _LastMouseMoveCommandToSend = null;
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
