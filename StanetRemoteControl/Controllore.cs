@@ -117,6 +117,9 @@ namespace StanetRemoteControl
         
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
+            if (_LastMouseMoveCommandToSend == null)
+                return;
+
             HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, _LastMouseMoveCommandToSend);
         }
 
