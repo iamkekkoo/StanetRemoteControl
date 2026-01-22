@@ -142,7 +142,6 @@ namespace StanetRemoteControl
             {
                 pictureBox1.Image?.Dispose();
                 pictureBox1.Image = (Bitmap)BytesToImage(_latestFrame);
-                Console.WriteLine("picturebox aggiornata");
             }
         }
         
@@ -152,7 +151,6 @@ namespace StanetRemoteControl
                 return;
 
             HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, _LastMouseMoveCommandToSend);
-            Console.WriteLine("MouseMove Inviato");
         }
 
         // ====== UTILS ======
