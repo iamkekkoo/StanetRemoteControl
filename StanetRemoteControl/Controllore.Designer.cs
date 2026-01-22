@@ -250,8 +250,8 @@ namespace StanetRemoteControl
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
         private static HubConnection connection = new HubConnection("https://francescostdev.azurewebsites.net");
         private IHubProxy HubSchermo = connection.CreateHubProxy("ScreenHub");
-        private IHubProxy HubPreciousCommand;
-        private IHubProxy HubMouseMove;
+        private IHubProxy HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
+        private IHubProxy HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
         private CancellationTokenSource cts = new CancellationTokenSource();
         private string _LastMouseMoveCommandToSend = null;
 

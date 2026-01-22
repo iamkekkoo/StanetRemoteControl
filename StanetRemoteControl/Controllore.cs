@@ -19,8 +19,15 @@ namespace StanetRemoteControl
         public Controllore()
         {
             InitializeComponent();
-            
             this.pictureBox1.Visible = false;
+            this.Load += Controllore_Load;
+
+            return;
+        }
+        private void Controllore_Load(object sender, EventArgs e) 
+        {
+            cts = new CancellationTokenSource();
+            return;
         }
 
         private async Task InizializzaSignalR()
@@ -45,8 +52,32 @@ namespace StanetRemoteControl
                 catch { Console.WriteLine("Errore connessione"); }
             };
 
+            connection.Closed += async () =>
+            {
+                await Task.Delay(2000);
+                try
+                {
+                    await connection.Start();
+                    await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
+                }
+                catch { Console.WriteLine("Errore connessione"); }
+            };
+
+            connection.Closed += async () =>
+            {
+                await Task.Delay(2000);
+                try
+                {
+                    await connection.Start();
+                    await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
+                }
+                catch { Console.WriteLine("Errore connessione"); }
+            };
+
             await connection.Start();
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
+            await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
+            await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
             Console.WriteLine("connessione riuscita");
             StartRenderTimer();
             StartSendMouseMoveCommandTimer();
@@ -121,6 +152,7 @@ namespace StanetRemoteControl
                 return;
 
             HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, _LastMouseMoveCommandToSend);
+            Console.WriteLine("MouseMove Inviato");
         }
 
         // ====== UTILS ======
