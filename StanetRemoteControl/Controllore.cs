@@ -141,7 +141,7 @@ namespace StanetRemoteControl
             using (var bmp = (Bitmap)BytesToImage(frame))
             {
                 pictureBox1.Image?.Dispose();
-                pictureBox1.Image = (Bitmap)BytesToImage(_latestFrame);
+                pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
             }
         }
         

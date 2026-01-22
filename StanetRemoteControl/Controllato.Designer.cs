@@ -175,7 +175,7 @@ namespace StanetRemoteControl
         public static Macchina mac = new Macchina();
         public static List<Connessione> connIngresso = new List<Connessione>();
         public Controllore paginaConn = new Controllore();
-        public static byte[] bx;
+        public static byte[] screenBytes;
         public static bool attivo = true;
         private HubConnection connection;
         private IHubProxy HubSchermo;

@@ -100,27 +100,20 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
-                if (connection.State == ConnectionState.Connected)
+                screenBytes = CaptureScreenBytes(schermo);
+                if (screenBytes != null)
                 {
-                    try
-                    {
-                        var screenBytes = CaptureScreenBytes(schermo);
-                        if (screenBytes != null && screenBytes.Length > 0)
-                        {
-                            await HubSchermo.Invoke("SendScreen", mac.ID, screenBytes);
-                        }
-                    }
-                    catch { /* ignora eccezioni temporanee */ }
+                    await HubSchermo.Invoke("SendScreen", mac.ID, screenBytes);
                 }
-
-                await Task.Delay(500); // 2 fps
+                
+                await Task.Delay(200); // 5 fps
             }
         }
 
         private void StartMouseMoveCommandTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 16; // ~60 FPS
+            _renderTimer.Interval = 8; // ~120 FPS
             _renderTimer.Tick += RenderMouseMove;
             _renderTimer.Start();
         }
