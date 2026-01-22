@@ -114,6 +114,7 @@ namespace StanetRemoteControl
                 Console.WriteLine("picturebox aggiornata");
             }
         }
+        
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
             HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, _LastMouseMoveCommandToSend);
