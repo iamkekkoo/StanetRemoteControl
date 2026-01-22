@@ -113,7 +113,7 @@ namespace StanetRemoteControl
         private void StartRenderTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 16; // ~30 FPS
+            _renderTimer.Interval = 33; // ~30 FPS
             _renderTimer.Tick += RenderFrame;
             _renderTimer.Start();
         }
@@ -121,7 +121,7 @@ namespace StanetRemoteControl
         private void StartSendMouseMoveCommandTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 100; // ~15 FPS
+            _renderTimer.Interval = 100; // ~10 FPS
             _renderTimer.Tick += SendMouseMoveCommand;
             _renderTimer.Start();
         }
