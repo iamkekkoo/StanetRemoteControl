@@ -113,14 +113,14 @@ namespace StanetRemoteControl
                     catch { /* ignora eccezioni temporanee */ }
                 }
 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(200); // 5 fps
             }
         }
 
         private void StartMouseMoveCommandTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 33; // ~30 FPS
+            _renderTimer.Interval = 16; // ~60 FPS
             _renderTimer.Tick += RenderMouseMove;
             _renderTimer.Start();
         }
