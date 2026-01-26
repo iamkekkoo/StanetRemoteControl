@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Forms;
 
 namespace StanetRemoteControl
@@ -33,6 +34,12 @@ namespace StanetRemoteControl
             base.Dispose(disposing);
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            Rubrica?.Close();
+            base.OnFormClosing(e);
+        }
+
         #region Windows Form Designer generated code
 
 
@@ -50,6 +57,7 @@ namespace StanetRemoteControl
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.rubrica = new System.Windows.Forms.Button();
             this.Error = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -86,6 +94,15 @@ namespace StanetRemoteControl
             this.button1.Text = "Invio";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // rubrica
+            // 
+            this.rubrica.Location = new System.Drawing.Point(this.Height-rubrica.Height, this.Width-rubrica.Width);
+            this.rubrica.Name = "rubrica";
+            this.rubrica.TabIndex = 2;
+            this.rubrica.Text = "Rubrica";
+            this.rubrica.UseVisualStyleBackColor = true;
+            this.rubrica.Click += new System.EventHandler(this.btnToggleRubrica_Click);
             // 
             // Error
             // 
@@ -139,6 +156,7 @@ namespace StanetRemoteControl
             this.ClientSize = new System.Drawing.Size(600, 365);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.rubrica);
             this.Controls.Add(this.Error);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox2);
@@ -147,9 +165,37 @@ namespace StanetRemoteControl
             this.Name = "Controllore";
             this.Text = "Stanet Remote Control";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.LocationChanged += Controllore_LocationChanged;
+            this.SizeChanged += Controllore_SizeChanged;
             this.ResumeLayout(false);
             this.PerformLayout();
 
+        }
+
+        private void PosizionaRubrica()
+        {
+            Rubrica.Top = this.Top;
+            Rubrica.Height = this.Height;
+
+            // a destra, leggermente nascosta
+            Rubrica.Left = this.Right;
+        }
+
+        private void Controllore_LocationChanged(object sender, EventArgs e)
+        {
+            if (Rubrica != null)
+                Rubrica.SyncPosition();
+        }
+
+        private void Controllore_SizeChanged(object sender, EventArgs e)
+        {
+            if (Rubrica != null)
+                Rubrica.SyncPosition();
+        }
+
+        private void btnToggleRubrica_Click(object sender, EventArgs e)
+        {
+            Rubrica.Toggle();
         }
 
         private void PictureBox1_MouseMove(object sender, MouseEventArgs e)
@@ -240,6 +286,7 @@ namespace StanetRemoteControl
             }
             catch { }
         }
+      
         private void SendKeyCommand(KeyCommand cmd)
         {
             if (HubPreciousCommand == null || connection == null || connection.State != ConnectionState.Connected)
@@ -302,6 +349,7 @@ namespace StanetRemoteControl
         private string _LastMouseMoveCommandSent = null;
         private Bitmap _displayBitmap;
         private readonly object _bitmapLock = new object();
+        private Rubrica Rubrica;
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
@@ -309,5 +357,6 @@ namespace StanetRemoteControl
         private System.Windows.Forms.Label Error;
         private System.Windows.Forms.Label label1;
         private PictureBox pictureBox1;
+        private System.Windows.Forms.Button rubrica;
     }
 }

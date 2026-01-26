@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using static NPOI.HSSF.Util.HSSFColor;
 using static NPOI.POIFS.Crypt.CryptoFunctions;
@@ -23,6 +24,7 @@ namespace StanetRemoteControl
             InitializeComponent();
             this.pictureBox1.Visible = false;
             this.Load += Controllore_Load;
+            this.Shown += Controllore_Shown;
 
             return;
         }
@@ -30,6 +32,11 @@ namespace StanetRemoteControl
         {
             cts = new CancellationTokenSource();
             return;
+        }
+
+        private void Controllore_Shown(object sender, EventArgs e)
+        {
+            Rubrica = new Rubrica(this);
         }
 
         private async Task InizializzaSignalR()
@@ -178,7 +185,6 @@ namespace StanetRemoteControl
             pictureBox1.BeginInvoke(new MethodInvoker(() => pictureBox1.Invalidate()));
         }
 
-
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
             if (_LastMouseMoveCommandToSend == null)
@@ -207,12 +213,12 @@ namespace StanetRemoteControl
             return bmp;
         }
 
-        public static Image BytesToImage(byte[] value)
+        public static System.Drawing.Image BytesToImage(byte[] value)
         {
             try
             {
                 using (var ms = new MemoryStream(value))
-                using (var img = Image.FromStream(ms, false, false))
+                using (var img = System.Drawing.Image.FromStream(ms, false, false))
                 {
                     return (Bitmap)new Bitmap(img).Clone();
                 }
@@ -226,6 +232,7 @@ namespace StanetRemoteControl
                 return bmp;
             }
         }
-         
+        
+
     }
 }
