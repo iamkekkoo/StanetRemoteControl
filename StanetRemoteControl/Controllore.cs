@@ -130,31 +130,17 @@ namespace StanetRemoteControl
 
         private void RenderFrame(object sender, EventArgs e)
         {
-            byte[] frame;
-            lock (_frameLock)
-            {
-                if (_latestFrame == null) return;
-                frame = _latestFrame;
-                _latestFrame = null; // evita di renderizzare lo stesso frame più volte
-            }
+            if (_latestFrame.Length < 8) return;
 
-            if (frame.Length < 8) return; // header mancante
+            int frameWidth = BitConverter.ToInt32(_latestFrame, 0);
+            int frameHeight = BitConverter.ToInt32(_latestFrame, 4);
 
-            // Leggi larghezza e altezza dai primi 8 byte
-            int frameWidth = BitConverter.ToInt32(frame, 0);
-            int frameHeight = BitConverter.ToInt32(frame, 4);
-
-            // Decodifica JPEG temporaneo
             Bitmap tempBmp;
-            using (var ms = new MemoryStream(frame, 8, frame.Length - 8))
-            {
+            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8))
                 tempBmp = new Bitmap(ms);
-            }
 
-            // Crea _displayBitmap se necessario
-            if (_displayBitmap == null ||
-                _displayBitmap.Width != frameWidth ||
-                _displayBitmap.Height != frameHeight)
+            // Crea bitmap riutilizzabile
+            if (_displayBitmap == null || _displayBitmap.Width != frameWidth || _displayBitmap.Height != frameHeight)
             {
                 lock (_bitmapLock)
                 {
@@ -164,7 +150,7 @@ namespace StanetRemoteControl
                 }
             }
 
-            // Copia i pixel usando LockBits + unsafe
+            // LockBits + unsafe copy
             lock (_bitmapLock)
             {
                 Rectangle rect = new Rectangle(0, 0, frameWidth, frameHeight);
@@ -186,7 +172,9 @@ namespace StanetRemoteControl
             }
 
             tempBmp.Dispose();
-            pictureBox1.Invalidate();
+
+            // Aggiorna UI
+            pictureBox1.BeginInvoke(new MethodInvoker(() => pictureBox1.Invalidate()));
         }
 
 

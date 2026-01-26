@@ -194,7 +194,6 @@ namespace StanetRemoteControl
                 Screen screen = screens[monitorIndex];
                 Rectangle bounds = screen.Bounds;
 
-                // Inizializza bitmap riutilizzabile se necessario
                 if (_captureBitmap == null || _monitorBounds != bounds)
                 {
                     _captureBitmap?.Dispose();
@@ -202,13 +201,11 @@ namespace StanetRemoteControl
                     _monitorBounds = bounds;
                 }
 
-                // Copia schermo direttamente nella bitmap riutilizzabile
                 using (Graphics g = Graphics.FromImage(_captureBitmap))
                 {
                     g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
                 }
 
-                // Converti in JPEG direttamente in MemoryStream
                 using (var ms = new MemoryStream())
                 {
                     var enc = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");
@@ -216,10 +213,8 @@ namespace StanetRemoteControl
                     ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
 
                     _captureBitmap.Save(ms, enc, ep);
-
                     byte[] jpegBytes = ms.ToArray();
 
-                    // Prepara array finale: 4 byte larghezza + 4 byte altezza + jpeg
                     byte[] result = new byte[8 + jpegBytes.Length];
                     Array.Copy(BitConverter.GetBytes(bounds.Width), 0, result, 0, 4);
                     Array.Copy(BitConverter.GetBytes(bounds.Height), 0, result, 4, 4);
