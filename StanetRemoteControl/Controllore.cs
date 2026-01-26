@@ -130,6 +130,7 @@ namespace StanetRemoteControl
 
         private void RenderFrame(object sender, EventArgs e)
         {
+            if (_latestFrame == null) return;
             if (_latestFrame.Length < 8) return;
 
             int frameWidth = BitConverter.ToInt32(_latestFrame, 0);
