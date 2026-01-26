@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -113,7 +114,7 @@ namespace StanetRemoteControl
         private void StartRenderTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 1; // ~960 FPS
+            _renderTimer.Interval = 16; // ~60 FPS
             _renderTimer.Tick += RenderFrame;
             _renderTimer.Start();
         }
@@ -121,7 +122,7 @@ namespace StanetRemoteControl
         private void StartSendMouseMoveCommandTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 200; // ~5 FPS
+            _renderTimer.Interval = 100; // ~10 FPS
             _renderTimer.Tick += SendMouseMoveCommand;
             _renderTimer.Start();
         }
@@ -138,11 +139,9 @@ namespace StanetRemoteControl
                 frame = _latestFrame;
             }
 
-            using (var bmp = (Bitmap)BytesToImage(frame))
-            {
-                pictureBox1.Image?.Dispose();
-                pictureBox1.Image = ResizeImage((Bitmap)BytesToImage(_latestFrame), pictureBox1.Width, pictureBox1.Height);
-            }
+            var old = pictureBox1.Image;
+            pictureBox1.Image = (Bitmap)BytesToImage(frame);
+            old?.Dispose();
         }
         
         private void SendMouseMoveCommand(object sender, EventArgs e)
@@ -150,7 +149,12 @@ namespace StanetRemoteControl
             if (_LastMouseMoveCommandToSend == null)
                 return;
 
-            HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, _LastMouseMoveCommandToSend);
+            if (_LastMouseMoveCommandToSend != _LastMouseMoveCommandSent) 
+            { 
+                HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, _LastMouseMoveCommandToSend);
+                _LastMouseMoveCommandSent = _LastMouseMoveCommandToSend;
+            }
+            
         }
 
         // ====== UTILS ======
@@ -170,31 +174,22 @@ namespace StanetRemoteControl
 
         public static Image BytesToImage(byte[] value)
         {
-            Image clone;
             try
             {
                 using (var ms = new MemoryStream(value))
+                using (var img = Image.FromStream(ms, false, false))
                 {
-                    Image img = Image.FromStream(ms);
-
-                    // Clona l’immagine per staccarla dal MemoryStream
-                    clone = new Bitmap(img);
-
-                    img.Dispose(); // smaltisci l’originale
-
-                   
+                    return (Bitmap)new Bitmap(img).Clone();
                 }
             }
             catch (Exception e)
-            { 
+            {
                 // Se i byte non sono validi, ritorna un'immagine nera 800x600
-                clone = new Bitmap(800, 600);
-                using (Graphics g = Graphics.FromImage(clone))
-                {
+                Bitmap bmp = new Bitmap(800, 600, PixelFormat.Format24bppRgb);
+                using (Graphics g = Graphics.FromImage(bmp))
                     g.Clear(Color.Black);
-                }
+                return bmp;
             }
-            return clone;
         }
          
     }
