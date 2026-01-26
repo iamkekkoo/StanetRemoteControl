@@ -210,7 +210,7 @@ namespace StanetRemoteControl
                 {
                     var enc = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");
                     var ep = new EncoderParameters(1);
-                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 30L);
+                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
 
                     _captureBitmap.Save(ms, enc, ep);
                     byte[] jpegBytes = ms.ToArray();
