@@ -300,6 +300,8 @@ namespace StanetRemoteControl
         private CancellationTokenSource cts = new CancellationTokenSource();
         private string _LastMouseMoveCommandToSend = null;
         private string _LastMouseMoveCommandSent = null;
+        private Bitmap _displayBitmap;
+        private readonly object _bitmapLock = new object();
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;

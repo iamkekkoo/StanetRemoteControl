@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -133,17 +134,58 @@ namespace StanetRemoteControl
 
             lock (_frameLock)
             {
-                if (_latestFrame == null)
-                    return;
-
+                if (_latestFrame == null) return;
                 frame = _latestFrame;
             }
 
-            var old = pictureBox1.Image;
-            pictureBox1.Image = (Bitmap)BytesToImage(frame);
-            old?.Dispose();
+            if (frame.Length < 8) return; // header mancante
+
+            // Leggi larghezza e altezza dai primi 8 byte
+            int frameWidth = BitConverter.ToInt32(frame, 0);
+            int frameHeight = BitConverter.ToInt32(frame, 4);
+
+            // Decodifica JPEG temporaneo
+            Bitmap tempBmp;
+            using (var ms = new MemoryStream(frame, 8, frame.Length - 8))
+            {
+                tempBmp = new Bitmap(ms);
+            }
+
+            // Crea _displayBitmap se necessario
+            if (_displayBitmap == null ||
+                _displayBitmap.Width != frameWidth ||
+                _displayBitmap.Height != frameHeight)
+            {
+                lock (_bitmapLock)
+                {
+                    _displayBitmap?.Dispose();
+                    _displayBitmap = new Bitmap(frameWidth, frameHeight, PixelFormat.Format24bppRgb);
+                    pictureBox1.Image = _displayBitmap;
+                }
+            }
+
+            // Copia i pixel usando LockBits
+            lock (_bitmapLock)
+            {
+                Rectangle rect = new Rectangle(0, 0, frameWidth, frameHeight);
+                BitmapData destData = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, _displayBitmap.PixelFormat);
+                BitmapData srcData = tempBmp.LockBits(rect, ImageLockMode.ReadOnly, tempBmp.PixelFormat);
+
+                int bytes = Math.Abs(destData.Stride) * frameHeight;
+                unsafe
+                {
+                    Buffer.MemoryCopy(srcData.Scan0.ToPointer(), destData.Scan0.ToPointer(), bytes, bytes);
+                }
+
+                _displayBitmap.UnlockBits(destData);
+                tempBmp.UnlockBits(srcData);
+            }
+
+            tempBmp.Dispose();
+            pictureBox1.Invalidate();
         }
-        
+
+
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
             if (_LastMouseMoveCommandToSend == null)

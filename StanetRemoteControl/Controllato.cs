@@ -190,32 +190,34 @@ namespace StanetRemoteControl
                 Screen[] screens = Screen.AllScreens;
 
                 if (monitorIndex < 0 || monitorIndex >= screens.Length)
-                    return null; // indice non valido
+                    return null;
 
-                // Spazio virtuale totale
-                Rectangle virtualBounds = SystemInformation.VirtualScreen;
-
-                // Monitor scelto
                 Screen screen = screens[monitorIndex];
                 Rectangle bounds = screen.Bounds;
 
-                // Bitmap grande quanto lo spazio virtuale
-                using (var bmp = new Bitmap(virtualBounds.Width, virtualBounds.Height, PixelFormat.Format24bppRgb))
+                using (var bmp = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb))
                 using (var g = Graphics.FromImage(bmp))
                 {
-                    // Copia tutto lo spazio virtuale
-                    g.CopyFromScreen(virtualBounds.Left, virtualBounds.Top, 0, 0, virtualBounds.Size, CopyPixelOperation.SourceCopy);
+                    // Copia lo schermo
+                    g.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
 
-                    // Ritaglia la porzione del monitor scelto
-                    using (Bitmap monitorBmp = bmp.Clone(new Rectangle(bounds.X - virtualBounds.X, bounds.Y - virtualBounds.Y, bounds.Width, bounds.Height), bmp.PixelFormat))
                     using (var ms = new MemoryStream())
                     {
+                        // Salva in JPEG compresso
                         var enc = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");
                         var ep = new EncoderParameters(1);
                         ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
+                        bmp.Save(ms, enc, ep);
 
-                        monitorBmp.Save(ms, enc, ep);
-                        return ms.ToArray();
+                        byte[] jpegBytes = ms.ToArray();
+
+                        // Prepara l'array finale con header 8 byte (width + height)
+                        byte[] result = new byte[8 + jpegBytes.Length];
+                        Array.Copy(BitConverter.GetBytes(bounds.Width), 0, result, 0, 4);
+                        Array.Copy(BitConverter.GetBytes(bounds.Height), 0, result, 4, 4);
+                        Array.Copy(jpegBytes, 0, result, 8, jpegBytes.Length);
+
+                        return result;
                     }
                 }
             }
@@ -224,6 +226,7 @@ namespace StanetRemoteControl
                 return null;
             }
         }
+
 
         private void HandleCommand(string cmdJson)
         {
