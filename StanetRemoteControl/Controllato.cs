@@ -106,7 +106,7 @@ namespace StanetRemoteControl
                     await HubSchermo.Invoke("SendScreen", mac.ID, screenBytes);
                 }
                 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(200); // 5 fps
             }
         }
 
@@ -228,7 +228,6 @@ namespace StanetRemoteControl
                 return null;
             }
         }
-
 
         private void HandleCommand(string cmdJson)
         {
