@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -105,7 +106,15 @@ namespace StanetRemoteControl
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
-            //pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+
+            pictureBox1.Paint += (s, e) =>
+            {
+                e.Graphics.InterpolationMode = InterpolationMode.Low;
+                e.Graphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;
+            };
+
             pictureBox1.Dock = DockStyle.Fill; // opzionale, fa riempire tutta la finestra
             pictureBox1.MouseMove += PictureBox1_MouseMove;
             pictureBox1.MouseDown += PictureBox1_MouseDown;
@@ -145,20 +154,18 @@ namespace StanetRemoteControl
 
         private void PictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            
-
-            int x = e.X * 1000 / pictureBox1.Width;
-            int y = e.Y * 1000 / pictureBox1.Height;
-
-            var cmd = new MouseCommand
+            if (TryGetImageCoordinates(pictureBox1, e.Location, out var coordinates)) //calcolo e mando il comando del mouse solo se il mouse è nella picturebox
             {
-                Type = "MOUSE",
-                X = x,
-                Y = y,
-                Action = "MOVE"
-            };
+                var cmd = new MouseCommand
+                {
+                    Type = "MOUSE",
+                    X = coordinates.X,
+                    Y = coordinates.Y,
+                    Action = "MOVE"
+                };
 
-            SendMouseCommand(cmd);
+                SendMouseCommand(cmd);
+            }
         }
 
         private void PictureBox1_MouseDown(object sender, MouseEventArgs e)
@@ -166,15 +173,18 @@ namespace StanetRemoteControl
             string action = e.Button == MouseButtons.Left ? "LEFT_DOWN" :
                             e.Button == MouseButtons.Right ? "RIGHT_DOWN" : "MIDDLE_DOWN";
 
-            var cmd = new MouseCommand
+            if (TryGetImageCoordinates(pictureBox1, e.Location, out var coordinates)) //calcolo e mando il comando del mouse solo se il mouse è nella picturebox
             {
-                Type = "MOUSE",
-                X = e.X * 1000 / pictureBox1.Width,
-                Y = e.Y * 1000 / pictureBox1.Height,
-                Action = action
-            };
+                var cmd = new MouseCommand
+                {
+                    Type = "MOUSE",
+                    X = coordinates.X,
+                    Y = coordinates.Y,
+                    Action = action
+                };
 
-            SendMouseCommand(cmd);
+                SendMouseCommand(cmd);
+            }
         }
 
         private void PictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -182,15 +192,18 @@ namespace StanetRemoteControl
             string action = e.Button == MouseButtons.Left ? "LEFT_UP" :
                             e.Button == MouseButtons.Right ? "RIGHT_UP" : "MIDDLE_UP";
 
-            var cmd = new MouseCommand
+            if (TryGetImageCoordinates(pictureBox1, e.Location, out var coordinates)) //calcolo e mando il comando del mouse solo se il mouse è nella picturebox
             {
-                Type = "MOUSE",
-                X = e.X * 1000 / pictureBox1.Width,
-                Y = e.Y * 1000 / pictureBox1.Height,
-                Action = action
-            };
+                var cmd = new MouseCommand
+                {
+                    Type = "MOUSE",
+                    X = coordinates.X,
+                    Y = coordinates.Y,
+                    Action = action
+                };
 
-            SendMouseCommand(cmd);
+                SendMouseCommand(cmd);
+            }
         }
 
         private void Controllore_KeyDown(object sender, KeyEventArgs e)
@@ -222,7 +235,7 @@ namespace StanetRemoteControl
 
             try
             {
-                if (cmd.Action.CompareTo("MOVE") == 0) { _LastMouseMoveCommandToSend = JsonConvert.SerializeObject(cmd); }
+                if (cmd.Action.CompareTo("MOVE") == 0 ) { _LastMouseMoveCommandToSend = JsonConvert.SerializeObject(cmd); }
                 else { HubPreciousCommand.Invoke("SendCommand", connUscita.ID_Controllato, JsonConvert.SerializeObject(cmd)); }
             }
             catch { }
@@ -238,6 +251,38 @@ namespace StanetRemoteControl
             }
             catch { }
         }
+
+        public static bool TryGetImageCoordinates(PictureBox pictureBox, Point mouseLocation, out Point imagePoint)
+        {
+            imagePoint = Point.Empty;
+
+            if (pictureBox.Image == null)
+                return false;
+
+            Size imgSize = pictureBox.Image.Size;
+            Size pbSize = pictureBox.ClientSize;
+
+            float ratioWidth = (float)pbSize.Width / imgSize.Width;
+            float ratioHeight = (float)pbSize.Height / imgSize.Height;
+            float scale = Math.Min(ratioWidth, ratioHeight);
+
+            int displayedWidth = (int)(imgSize.Width * scale);
+            int displayedHeight = (int)(imgSize.Height * scale);
+
+            int offsetX = (pbSize.Width - displayedWidth) / 2;
+            int offsetY = (pbSize.Height - displayedHeight) / 2;
+
+            if (mouseLocation.X < offsetX || mouseLocation.X > offsetX + displayedWidth ||
+                mouseLocation.Y < offsetY || mouseLocation.Y > offsetY + displayedHeight)
+                return false;
+
+            int x = (int)((mouseLocation.X - offsetX) / scale);
+            int y = (int)((mouseLocation.Y - offsetY) / scale);
+
+            imagePoint = new Point(x, y);
+            return true;
+        }
+
         #endregion
 
 
@@ -254,6 +299,7 @@ namespace StanetRemoteControl
         private IHubProxy HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
         private CancellationTokenSource cts = new CancellationTokenSource();
         private string _LastMouseMoveCommandToSend = null;
+        private string _LastMouseMoveCommandSent = null;
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
