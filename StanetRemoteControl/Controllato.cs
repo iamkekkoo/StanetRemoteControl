@@ -188,37 +188,44 @@ namespace StanetRemoteControl
             try
             {
                 Screen[] screens = Screen.AllScreens;
-
                 if (monitorIndex < 0 || monitorIndex >= screens.Length)
                     return null;
 
                 Screen screen = screens[monitorIndex];
                 Rectangle bounds = screen.Bounds;
 
-                using (var bmp = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb))
-                using (var g = Graphics.FromImage(bmp))
+                // Inizializza bitmap riutilizzabile se necessario
+                if (_captureBitmap == null || _monitorBounds != bounds)
                 {
-                    // Copia lo schermo
-                    g.CopyFromScreen(bounds.Left, bounds.Top, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
+                    _captureBitmap?.Dispose();
+                    _captureBitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb);
+                    _monitorBounds = bounds;
+                }
 
-                    using (var ms = new MemoryStream())
-                    {
-                        // Salva in JPEG compresso
-                        var enc = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");
-                        var ep = new EncoderParameters(1);
-                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
-                        bmp.Save(ms, enc, ep);
+                // Copia schermo direttamente nella bitmap riutilizzabile
+                using (Graphics g = Graphics.FromImage(_captureBitmap))
+                {
+                    g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
+                }
 
-                        byte[] jpegBytes = ms.ToArray();
+                // Converti in JPEG direttamente in MemoryStream
+                using (var ms = new MemoryStream())
+                {
+                    var enc = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");
+                    var ep = new EncoderParameters(1);
+                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
 
-                        // Prepara l'array finale con header 8 byte (width + height)
-                        byte[] result = new byte[8 + jpegBytes.Length];
-                        Array.Copy(BitConverter.GetBytes(bounds.Width), 0, result, 0, 4);
-                        Array.Copy(BitConverter.GetBytes(bounds.Height), 0, result, 4, 4);
-                        Array.Copy(jpegBytes, 0, result, 8, jpegBytes.Length);
+                    _captureBitmap.Save(ms, enc, ep);
 
-                        return result;
-                    }
+                    byte[] jpegBytes = ms.ToArray();
+
+                    // Prepara array finale: 4 byte larghezza + 4 byte altezza + jpeg
+                    byte[] result = new byte[8 + jpegBytes.Length];
+                    Array.Copy(BitConverter.GetBytes(bounds.Width), 0, result, 0, 4);
+                    Array.Copy(BitConverter.GetBytes(bounds.Height), 0, result, 4, 4);
+                    Array.Copy(jpegBytes, 0, result, 8, jpegBytes.Length);
+
+                    return result;
                 }
             }
             catch

@@ -115,7 +115,7 @@ namespace StanetRemoteControl
         private void StartRenderTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 30; // ~60 FPS
+            _renderTimer.Interval = 16; // ~60 FPS
             _renderTimer.Tick += RenderFrame;
             _renderTimer.Start();
         }
@@ -131,11 +131,11 @@ namespace StanetRemoteControl
         private void RenderFrame(object sender, EventArgs e)
         {
             byte[] frame;
-
             lock (_frameLock)
             {
                 if (_latestFrame == null) return;
                 frame = _latestFrame;
+                _latestFrame = null; // evita di renderizzare lo stesso frame più volte
             }
 
             if (frame.Length < 8) return; // header mancante
@@ -164,17 +164,21 @@ namespace StanetRemoteControl
                 }
             }
 
-            // Copia i pixel usando LockBits
+            // Copia i pixel usando LockBits + unsafe
             lock (_bitmapLock)
             {
                 Rectangle rect = new Rectangle(0, 0, frameWidth, frameHeight);
+
                 BitmapData destData = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, _displayBitmap.PixelFormat);
                 BitmapData srcData = tempBmp.LockBits(rect, ImageLockMode.ReadOnly, tempBmp.PixelFormat);
 
                 int bytes = Math.Abs(destData.Stride) * frameHeight;
+
                 unsafe
                 {
-                    Buffer.MemoryCopy(srcData.Scan0.ToPointer(), destData.Scan0.ToPointer(), bytes, bytes);
+                    byte* srcPtr = (byte*)srcData.Scan0;
+                    byte* destPtr = (byte*)destData.Scan0;
+                    Buffer.MemoryCopy(srcPtr, destPtr, bytes, bytes);
                 }
 
                 _displayBitmap.UnlockBits(destData);

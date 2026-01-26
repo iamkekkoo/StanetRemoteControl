@@ -186,6 +186,8 @@ namespace StanetRemoteControl
         private System.Windows.Forms.Timer _renderTimer;
         private CancellationTokenSource cts;
         private Connessione connessione;
+        private Bitmap _captureBitmap; // bitmap riutilizzabile per il monitor
+        private Rectangle _monitorBounds; // salva le dimensioni del monitor
 
         public FileStream fs;
         public StreamReader reader;
