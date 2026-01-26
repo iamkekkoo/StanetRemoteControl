@@ -255,39 +255,23 @@ namespace StanetRemoteControl
         public static bool TryGetImageCoordinates(PictureBox pictureBox, Point mouseLocation, out Point imagePoint)
         {
             imagePoint = Point.Empty;
-            if (pictureBox.Image == null) return false;
 
-            int imgWidth = pictureBox.Image.Width;
-            int imgHeight = pictureBox.Image.Height;
+            if (pictureBox.Image == null)
+                return false;
 
-            int pbWidth = pictureBox.ClientSize.Width;
-            int pbHeight = pictureBox.ClientSize.Height;
+            Size imgSize = pictureBox.Image.Size;
+            Size pbSize = pictureBox.ClientSize;
 
-            float ratioImg = (float)imgWidth / imgHeight;
-            float ratioPb = (float)pbWidth / pbHeight;
+            float ratioWidth = (float)pbSize.Width / imgSize.Width;
+            float ratioHeight = (float)pbSize.Height / imgSize.Height;
+            float scale = Math.Min(ratioWidth, ratioHeight);
 
-            float scale;
-            int offsetX = 0, offsetY = 0;
-            int displayedWidth, displayedHeight;
+            int displayedWidth = (int)(imgSize.Width * scale);
+            int displayedHeight = (int)(imgSize.Height * scale);
 
-            if (ratioPb > ratioImg)
-            {
-                // PictureBox più largo rispetto all'immagine → bande laterali
-                scale = (float)pbHeight / imgHeight;
-                displayedWidth = (int)(imgWidth * scale);
-                displayedHeight = pbHeight;
-                offsetX = (pbWidth - displayedWidth) / 2;
-            }
-            else
-            {
-                // PictureBox più alto rispetto all'immagine → bande sopra/sotto
-                scale = (float)pbWidth / imgWidth;
-                displayedWidth = pbWidth;
-                displayedHeight = (int)(imgHeight * scale);
-                offsetY = (pbHeight - displayedHeight) / 2;
-            }
+            int offsetX = (pbSize.Width - displayedWidth) / 2;
+            int offsetY = (pbSize.Height - displayedHeight) / 2;
 
-            // Verifica se il mouse è dentro l'immagine visualizzata
             if (mouseLocation.X < offsetX || mouseLocation.X > offsetX + displayedWidth ||
                 mouseLocation.Y < offsetY || mouseLocation.Y > offsetY + displayedHeight)
                 return false;
@@ -298,7 +282,6 @@ namespace StanetRemoteControl
             imagePoint = new Point(x, y);
             return true;
         }
-
 
         #endregion
 

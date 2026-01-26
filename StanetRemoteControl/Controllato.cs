@@ -234,9 +234,7 @@ namespace StanetRemoteControl
                 {
                     if (mouseCmd.X == 0) { schermo = schermo - 1; Task.Delay(1500); }
                     else if (mouseCmd.X == Screen.AllScreens[schermo].Bounds.Width) { schermo = schermo + 1; Task.Delay(1500); }
-                    else { 
-                    mouseCmd.X = mouseCmd.X * Screen.PrimaryScreen.Bounds.Width / 1000;
-                    mouseCmd.Y = mouseCmd.Y * Screen.PrimaryScreen.Bounds.Height / 1000;
+                    else {
                     EseguiMouse(mouseCmd);
                     }
                     return;
