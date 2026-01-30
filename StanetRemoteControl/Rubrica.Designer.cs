@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
+using StanetRemoteControl.RemoteControlNode;
 
 namespace StanetRemoteControl
 {
@@ -36,28 +39,64 @@ namespace StanetRemoteControl
         /// </summary>
         private void InitializeComponent()
         {
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.SuspendLayout();
             // 
-            // Rubrica
+            // flowLayoutPanel1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.flowLayoutPanel1.AutoScroll = true;
+            this.flowLayoutPanel1.AutoSize = true;
+            this.flowLayoutPanel1.Margin = new Padding(5, 0, 0, 0);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
+            this.flowLayoutPanel1.WrapContents = false;
+            this.flowLayoutPanel1.BackColor = Color.LightGray;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.TabIndex = 0;
+            this.flowLayoutPanel1.Click += (s, e) => this.flowLayoutPanel1.Focus();
+            // 
+            // flowLayoutPanel2
+            // 
+            this.flowLayoutPanel2.AutoScroll = true;
+            this.flowLayoutPanel2.AutoSize = true;
+            this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel2.FlowDirection = FlowDirection.TopDown;
+            this.flowLayoutPanel2.WrapContents = false;
+            this.flowLayoutPanel2.BackColor = Color.White;
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.flowLayoutPanel2.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel2.TabIndex = 0;
+            this.flowLayoutPanel2.Click += (s, e) => this.flowLayoutPanel1.Focus();
+            // 
+            // Form Rubrica
+            // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.LightGray;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = Color.LightGray;
+            this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Controls.Add(this.flowLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Name = "Rubrica";
-            this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Rubrica";
             this.ResumeLayout(false);
-
         }
+
+
 
         #endregion
 
-        Timer animTimer;
-        bool nascosta = true; // se true → fuori, se false → dentro
-        int step = 15;
-        int targetLeft;
+        public Timer animTimer;
+        bool nascosta = false; // false -> fuori, true -> dentro
+        int step = 5;
+        int targetWhidth;
+        IService1 service;
+        Contatto[] rubrica;
+        private FlowLayoutPanel flowLayoutPanel1;
+        private FlowLayoutPanel flowLayoutPanel2;
+        Int64 IdMacchina;
+        private Controllore controllore;
+        public TextBox ricerca = new TextBox();
     }
 }

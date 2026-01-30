@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
-using NPOI.Util;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -301,6 +299,7 @@ namespace StanetRemoteControl
         const int INPUT_KEYBOARD = 1;
         const uint KEYEVENTF_KEYUP = 0x0002;
 
+        [StructLayout(LayoutKind.Sequential)]
         struct INPUT
         {
             public int type;
@@ -313,6 +312,7 @@ namespace StanetRemoteControl
             [FieldOffset(0)] public KEYBDINPUT ki;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         struct KEYBDINPUT
         {
             public ushort wVk;
@@ -323,54 +323,76 @@ namespace StanetRemoteControl
         }
 
         // ------------------- Mappa tasti -------------------
-        static readonly Dictionary<string, ushort> KeyMap = new Dictionary<string, ushort>()
+        static readonly Dictionary<string, ushort> KeyMap = new Dictionary<string, ushort>(StringComparer.OrdinalIgnoreCase)
         {
-            { "A", (ushort)Keys.A },
-            { "B", (ushort)Keys.B },
-            { "C", (ushort)Keys.C },
-            { "D", (ushort)Keys.D },
-            { "E", (ushort)Keys.E },
-            { "F", (ushort)Keys.F },
-            { "G", (ushort)Keys.G },
-            { "H", (ushort)Keys.H },
-            { "I", (ushort)Keys.I },
-            { "J", (ushort)Keys.J },
-            { "K", (ushort)Keys.K },
-            { "L", (ushort)Keys.L },
-            { "M", (ushort)Keys.M },
-            { "N", (ushort)Keys.N },
-            { "O", (ushort)Keys.O },
-            { "P", (ushort)Keys.P },
-            { "Q", (ushort)Keys.Q },
-            { "R", (ushort)Keys.R },
-            { "S", (ushort)Keys.S },
-            { "T", (ushort)Keys.T },
-            { "U", (ushort)Keys.U },
-            { "V", (ushort)Keys.V },
-            { "W", (ushort)Keys.W },
-            { "X", (ushort)Keys.X },
-            { "Y", (ushort)Keys.Y },
-            { "Z", (ushort)Keys.Z },
-            { "ENTER", (ushort)Keys.Enter },
-            { "ESC", (ushort)Keys.Escape },
-            { "TAB", (ushort)Keys.Tab },
-            { "SPACE", (ushort)Keys.Space },
-            { "CTRL", (ushort)Keys.ControlKey },
-            { "SHIFT", (ushort)Keys.ShiftKey },
-            { "ALT", (ushort)Keys.Menu },
-            { "F1", (ushort)Keys.F1 },
-            { "F2", (ushort)Keys.F2 },
-            { "F3", (ushort)Keys.F3 },
-            { "F4", (ushort)Keys.F4 },
-            { "F5", (ushort)Keys.F5 },
-            { "F6", (ushort)Keys.F6 },
-            { "F7", (ushort)Keys.F7 },
-            { "F8", (ushort)Keys.F8 },
-            { "F9", (ushort)Keys.F9 },
-            { "F10", (ushort)Keys.F10 },
-            { "F11", (ushort)Keys.F11 },
-            { "F12", (ushort)Keys.F12 }
+            // ----------------- LETTERE -----------------
+            { "A", 0x41 }, { "B", 0x42 }, { "C", 0x43 }, { "D", 0x44 },
+            { "E", 0x45 }, { "F", 0x46 }, { "G", 0x47 }, { "H", 0x48 },
+            { "I", 0x49 }, { "J", 0x4A }, { "K", 0x4B }, { "L", 0x4C },
+            { "M", 0x4D }, { "N", 0x4E }, { "O", 0x4F }, { "P", 0x50 },
+            { "Q", 0x51 }, { "R", 0x52 }, { "S", 0x53 }, { "T", 0x54 },
+            { "U", 0x55 }, { "V", 0x56 }, { "W", 0x57 }, { "X", 0x58 },
+            { "Y", 0x59 }, { "Z", 0x5A },
+
+            // ----------------- NUMERI -----------------
+            { "0", 0x30 }, { "1", 0x31 }, { "2", 0x32 }, { "3", 0x33 },
+            { "4", 0x34 }, { "5", 0x35 }, { "6", 0x36 }, { "7", 0x37 },
+            { "8", 0x38 }, { "9", 0x39 },
+
+            // ----------------- FUNZIONE -----------------
+            { "F1", 0x70 },  { "F2", 0x71 },  { "F3", 0x72 },  { "F4", 0x73 },
+            { "F5", 0x74 },  { "F6", 0x75 },  { "F7", 0x76 },  { "F8", 0x77 },
+            { "F9", 0x78 },  { "F10", 0x79 }, { "F11", 0x7A }, { "F12", 0x7B },
+
+            // ----------------- CONTROLLO -----------------
+            { "ENTER", 0x0D },
+            { "ESC", 0x1B },
+            { "TAB", 0x09 },
+            { "SPACE", 0x20 },
+            { "BACKSPACE", 0x08 },
+            { "CAPSLOCK", 0x14 },
+
+            // ----------------- MODIFICATORI -----------------
+            { "SHIFT", 0x10 },
+            { "CTRL", 0x11 },
+            { "CONTROL", 0x11 },
+            { "ALT", 0x12 },
+            { "WIN", 0x5B },
+
+            // ----------------- NAVIGAZIONE -----------------
+            { "LEFT", 0x25 },
+            { "UP", 0x26 },
+            { "RIGHT", 0x27 },
+            { "DOWN", 0x28 },
+            { "HOME", 0x24 },
+            { "END", 0x23 },
+            { "PAGEUP", 0x21 },
+            { "PAGEDOWN", 0x22 },
+            { "INSERT", 0x2D },
+            { "DELETE", 0x2E },
+
+            // ----------------- NUMPAD -----------------
+            { "NUM0", 0x60 }, { "NUM1", 0x61 }, { "NUM2", 0x62 },
+            { "NUM3", 0x63 }, { "NUM4", 0x64 }, { "NUM5", 0x65 },
+            { "NUM6", 0x66 }, { "NUM7", 0x67 }, { "NUM8", 0x68 },
+            { "NUM9", 0x69 },
+            { "NUMMULTIPLY", 0x6A },
+            { "NUMADD", 0x6B },
+            { "NUMSUBTRACT", 0x6D },
+            { "NUMDECIMAL", 0x6E },
+            { "NUMDIVIDE", 0x6F },
+
+            // ----------------- MEDIA -----------------
+            { "VOLUMEUP", 0xAF },
+            { "VOLUMEDOWN", 0xAE },
+            { "MUTE", 0xAD },
+
+            // ----------------- VARI -----------------
+            { "PRINTSCREEN", 0x2C },
+            { "SCROLLLOCK", 0x91 },
+            { "PAUSE", 0x13 }
         };
+
 
         // ------------------- Funzioni invio tasto -------------------
         static void KeyDown(ushort key)
@@ -380,7 +402,11 @@ namespace StanetRemoteControl
                 type = INPUT_KEYBOARD,
                 u = new InputUnion
                 {
-                    ki = new KEYBDINPUT { wVk = key }
+                    ki = new KEYBDINPUT
+                    {
+                        wVk = key,
+                        dwFlags = 0
+                    }
                 }
             };
             SendInput(1, new INPUT[] { input }, Marshal.SizeOf(typeof(INPUT)));
