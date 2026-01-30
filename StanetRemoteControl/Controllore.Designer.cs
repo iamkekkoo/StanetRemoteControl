@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -32,6 +33,14 @@ namespace StanetRemoteControl
                 components.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            HubSchermo.Invoke("LeaveConnection", connUscita.ID_Controllato);
+            HubMouseMove.Invoke("LeaveConnection", connUscita.ID_Controllato);
+            HubPreciousCommand.Invoke("LeaveConnection", connUscita.ID_Controllato);
+            base.OnClosing(e);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -93,11 +102,11 @@ namespace StanetRemoteControl
             this.button1.TabIndex = 2;
             this.button1.Text = "Invio";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += (s,e) => button1_Click(textBox1.Text, textBox2.Text);
             // 
             // rubrica
             // 
-            this.rubrica.Location = new System.Drawing.Point(this.Height-rubrica.Height, this.Width-rubrica.Width);
+            this.rubrica.Location = new System.Drawing.Point(this.Top, this.Right);
             this.rubrica.Name = "rubrica";
             this.rubrica.TabIndex = 2;
             this.rubrica.Text = "Rubrica";
@@ -172,15 +181,6 @@ namespace StanetRemoteControl
 
         }
 
-        private void PosizionaRubrica()
-        {
-            Rubrica.Top = this.Top;
-            Rubrica.Height = this.Height;
-
-            // a destra, leggermente nascosta
-            Rubrica.Left = this.Right;
-        }
-
         private void Controllore_LocationChanged(object sender, EventArgs e)
         {
             if (Rubrica != null)
@@ -195,7 +195,7 @@ namespace StanetRemoteControl
 
         private void btnToggleRubrica_Click(object sender, EventArgs e)
         {
-            Rubrica.Toggle();
+            Rubrica.animTimer.Start();
         }
 
         private void PictureBox1_MouseMove(object sender, MouseEventArgs e)
@@ -334,16 +334,16 @@ namespace StanetRemoteControl
 
 
         public static IService1 serv = new RemoteControlNode.Service1Client();
-        private Connessione connUscita = new Connessione();
-        public Int64 IdMacchina;
+        internal Connessione connUscita = new Connessione();
+        internal Int64 IdMacchina;
         byte[] _latestFrame = null;
         private readonly object _frameLock = new object();
         private System.Windows.Forms.Timer _renderTimer;
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
         private static HubConnection connection = new HubConnection("https://francescostdev.azurewebsites.net");
-        private IHubProxy HubSchermo = connection.CreateHubProxy("ScreenHub");
-        private IHubProxy HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
-        private IHubProxy HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
+        internal IHubProxy HubSchermo = connection.CreateHubProxy("ScreenHub");
+        internal IHubProxy HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
+        internal IHubProxy HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
         private CancellationTokenSource cts = new CancellationTokenSource();
         private string _LastMouseMoveCommandToSend = null;
         private string _LastMouseMoveCommandSent = null;

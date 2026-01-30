@@ -1,18 +1,11 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
-using Newtonsoft.Json;
-using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Forms;
-using static NPOI.HSSF.Util.HSSFColor;
-using static NPOI.POIFS.Crypt.CryptoFunctions;
 
 
 namespace StanetRemoteControl
@@ -36,7 +29,7 @@ namespace StanetRemoteControl
 
         private void Controllore_Shown(object sender, EventArgs e)
         {
-            Rubrica = new Rubrica(this);
+            Rubrica = new Rubrica(this, serv, IdMacchina);
         }
 
         private async Task InizializzaSignalR()
@@ -92,10 +85,10 @@ namespace StanetRemoteControl
             StartSendMouseMoveCommandTimer();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(string UserName, string Password)
         {
 
-            connUscita = serv.ChiediAccesso(textBox1.Text, textBox2.Text, IdMacchina);
+            connUscita = serv.ChiediAccesso(UserName, Password, IdMacchina);
             
             if (connUscita.ID != 0) 
             {
@@ -108,8 +101,6 @@ namespace StanetRemoteControl
                 
                 //proviamo cosi
                 pictureBox1.Width = Width; pictureBox1.Height = Height;
-
-
 
                 pictureBox1.Visible = true;
 

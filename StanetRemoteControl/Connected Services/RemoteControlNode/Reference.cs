@@ -363,10 +363,10 @@ namespace StanetRemoteControl.RemoteControlNode {
         System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Connessione> ChiediAccessoAsync(string user, string psw, long mioId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetRubrica", ReplyAction="http://tempuri.org/IService1/GetRubricaResponse")]
-        StanetRemoteControl.RemoteControlNode.Contatto[] GetRubrica(StanetRemoteControl.RemoteControlNode.Macchina mac);
+        StanetRemoteControl.RemoteControlNode.Contatto[] GetRubrica(long macId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/GetRubrica", ReplyAction="http://tempuri.org/IService1/GetRubricaResponse")]
-        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto[]> GetRubricaAsync(StanetRemoteControl.RemoteControlNode.Macchina mac);
+        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto[]> GetRubricaAsync(long macId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AggiungiGruppo", ReplyAction="http://tempuri.org/IService1/AggiungiGruppoResponse")]
         long AggiungiGruppo(long IdSottoscrizione, string NomeGruppo);
@@ -387,22 +387,22 @@ namespace StanetRemoteControl.RemoteControlNode {
         System.Threading.Tasks.Task<string> RinominaGruppoAsync(long IdGruppo, string NuovoNomeGruppo);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AggiungiContattoAGruppo", ReplyAction="http://tempuri.org/IService1/AggiungiContattoAGruppoResponse")]
-        StanetRemoteControl.RemoteControlNode.Contatto AggiungiContattoAGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina);
+        StanetRemoteControl.RemoteControlNode.Contatto AggiungiContattoAGruppo(string macUserName, string macPassword, long IdGruppo, string NomeMacchina);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/AggiungiContattoAGruppo", ReplyAction="http://tempuri.org/IService1/AggiungiContattoAGruppoResponse")]
-        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto> AggiungiContattoAGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina);
+        System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto> AggiungiContattoAGruppoAsync(string macUserName, string macPassword, long IdGruppo, string NomeMacchina);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RimuoviContattoDaGruppo", ReplyAction="http://tempuri.org/IService1/RimuoviContattoDaGruppoResponse")]
-        string RimuoviContattoDaGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo);
+        string RimuoviContattoDaGruppo(string macUserName, long IdGruppo);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RimuoviContattoDaGruppo", ReplyAction="http://tempuri.org/IService1/RimuoviContattoDaGruppoResponse")]
-        System.Threading.Tasks.Task<string> RimuoviContattoDaGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo);
+        System.Threading.Tasks.Task<string> RimuoviContattoDaGruppoAsync(string macUserName, long IdGruppo);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RinominaContattoInGruppo", ReplyAction="http://tempuri.org/IService1/RinominaContattoInGruppoResponse")]
-        string RinominaContattoInGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina);
+        string RinominaContattoInGruppo(string macUserName, long IdGruppo, string NuovoNomeMacchina);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService1/RinominaContattoInGruppo", ReplyAction="http://tempuri.org/IService1/RinominaContattoInGruppoResponse")]
-        System.Threading.Tasks.Task<string> RinominaContattoInGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina);
+        System.Threading.Tasks.Task<string> RinominaContattoInGruppoAsync(string macUserName, long IdGruppo, string NuovoNomeMacchina);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -456,12 +456,12 @@ namespace StanetRemoteControl.RemoteControlNode {
             return base.Channel.ChiediAccessoAsync(user, psw, mioId);
         }
         
-        public StanetRemoteControl.RemoteControlNode.Contatto[] GetRubrica(StanetRemoteControl.RemoteControlNode.Macchina mac) {
-            return base.Channel.GetRubrica(mac);
+        public StanetRemoteControl.RemoteControlNode.Contatto[] GetRubrica(long macId) {
+            return base.Channel.GetRubrica(macId);
         }
         
-        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto[]> GetRubricaAsync(StanetRemoteControl.RemoteControlNode.Macchina mac) {
-            return base.Channel.GetRubricaAsync(mac);
+        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto[]> GetRubricaAsync(long macId) {
+            return base.Channel.GetRubricaAsync(macId);
         }
         
         public long AggiungiGruppo(long IdSottoscrizione, string NomeGruppo) {
@@ -488,28 +488,28 @@ namespace StanetRemoteControl.RemoteControlNode {
             return base.Channel.RinominaGruppoAsync(IdGruppo, NuovoNomeGruppo);
         }
         
-        public StanetRemoteControl.RemoteControlNode.Contatto AggiungiContattoAGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina) {
-            return base.Channel.AggiungiContattoAGruppo(mac, IdGruppo, NomeMacchina);
+        public StanetRemoteControl.RemoteControlNode.Contatto AggiungiContattoAGruppo(string macUserName, string macPassword, long IdGruppo, string NomeMacchina) {
+            return base.Channel.AggiungiContattoAGruppo(macUserName, macPassword, IdGruppo, NomeMacchina);
         }
         
-        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto> AggiungiContattoAGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NomeMacchina) {
-            return base.Channel.AggiungiContattoAGruppoAsync(mac, IdGruppo, NomeMacchina);
+        public System.Threading.Tasks.Task<StanetRemoteControl.RemoteControlNode.Contatto> AggiungiContattoAGruppoAsync(string macUserName, string macPassword, long IdGruppo, string NomeMacchina) {
+            return base.Channel.AggiungiContattoAGruppoAsync(macUserName, macPassword, IdGruppo, NomeMacchina);
         }
         
-        public string RimuoviContattoDaGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo) {
-            return base.Channel.RimuoviContattoDaGruppo(mac, IdGruppo);
+        public string RimuoviContattoDaGruppo(string macUserName, long IdGruppo) {
+            return base.Channel.RimuoviContattoDaGruppo(macUserName, IdGruppo);
         }
         
-        public System.Threading.Tasks.Task<string> RimuoviContattoDaGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo) {
-            return base.Channel.RimuoviContattoDaGruppoAsync(mac, IdGruppo);
+        public System.Threading.Tasks.Task<string> RimuoviContattoDaGruppoAsync(string macUserName, long IdGruppo) {
+            return base.Channel.RimuoviContattoDaGruppoAsync(macUserName, IdGruppo);
         }
         
-        public string RinominaContattoInGruppo(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina) {
-            return base.Channel.RinominaContattoInGruppo(mac, IdGruppo, NuovoNomeMacchina);
+        public string RinominaContattoInGruppo(string macUserName, long IdGruppo, string NuovoNomeMacchina) {
+            return base.Channel.RinominaContattoInGruppo(macUserName, IdGruppo, NuovoNomeMacchina);
         }
         
-        public System.Threading.Tasks.Task<string> RinominaContattoInGruppoAsync(StanetRemoteControl.RemoteControlNode.Macchina mac, long IdGruppo, string NuovoNomeMacchina) {
-            return base.Channel.RinominaContattoInGruppoAsync(mac, IdGruppo, NuovoNomeMacchina);
+        public System.Threading.Tasks.Task<string> RinominaContattoInGruppoAsync(string macUserName, long IdGruppo, string NuovoNomeMacchina) {
+            return base.Channel.RinominaContattoInGruppoAsync(macUserName, IdGruppo, NuovoNomeMacchina);
         }
     }
 }

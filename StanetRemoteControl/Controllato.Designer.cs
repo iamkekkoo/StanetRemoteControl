@@ -34,6 +34,14 @@ namespace StanetRemoteControl
             base.Dispose(disposing);
         }
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            HubSchermo.Invoke("LeaveConnection", mac.ID);
+            HubMouseMove.Invoke("LeaveConnection", mac.ID);
+            HubPreciousCommand.Invoke("LeaveConnection", mac.ID);
+            base.OnClosing(e);
+        }
+
         #region Codice generato da Progettazione Windows Form
 
         /// <summary>
