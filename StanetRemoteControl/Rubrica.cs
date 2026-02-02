@@ -121,6 +121,44 @@ namespace StanetRemoteControl
             ricerca.KeyUp += (s, e) => { flowLayoutPanel2.Controls.Clear(); CaricaContatti(ricerca.Text); flowLayoutPanel1.Controls.Add(flowLayoutPanel2); };
             flowLayoutPanel1.Controls.Add(ricerca);
 
+            // TextBox per nome nuovo gruppo
+            TextBox NuovoGruppo = new TextBox();
+            Button aggiungiGruppo = new Button();
+            aggiungiGruppo.Text = "+";
+            aggiungiGruppo.AutoSize = true;
+            NuovoGruppo.Size = aggiungiGruppo.Size;
+            NuovoGruppo.Visible = false;
+            NuovoGruppo.KeyUp += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter && NuovoGruppo.Text.CompareTo("") != 0)
+                {
+                    service.AggiungiGruppo(controllore.IdSottoscrizione.Value, NuovoGruppo.Text);
+                    rubrica = service.GetRubrica(IdMacchina);
+                    flowLayoutPanel2.Controls.Clear();
+                    CaricaContatti(ricerca.Text);
+                    aggiungiGruppo.Visible = true; NuovoGruppo.Visible = false;
+                    NuovoGruppo.Text = "";
+                }
+
+            };
+            NuovoGruppo.LostFocus += (s, e) => {
+                if (NuovoGruppo.Text.CompareTo("") != 0)
+                {
+                    service.AggiungiGruppo(controllore.IdSottoscrizione.Value, NuovoGruppo.Text);
+                    rubrica = service.GetRubrica(IdMacchina);
+                    flowLayoutPanel2.Controls.Clear();
+                    CaricaContatti(ricerca.Text);
+                    aggiungiGruppo.Visible = true; NuovoGruppo.Visible = false;
+                    NuovoGruppo.Text = "";
+                }
+            };
+
+            
+            aggiungiGruppo.Click += (s, e) => { aggiungiGruppo.Visible = false; NuovoGruppo.Visible = true; NuovoGruppo.Focus(); };
+
+            flowLayoutPanel1.Controls.Add(NuovoGruppo);
+            flowLayoutPanel1.Controls.Add(aggiungiGruppo);
+
             flowLayoutPanel2.Controls.Clear();
             rubrica = service.GetRubrica(IdMacchina);
             CaricaContatti(ricerca.Text);
@@ -129,8 +167,6 @@ namespace StanetRemoteControl
 
         private void CaricaContatti(string filtro)
         {
-            
-
             var gruppi = rubrica
                 .GroupBy(c => (c.IdGruppo, c.NomeGruppo))
                 .ToList();

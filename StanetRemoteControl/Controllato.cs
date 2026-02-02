@@ -177,6 +177,7 @@ namespace StanetRemoteControl
                 paginaConn = new Controllore();
                 Application.EnableVisualStyles();
                 paginaConn.IdMacchina = mac.ID;
+                paginaConn.IdSottoscrizione = mac.IdSottoscrizione;
                 Application.Run(paginaConn);
             }).Start();
         }

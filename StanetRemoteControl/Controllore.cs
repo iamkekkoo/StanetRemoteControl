@@ -181,9 +181,6 @@ namespace StanetRemoteControl
             pictureBox1.BeginInvoke(new MethodInvoker(() => pictureBox1.Invalidate()));
         }
 
-
-
-
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
             if (_LastMouseMoveCommandToSend == null)
