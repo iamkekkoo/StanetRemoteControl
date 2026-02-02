@@ -138,10 +138,16 @@ namespace StanetRemoteControl
             if (frame == null || frame.Length < 8)
                 return;
 
+            // Leggi dimensioni
             int width = BitConverter.ToInt32(frame, 0);
             int height = BitConverter.ToInt32(frame, 4);
 
-            // Crea bitmap se non esiste o cambia dimensione
+            // Controllo robusto: lunghezza minima necessaria
+            long expectedLength = 8L + ((long)width * height * 3); // evita overflow
+            if (frame.Length < expectedLength || width <= 0 || height <= 0)
+                return; // frame incompleto o corrotto
+
+            // Crea bitmap se necessario
             if (_displayBitmap == null || _displayBitmap.Width != width || _displayBitmap.Height != height)
             {
                 _displayBitmap?.Dispose();
@@ -149,11 +155,11 @@ namespace StanetRemoteControl
                 pictureBox1.Image = _displayBitmap;
             }
 
-            // Lock bitmap per scrittura
+            // Lock bitmap per scrittura veloce
             Rectangle rect = new Rectangle(0, 0, width, height);
             BitmapData data = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
 
-            int bytesPerRow = width * 3; // solo pixel validi
+            int bytesPerRow = width * 3;
 
             fixed (byte* src = &frame[8])
             {
@@ -161,12 +167,12 @@ namespace StanetRemoteControl
 
                 for (int y = 0; y < height; y++)
                 {
-                    // Copia solo i pixel reali rispettando lo stride
+                    // Copia solo i pixel validi rispettando lo stride
                     Buffer.MemoryCopy(
-                        src + y * bytesPerRow,   // sorgente
-                        dest + y * data.Stride,  // destinazione
-                        data.Stride,             // dimensione massima della riga destinazione
-                        bytesPerRow);            // lunghezza reale da copiare
+                        src + (long)y * bytesPerRow,  // sorgente
+                        dest + (long)y * data.Stride, // destinazione
+                        data.Stride,                  // dimensione massima destinazione
+                        bytesPerRow);                 // lunghezza reale dei pixel
                 }
             }
 
