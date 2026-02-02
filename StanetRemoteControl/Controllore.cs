@@ -251,6 +251,13 @@ namespace StanetRemoteControl
             this.pictureBox1.BackColor = System.Drawing.Color.Black;
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.pictureBox1.Visible = false;
+            // 
+            // Controllore
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(600, 365);
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
         }
 
         // ====== UTILS ======
