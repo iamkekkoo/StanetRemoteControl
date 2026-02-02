@@ -452,6 +452,8 @@ namespace StanetRemoteControl
                 controllore.HubSchermo.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
                 controllore.HubMouseMove.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
                 controllore.HubPreciousCommand.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
+                controllore.connection.Stop();
+                controllore.connUscita.ID_Controllato = 0;
             }
 
             controllore.button1_Click(UserName, Password);
@@ -466,6 +468,8 @@ namespace StanetRemoteControl
                 controllore.HubSchermo.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
                 controllore.HubMouseMove.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
                 controllore.HubPreciousCommand.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
+                controllore.connection.Stop();
+                controllore.connUscita.ID_Controllato = 0;
             }
             flowLayoutPanel2.Controls.Clear();
             CaricaContatti(ricerca.Text);

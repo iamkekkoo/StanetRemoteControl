@@ -340,10 +340,10 @@ namespace StanetRemoteControl
         private readonly object _frameLock = new object();
         private System.Windows.Forms.Timer _renderTimer;
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
-        private static HubConnection connection = new HubConnection("https://francescostdev.azurewebsites.net");
-        internal IHubProxy HubSchermo = connection.CreateHubProxy("ScreenHub");
-        internal IHubProxy HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
-        internal IHubProxy HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
+        internal HubConnection connection = new HubConnection("https://francescostdev.azurewebsites.net");
+        internal IHubProxy HubSchermo;
+        internal IHubProxy HubPreciousCommand;
+        internal IHubProxy HubMouseMove;
         private CancellationTokenSource cts = new CancellationTokenSource();
         private string _LastMouseMoveCommandToSend = null;
         private string _LastMouseMoveCommandSent = null;

@@ -34,6 +34,10 @@ namespace StanetRemoteControl
 
         private async Task InizializzaSignalR()
         {
+            HubSchermo = connection.CreateHubProxy("ScreenHub");
+            HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
+            HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
+
             // Ricezione screen
             HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
                 lock (_frameLock)
@@ -80,7 +84,6 @@ namespace StanetRemoteControl
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
-            Console.WriteLine("connessione riuscita");
             StartRenderTimer();
             StartSendMouseMoveCommandTimer();
         }
