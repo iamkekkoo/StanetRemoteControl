@@ -133,6 +133,7 @@ namespace StanetRemoteControl
 
         private unsafe void RenderFrame(object sender, EventArgs e)
         {
+            // Prendi l'ultimo frame e azzera il buffer
             byte[] frame = Interlocked.Exchange(ref _latestFrame, null);
             if (frame == null || frame.Length < 8)
                 return;
@@ -140,19 +141,19 @@ namespace StanetRemoteControl
             int width = BitConverter.ToInt32(frame, 0);
             int height = BitConverter.ToInt32(frame, 4);
 
-            if (_displayBitmap == null ||
-                _displayBitmap.Width != width ||
-                _displayBitmap.Height != height)
+            // Crea bitmap se non esiste o cambia dimensione
+            if (_displayBitmap == null || _displayBitmap.Width != width || _displayBitmap.Height != height)
             {
                 _displayBitmap?.Dispose();
                 _displayBitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
                 pictureBox1.Image = _displayBitmap;
             }
 
+            // Lock bitmap per scrittura
             Rectangle rect = new Rectangle(0, 0, width, height);
             BitmapData data = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
 
-            int bytesPerRow = width * 3;
+            int bytesPerRow = width * 3; // solo pixel validi
 
             fixed (byte* src = &frame[8])
             {
@@ -160,17 +161,22 @@ namespace StanetRemoteControl
 
                 for (int y = 0; y < height; y++)
                 {
+                    // Copia solo i pixel reali rispettando lo stride
                     Buffer.MemoryCopy(
-                        src + y * bytesPerRow,
-                        dest + y * data.Stride,
-                        bytesPerRow,
-                        bytesPerRow);
+                        src + y * bytesPerRow,   // sorgente
+                        dest + y * data.Stride,  // destinazione
+                        data.Stride,             // dimensione massima della riga destinazione
+                        bytesPerRow);            // lunghezza reale da copiare
                 }
             }
 
             _displayBitmap.UnlockBits(data);
-            pictureBox1.Invalidate();
+
+            // Aggiorna UI
+            if (pictureBox1.IsHandleCreated)
+                pictureBox1.Invalidate();
         }
+
 
 
 
