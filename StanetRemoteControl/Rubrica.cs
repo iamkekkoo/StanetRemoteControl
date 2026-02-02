@@ -244,7 +244,6 @@ namespace StanetRemoteControl
                         {//se non connesso a questo chiede se connettere
                             menu.Items.Add("Connetti", null, (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password));
                         }
-                        menu.Items.Add("Elimina", null, (s, e) => CancellaContatto((Contatto)btn.Tag));
                         menu.Items.Add("Rinomina", null, (s, e) => { newNameContatto.Text = btn.Text; btn.Visible = false; newNameContatto.Visible = true; newNameContatto.Focus(); });
                         menu.Items.Add("Elimina", null, (s, e) => CancellaContatto((Contatto)btn.Tag));
 
@@ -320,6 +319,14 @@ namespace StanetRemoteControl
 
                             // Menu contestuale
                             ContextMenuStrip menu = new ContextMenuStrip();
+                            if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
+                            {//se connesso a questo chiede se disconnettere
+                                menu.Items.Add("Disconnetti", null, (s, e) => DisconnettiDaRubrica());
+                            }
+                            else
+                            {//se non connesso a questo chiede se connettere
+                                menu.Items.Add("Connetti", null, (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password));
+                            }
                             menu.Items.Add("Rinomina", null, (s, e) => { newNameContatto.Text = btn.Text; btn.Visible = false; newNameContatto.Visible = true; newNameContatto.Focus(); });
                             menu.Items.Add("Elimina", null, (s, e) => CancellaContatto((Contatto)btn.Tag));
 
@@ -337,35 +344,6 @@ namespace StanetRemoteControl
                 }
             }
         }
-
-        private void Btn_Click(object sender, EventArgs e)
-        {
-            Button btn = sender as Button;
-            var item = btn.Tag as Contatto;
-
-            MessageBox.Show(item.UserName);
-        }
-
-        /*private void AdattaLarghezzaForm()
-        {
-            int maxWidth = 0;
-
-            foreach (Control ctrl in flowLayoutPanel1.Controls)
-            {
-                maxWidth = Math.Max(maxWidth, ctrl.Right);
-            }
-
-            foreach (Control ctrl in flowLayoutPanel2.Controls)
-            {
-                maxWidth = Math.Max(maxWidth, ctrl.Right);
-            }
-
-
-            // padding + bordi
-            this.Width = maxWidth + 20;
-            flowLayoutPanel1.AutoSize = true;
-            flowLayoutPanel2.AutoSize = true;
-        }*/
 
         private void CancellaContatto(Contatto c) 
         {

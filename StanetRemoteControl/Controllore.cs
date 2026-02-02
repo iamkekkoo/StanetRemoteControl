@@ -34,6 +34,7 @@ namespace StanetRemoteControl
 
         private async Task InizializzaSignalR()
         {
+            connection = new HubConnection("https://francescostdev.azurewebsites.net");
             HubSchermo = connection.CreateHubProxy("ScreenHub");
             HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
             HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
@@ -49,7 +50,7 @@ namespace StanetRemoteControl
             // riconnessione semplice a SignalR
             connection.Closed += async () =>
             {
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 try
                 {
                     await connection.Start();
@@ -60,7 +61,7 @@ namespace StanetRemoteControl
 
             connection.Closed += async () =>
             {
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 try
                 {
                     await connection.Start();
@@ -71,7 +72,7 @@ namespace StanetRemoteControl
 
             connection.Closed += async () =>
             {
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 try
                 {
                     await connection.Start();
@@ -82,6 +83,7 @@ namespace StanetRemoteControl
 
             await connection.Start();
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
+            Console.WriteLine("Schermo connesso a: " + connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
             StartRenderTimer();
@@ -116,7 +118,7 @@ namespace StanetRemoteControl
         private void StartRenderTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 4; // ~240 FPS
+            _renderTimer.Interval = 33; // ~30 FPS
             _renderTimer.Tick += RenderFrame;
             _renderTimer.Start();
         }
@@ -129,55 +131,48 @@ namespace StanetRemoteControl
             _renderTimer.Start();
         }
 
-        private void RenderFrame(object sender, EventArgs e)
+        private unsafe void RenderFrame(object sender, EventArgs e)
         {
-            if (_latestFrame == null) return;
-            if (_latestFrame.Length < 8) return;
+            byte[] frame = Interlocked.Exchange(ref _latestFrame, null);
+            if (frame == null || frame.Length < 8)
+                return;
 
-            int frameWidth = BitConverter.ToInt32(_latestFrame, 0);
-            int frameHeight = BitConverter.ToInt32(_latestFrame, 4);
+            int width = BitConverter.ToInt32(frame, 0);
+            int height = BitConverter.ToInt32(frame, 4);
 
-            Bitmap tempBmp;
-            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8))
-                tempBmp = new Bitmap(ms);
-
-            // Crea bitmap riutilizzabile
-            if (_displayBitmap == null || _displayBitmap.Width != frameWidth || _displayBitmap.Height != frameHeight)
+            if (_displayBitmap == null ||
+                _displayBitmap.Width != width ||
+                _displayBitmap.Height != height)
             {
-                lock (_bitmapLock)
+                _displayBitmap?.Dispose();
+                _displayBitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+                pictureBox1.Image = _displayBitmap;
+            }
+
+            Rectangle rect = new Rectangle(0, 0, width, height);
+            BitmapData data = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+
+            int bytesPerRow = width * 3;
+
+            fixed (byte* src = &frame[8])
+            {
+                byte* dest = (byte*)data.Scan0;
+
+                for (int y = 0; y < height; y++)
                 {
-                    _displayBitmap?.Dispose();
-                    _displayBitmap = new Bitmap(frameWidth, frameHeight, PixelFormat.Format24bppRgb);
-                    pictureBox1.Image = _displayBitmap;
+                    Buffer.MemoryCopy(
+                        src + y * bytesPerRow,
+                        dest + y * data.Stride,
+                        bytesPerRow,
+                        bytesPerRow);
                 }
             }
 
-            // LockBits + unsafe copy
-            lock (_bitmapLock)
-            {
-                Rectangle rect = new Rectangle(0, 0, frameWidth, frameHeight);
-
-                BitmapData destData = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, _displayBitmap.PixelFormat);
-                BitmapData srcData = tempBmp.LockBits(rect, ImageLockMode.ReadOnly, tempBmp.PixelFormat);
-
-                int bytes = Math.Abs(destData.Stride) * frameHeight;
-
-                unsafe
-                {
-                    byte* srcPtr = (byte*)srcData.Scan0;
-                    byte* destPtr = (byte*)destData.Scan0;
-                    Buffer.MemoryCopy(srcPtr, destPtr, bytes, bytes);
-                }
-
-                _displayBitmap.UnlockBits(destData);
-                tempBmp.UnlockBits(srcData);
-            }
-
-            tempBmp.Dispose();
-
-            // Aggiorna UI
-            pictureBox1.BeginInvoke(new MethodInvoker(() => pictureBox1.Invalidate()));
+            _displayBitmap.UnlockBits(data);
+            pictureBox1.Invalidate();
         }
+
+
 
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
@@ -224,7 +219,6 @@ namespace StanetRemoteControl
             this.button1.TabIndex = 2;
             this.button1.Text = "Invio";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += (s, e) => button1_Click(textBox1.Text, textBox2.Text);
             // 
             // rubrica
             // 
