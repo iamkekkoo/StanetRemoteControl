@@ -133,19 +133,16 @@ namespace StanetRemoteControl
 
         private unsafe void RenderFrame(object sender, EventArgs e)
         {
-            // Prendi l'ultimo frame e azzera il buffer
             byte[] frame = Interlocked.Exchange(ref _latestFrame, null);
             if (frame == null || frame.Length < 8)
                 return;
 
-            // Leggi dimensioni
             int width = BitConverter.ToInt32(frame, 0);
             int height = BitConverter.ToInt32(frame, 4);
 
-            // Controllo robusto: lunghezza minima necessaria
-            long expectedLength = 8L + ((long)width * height * 3); // evita overflow
+            long expectedLength = 8L + ((long)width * height * 3);
             if (frame.Length < expectedLength || width <= 0 || height <= 0)
-                return; // frame incompleto o corrotto
+                return;
 
             // Crea bitmap se necessario
             if (_displayBitmap == null || _displayBitmap.Width != width || _displayBitmap.Height != height)
@@ -155,24 +152,27 @@ namespace StanetRemoteControl
                 pictureBox1.Image = _displayBitmap;
             }
 
-            // Lock bitmap per scrittura veloce
-            Rectangle rect = new Rectangle(0, 0, width, height);
-            BitmapData data = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            // Lock bitmap
+            BitmapData data = _displayBitmap.LockBits(
+                new Rectangle(0, 0, width, height),
+                ImageLockMode.WriteOnly,
+                PixelFormat.Format24bppRgb);
 
-            int bytesPerRow = width * 3;
-
-            fixed (byte* src = &frame[8])
+            unsafe
             {
                 byte* dest = (byte*)data.Scan0;
-
-                for (int y = 0; y < height; y++)
+                fixed (byte* src = &frame[8])
                 {
-                    // Copia solo i pixel validi rispettando lo stride
-                    Buffer.MemoryCopy(
-                        src + (long)y * bytesPerRow,  // sorgente
-                        dest + (long)y * data.Stride, // destinazione
-                        data.Stride,                  // dimensione massima destinazione
-                        bytesPerRow);                 // lunghezza reale dei pixel
+                    int stride = data.Stride;
+
+                    for (int y = 0; y < height; y++)
+                    {
+                        // Copia ogni riga con il stride corretto
+                        for (int x = 0; x < width * 3; x++)
+                        {
+                            dest[y * stride + x] = src[y * width * 3 + x];
+                        }
+                    }
                 }
             }
 
