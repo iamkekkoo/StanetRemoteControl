@@ -470,7 +470,7 @@ namespace StanetRemoteControl
                 controllore.HubPreciousCommand.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
                 controllore.connection.Stop();
                 controllore.connUscita.ID_Controllato = 0;
-                controllore = new Controllore();
+                controllore.ControlloreReset();
             }
             flowLayoutPanel2.Controls.Clear();
             CaricaContatti(ricerca.Text);

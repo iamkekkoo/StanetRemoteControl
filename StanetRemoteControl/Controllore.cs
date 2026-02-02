@@ -192,6 +192,14 @@ namespace StanetRemoteControl
             
         }
 
+        public void ControlloreReset() 
+        {
+            InitializeComponent();
+            this.pictureBox1.Visible = false;
+            this.Load += Controllore_Load;
+            this.Shown += Controllore_Shown;
+        }
+
         // ====== UTILS ======
 
         private static Bitmap ResizeImage(Bitmap src, int maxW, int maxH)
