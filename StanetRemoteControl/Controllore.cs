@@ -133,54 +133,52 @@ namespace StanetRemoteControl
 
         private unsafe void RenderFrame(object sender, EventArgs e)
         {
-            byte[] frame = Interlocked.Exchange(ref _latestFrame, null);
-            if (frame == null || frame.Length < 8)
-                return;
+            if (_latestFrame == null) return;
+            if (_latestFrame.Length < 8) return;
 
-            int width = BitConverter.ToInt32(frame, 0);
-            int height = BitConverter.ToInt32(frame, 4);
+            int frameWidth = BitConverter.ToInt32(_latestFrame, 0);
+            int frameHeight = BitConverter.ToInt32(_latestFrame, 4);
 
-            long expectedLength = 8L + ((long)width * height * 3);
-            if (frame.Length < expectedLength || width <= 0 || height <= 0)
-                return;
+            Bitmap tempBmp;
+            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8))
+                tempBmp = new Bitmap(ms);
 
-            // Crea bitmap se necessario
-            if (_displayBitmap == null || _displayBitmap.Width != width || _displayBitmap.Height != height)
+            // Crea bitmap riutilizzabile
+            if (_displayBitmap == null || _displayBitmap.Width != frameWidth || _displayBitmap.Height != frameHeight)
             {
-                _displayBitmap?.Dispose();
-                _displayBitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-                pictureBox1.Image = _displayBitmap;
-            }
-
-            // Lock bitmap
-            BitmapData data = _displayBitmap.LockBits(
-                new Rectangle(0, 0, width, height),
-                ImageLockMode.WriteOnly,
-                PixelFormat.Format24bppRgb);
-
-            unsafe
-            {
-                byte* dest = (byte*)data.Scan0;
-                fixed (byte* src = &frame[8])
+                lock (_bitmapLock)
                 {
-                    int stride = data.Stride;
-
-                    for (int y = 0; y < height; y++)
-                    {
-                        // Copia ogni riga con il stride corretto
-                        for (int x = 0; x < width * 3; x++)
-                        {
-                            dest[y * stride + x] = src[y * width * 3 + x];
-                        }
-                    }
+                    _displayBitmap?.Dispose();
+                    _displayBitmap = new Bitmap(frameWidth, frameHeight, PixelFormat.Format24bppRgb);
+                    pictureBox1.Image = _displayBitmap;
                 }
             }
 
-            _displayBitmap.UnlockBits(data);
+            // LockBits + unsafe copy
+            lock (_bitmapLock)
+            {
+                Rectangle rect = new Rectangle(0, 0, frameWidth, frameHeight);
+
+                BitmapData destData = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, _displayBitmap.PixelFormat);
+                BitmapData srcData = tempBmp.LockBits(rect, ImageLockMode.ReadOnly, tempBmp.PixelFormat);
+
+                int bytes = Math.Abs(destData.Stride) * frameHeight;
+
+                unsafe
+                {
+                    byte* srcPtr = (byte*)srcData.Scan0;
+                    byte* destPtr = (byte*)destData.Scan0;
+                    Buffer.MemoryCopy(srcPtr, destPtr, bytes, bytes);
+                }
+
+                _displayBitmap.UnlockBits(destData);
+                tempBmp.UnlockBits(srcData);
+            }
+
+            tempBmp.Dispose();
 
             // Aggiorna UI
-            if (pictureBox1.IsHandleCreated)
-                pictureBox1.Invalidate();
+            pictureBox1.BeginInvoke(new MethodInvoker(() => pictureBox1.Invalidate()));
         }
 
 
