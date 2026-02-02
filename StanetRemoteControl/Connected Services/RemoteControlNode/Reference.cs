@@ -244,6 +244,9 @@ namespace StanetRemoteControl.RemoteControlNode {
         private long IdGruppoField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private long IdMacchinaField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string NomeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -274,6 +277,19 @@ namespace StanetRemoteControl.RemoteControlNode {
                 if ((this.IdGruppoField.Equals(value) != true)) {
                     this.IdGruppoField = value;
                     this.RaisePropertyChanged("IdGruppo");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public long IdMacchina {
+            get {
+                return this.IdMacchinaField;
+            }
+            set {
+                if ((this.IdMacchinaField.Equals(value) != true)) {
+                    this.IdMacchinaField = value;
+                    this.RaisePropertyChanged("IdMacchina");
                 }
             }
         }

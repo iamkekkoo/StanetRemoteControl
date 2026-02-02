@@ -29,6 +29,7 @@
   <xs:complexType name="Contatto">
     <xs:sequence>
       <xs:element minOccurs="0" name="IdGruppo" type="xs:long" />
+      <xs:element minOccurs="0" name="IdMacchina" type="xs:long" />
       <xs:element minOccurs="0" name="Nome" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="NomeGruppo" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />

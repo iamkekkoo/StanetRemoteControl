@@ -215,7 +215,15 @@ namespace StanetRemoteControl
                         btn.Text = contatto.Nome;
                         btn.Tag = contatto;
                         btn.AutoSize = true;
-                        btn.Click += (s, e) => ConnessioneDaRubrica(contatto.UserName, contatto.Password);
+                        if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
+                        {//se connesso a questo cliccando disconnette
+                            btn.Click += (s, e) => DisconnettiDaRubrica();
+                        }
+                        else 
+                        {//se non connesso a questo cliccando connette
+                            btn.Click += (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password);
+                        }
+                            
                         row.Controls.Add(btn);
 
                         // TextBox per rinomina
@@ -228,6 +236,15 @@ namespace StanetRemoteControl
 
                         // Menu contestuale
                         ContextMenuStrip menu = new ContextMenuStrip();
+                        if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
+                        {//se connesso a questo chiede se disconnettere
+                            menu.Items.Add("Disconnetti", null, (s, e) => DisconnettiDaRubrica());
+                        }
+                        else 
+                        {//se non connesso a questo chiede se connettere
+                            menu.Items.Add("Connetti", null, (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password));
+                        }
+                        menu.Items.Add("Elimina", null, (s, e) => CancellaContatto((Contatto)btn.Tag));
                         menu.Items.Add("Rinomina", null, (s, e) => { newNameContatto.Text = btn.Text; btn.Visible = false; newNameContatto.Visible = true; newNameContatto.Focus(); });
                         menu.Items.Add("Elimina", null, (s, e) => CancellaContatto((Contatto)btn.Tag));
 
@@ -283,7 +300,14 @@ namespace StanetRemoteControl
                             btn.Text = contatto.Nome;
                             btn.Tag = contatto;
                             btn.AutoSize = true;
-                            btn.Click += (s, e) => ConnessioneDaRubrica(contatto.UserName, contatto.Password);
+                            if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
+                            {//se connesso a questo cliccando disconnette
+                                btn.Click += (s, e) => DisconnettiDaRubrica();
+                            }
+                            else
+                            {//se non connesso a questo cliccando connette
+                                btn.Click += (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password);
+                            }
                             row.Controls.Add(btn);
 
                             // TextBox per rinomina
@@ -421,9 +445,9 @@ namespace StanetRemoteControl
 
         }
 
-        private void ConnessioneDaRubrica(string UserName, string Password) 
+        private void ConnettiDaRubrica(string UserName, string Password)
         {
-            if (controllore.connUscita.ID_Controllato != 0) 
+            if (controllore.connUscita.ID_Controllato != 0)
             {
                 controllore.HubSchermo.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
                 controllore.HubMouseMove.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
@@ -431,8 +455,19 @@ namespace StanetRemoteControl
             }
 
             controllore.button1_Click(UserName, Password);
+            CaricaContatti(ricerca.Text);
         }
 
+        private void DisconnettiDaRubrica()
+        {
+            if (controllore.connUscita.ID_Controllato != 0)
+            {
+                controllore.HubSchermo.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
+                controllore.HubMouseMove.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
+                controllore.HubPreciousCommand.Invoke("LeaveConnection", controllore.connUscita.ID_Controllato);
+            }
+            CaricaContatti(ricerca.Text);
+        }
     }
 
     public class ContattoDialog : Form

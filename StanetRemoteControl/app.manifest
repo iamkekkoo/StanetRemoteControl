@@ -16,8 +16,9 @@
             Rimuovere questo elemento se l'applicazione richiede questa virtualizzazione per
             compatibilità con le versioni precedenti.
         -->
-        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
-      </requestedPrivileges>
+
+		  <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+	  </requestedPrivileges>
       <applicationRequestMinimum>
         <defaultAssemblyRequest permissionSetReference="Custom" />
         <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
