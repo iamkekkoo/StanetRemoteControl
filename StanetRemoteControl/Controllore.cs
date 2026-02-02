@@ -196,8 +196,6 @@ namespace StanetRemoteControl
         {
             InitializeComponent();
             this.pictureBox1.Visible = false;
-            this.Load += Controllore_Load;
-            this.Shown += Controllore_Shown;
         }
 
         // ====== UTILS ======
