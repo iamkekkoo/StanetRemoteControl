@@ -194,7 +194,62 @@ namespace StanetRemoteControl
 
         public void ControlloreReset() 
         {
-            InitializeComponent();
+            // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F);
+            this.textBox1.Location = new System.Drawing.Point(60, 77);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(189, 44);
+            this.textBox1.TabIndex = 0;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F);
+            this.textBox2.Location = new System.Drawing.Point(348, 77);
+            this.textBox2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(189, 44);
+            this.textBox2.TabIndex = 1;
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(528, 329);
+            this.button1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(64, 27);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Invio";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += (s, e) => button1_Click(textBox1.Text, textBox2.Text);
+            // 
+            // rubrica
+            // 
+            this.rubrica.Location = new System.Drawing.Point(this.Top, this.Right);
+            this.rubrica.Name = "rubrica";
+            this.rubrica.TabIndex = 2;
+            this.rubrica.Text = "Rubrica";
+            this.rubrica.UseVisualStyleBackColor = true;
+            this.rubrica.Click += new System.EventHandler(this.btnToggleRubrica_Click);
+            // 
+            // Error
+            // 
+            this.Error.AutoSize = true;
+            this.Error.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
+            this.Error.ForeColor = System.Drawing.Color.Red;
+            this.Error.Location = new System.Drawing.Point(9, 344);
+            this.Error.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.Error.Name = "Error";
+            this.Error.Size = new System.Drawing.Size(0, 13);
+            this.Error.TabIndex = 3;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.Color.Black;
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.pictureBox1.Visible = false;
         }
 
