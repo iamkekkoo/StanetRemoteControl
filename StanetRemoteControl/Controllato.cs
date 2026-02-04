@@ -222,8 +222,8 @@ namespace StanetRemoteControl
                 g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // Thumbnail /2 con HighQualityBicubic
-            int thumbWidth = (int)(bounds.Width * 0.66);
-            int thumbHeight = (int)(bounds.Height * 0.66);
+            int thumbWidth = (int)(bounds.Width);
+            int thumbHeight = (int)(bounds.Height);
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight))
             using (Graphics g = Graphics.FromImage(thumb))
