@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Forms;
 
 
@@ -44,7 +46,8 @@ namespace StanetRemoteControl
                 lock (_frameLock)
                 {
                     _latestFrame = screenBytes;
-                }            
+                }
+                RenderFrame(screenBytes);
             });
 
             // riconnessione semplice a SignalR
@@ -86,7 +89,7 @@ namespace StanetRemoteControl
             Console.WriteLine("Schermo connesso a: " + connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
-            StartRenderTimer();
+            //StartRenderTimer();
             StartSendMouseMoveCommandTimer();
         }
 
@@ -115,13 +118,13 @@ namespace StanetRemoteControl
             }
         }
 
-        private void StartRenderTimer()
+        /*private void StartRenderTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
             _renderTimer.Interval = 3; // ~240 FPS   //provo da 4->3 (240 ->360 fps)
             _renderTimer.Tick += RenderFrame;
             _renderTimer.Start();
-        }
+        }*/
 
         private void StartSendMouseMoveCommandTimer()
         {
@@ -131,55 +134,37 @@ namespace StanetRemoteControl
             _renderTimer.Start();
         }
 
-        private unsafe void RenderFrame(object sender, EventArgs e)
+        private void RenderFrame(byte[] _latestFrame)
         {
-            if (_latestFrame == null) return;
-            if (_latestFrame.Length < 8) return;
+            if (_latestFrame == null || _latestFrame.Length <= 8)
+                return;
 
-            int frameWidth = BitConverter.ToInt32(_latestFrame, 0);
-            int frameHeight = BitConverter.ToInt32(_latestFrame, 4);
+            int width = BitConverter.ToInt32(_latestFrame, 0);
+            int height = BitConverter.ToInt32(_latestFrame, 4);
 
-            Bitmap tempBmp;
-            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8))
-                tempBmp = new Bitmap(ms);
-
-            // Crea bitmap riutilizzabile
-            if (_displayBitmap == null || _displayBitmap.Width != frameWidth || _displayBitmap.Height != frameHeight)
+            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8, false))
             {
-                lock (_bitmapLock)
+                var thumb = new Bitmap(ms); // thumbnail ricevuto dal controllato
+
+                // Aggiorna PictureBox con Zoom
+                if (pictureBox1.InvokeRequired)
                 {
-                    _displayBitmap?.Dispose();
-                    _displayBitmap = new Bitmap(frameWidth, frameHeight, PixelFormat.Format24bppRgb);
-                    pictureBox1.Image = _displayBitmap;
+                    pictureBox1.BeginInvoke(new Action(() =>
+                    {
+                        var old = pictureBox1.Image;
+                        pictureBox1.Image = thumb;
+                        old?.Dispose();
+                    }));
+                }
+                else
+                {
+                    var old = pictureBox1.Image;
+                    pictureBox1.Image = thumb;
+                    old?.Dispose();
                 }
             }
-
-            // LockBits + unsafe copy
-            lock (_bitmapLock)
-            {
-                Rectangle rect = new Rectangle(0, 0, frameWidth, frameHeight);
-
-                BitmapData destData = _displayBitmap.LockBits(rect, ImageLockMode.WriteOnly, _displayBitmap.PixelFormat);
-                BitmapData srcData = tempBmp.LockBits(rect, ImageLockMode.ReadOnly, tempBmp.PixelFormat);
-
-                int bytes = Math.Abs(destData.Stride) * frameHeight;
-
-                unsafe
-                {
-                    byte* srcPtr = (byte*)srcData.Scan0;
-                    byte* destPtr = (byte*)destData.Scan0;
-                    Buffer.MemoryCopy(srcPtr, destPtr, bytes, bytes);
-                }
-
-                _displayBitmap.UnlockBits(destData);
-                tempBmp.UnlockBits(srcData);
-            }
-
-            tempBmp.Dispose();
-
-            // Aggiorna UI
-            pictureBox1.BeginInvoke(new MethodInvoker(() => pictureBox1.Invalidate()));
         }
+
 
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {

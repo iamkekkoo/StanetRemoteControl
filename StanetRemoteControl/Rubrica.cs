@@ -121,43 +121,117 @@ namespace StanetRemoteControl
             ricerca.KeyUp += (s, e) => { flowLayoutPanel2.Controls.Clear(); CaricaContatti(ricerca.Text); flowLayoutPanel1.Controls.Add(flowLayoutPanel2); };
             flowLayoutPanel1.Controls.Add(ricerca);
 
-            // TextBox per nome nuovo gruppo
             TextBox NuovoGruppo = new TextBox();
             Button aggiungiGruppo = new Button();
+            Button btnRichiamaAggiungiGruppo = new Button();
+            FlowLayoutPanel PanelAggiungiGruppo = new FlowLayoutPanel();  //per NuovoGruppo e btnRichiamaAggiungiGruppo
+            PanelAggiungiGruppo.AutoScroll = false;
+            PanelAggiungiGruppo.AutoSize = true;
+            PanelAggiungiGruppo.Margin = new Padding(5, 0, 0, 0);
+            PanelAggiungiGruppo.Dock = System.Windows.Forms.DockStyle.Fill;
+            PanelAggiungiGruppo.FlowDirection = FlowDirection.LeftToRight;
+            PanelAggiungiGruppo.WrapContents = false;
+            PanelAggiungiGruppo.BackColor = Color.LightGray;
+            PanelAggiungiGruppo.Location = new System.Drawing.Point(0, 0);
+            PanelAggiungiGruppo.Name = "flowLayoutPanel1";
+            PanelAggiungiGruppo.TabIndex = 0;
+            PanelAggiungiGruppo.Click += (s, e) => this.flowLayoutPanel1.Focus();
+            FlowLayoutPanel PanelAggiungiGruppoERicerca = new FlowLayoutPanel();  //per ricerca e aggiungigruppo
+            PanelAggiungiGruppoERicerca.AutoScroll = false;
+            PanelAggiungiGruppoERicerca.AutoSize = true;
+            PanelAggiungiGruppoERicerca.Margin = new Padding(5, 0, 0, 0);
+            PanelAggiungiGruppoERicerca.Dock = System.Windows.Forms.DockStyle.Fill;
+            PanelAggiungiGruppoERicerca.FlowDirection = FlowDirection.LeftToRight;
+            PanelAggiungiGruppoERicerca.WrapContents = false;
+            PanelAggiungiGruppoERicerca.BackColor = Color.LightGray;
+            PanelAggiungiGruppoERicerca.Location = new System.Drawing.Point(0, 0);
+            PanelAggiungiGruppoERicerca.Name = "flowLayoutPanel1";
+            PanelAggiungiGruppoERicerca.TabIndex = 0;
+            PanelAggiungiGruppoERicerca.Click += (s, e) => this.flowLayoutPanel1.Focus();
+            FlowLayoutPanel RicercaEAggiungiGruppo = new FlowLayoutPanel();  //per PanelAggiungiGruppoERicerca e PanelAggiungiGruppo
+            RicercaEAggiungiGruppo.AutoScroll = false;
+            RicercaEAggiungiGruppo.AutoSize = true;
+            RicercaEAggiungiGruppo.Margin = new Padding(5, 0, 0, 0);
+            RicercaEAggiungiGruppo.Dock = System.Windows.Forms.DockStyle.Fill;
+            RicercaEAggiungiGruppo.FlowDirection = FlowDirection.TopDown;
+            RicercaEAggiungiGruppo.WrapContents = false;
+            RicercaEAggiungiGruppo.BackColor = Color.LightGray;
+            RicercaEAggiungiGruppo.Location = new System.Drawing.Point(0, 0);
+            RicercaEAggiungiGruppo.Name = "flowLayoutPanel1";
+            RicercaEAggiungiGruppo.TabIndex = 0;
+            RicercaEAggiungiGruppo.Click += (s, e) => this.flowLayoutPanel1.Focus();
+
+            //btn +
             aggiungiGruppo.Text = "+";
             aggiungiGruppo.AutoSize = true;
+
+            //Textbox nome nuovo gruppo
             NuovoGruppo.Size = aggiungiGruppo.Size;
             NuovoGruppo.Visible = false;
             NuovoGruppo.KeyUp += (s, e) =>
             {
                 if (e.KeyCode == Keys.Enter && NuovoGruppo.Text.CompareTo("") != 0)
                 {
-                    service.AggiungiGruppo(controllore.IdSottoscrizione.Value, NuovoGruppo.Text);
-                    rubrica = service.GetRubrica(IdMacchina);
-                    flowLayoutPanel2.Controls.Clear();
-                    CaricaContatti(ricerca.Text);
-                    aggiungiGruppo.Visible = true; NuovoGruppo.Visible = false;
+                    if (NuovoGruppo.Text.CompareTo("") != 0)
+                    {
+                        service.AggiungiGruppo(controllore.IdSottoscrizione.Value, NuovoGruppo.Text);
+                        rubrica = service.GetRubrica(IdMacchina);
+                        flowLayoutPanel2.Controls.Clear();
+                        CaricaContatti(ricerca.Text);
+                    }
+                    aggiungiGruppo.Visible = true;
+                    NuovoGruppo.Visible = false;
                     NuovoGruppo.Text = "";
+                    btnRichiamaAggiungiGruppo.Visible = false;
                 }
 
             };
-            NuovoGruppo.LostFocus += (s, e) => {
+            NuovoGruppo.LostFocus += (s, e) =>
+            {
                 if (NuovoGruppo.Text.CompareTo("") != 0)
                 {
                     service.AggiungiGruppo(controllore.IdSottoscrizione.Value, NuovoGruppo.Text);
                     rubrica = service.GetRubrica(IdMacchina);
                     flowLayoutPanel2.Controls.Clear();
                     CaricaContatti(ricerca.Text);
-                    aggiungiGruppo.Visible = true; NuovoGruppo.Visible = false;
-                    NuovoGruppo.Text = "";
                 }
+                aggiungiGruppo.Visible = true;
+                NuovoGruppo.Visible = false;
+                NuovoGruppo.Text = "";
+                btnRichiamaAggiungiGruppo.Visible = false;
             };
 
-            
-            aggiungiGruppo.Click += (s, e) => { aggiungiGruppo.Visible = false; NuovoGruppo.Visible = true; NuovoGruppo.Focus(); };
+            //Btn che aggiunge il gruppo
+            btnRichiamaAggiungiGruppo.Size = aggiungiGruppo.Size;
+            btnRichiamaAggiungiGruppo.Visible = false;
+            btnRichiamaAggiungiGruppo.Text = "Add";
 
-            flowLayoutPanel1.Controls.Add(NuovoGruppo);
-            flowLayoutPanel1.Controls.Add(aggiungiGruppo);
+            btnRichiamaAggiungiGruppo.Click += (s, e) =>
+            {
+                if (NuovoGruppo.Text.CompareTo("") != 0)
+                {
+                    service.AggiungiGruppo(controllore.IdSottoscrizione.Value, NuovoGruppo.Text);
+                    rubrica = service.GetRubrica(IdMacchina);
+                    flowLayoutPanel2.Controls.Clear();
+                    CaricaContatti(ricerca.Text);
+                }
+                aggiungiGruppo.Visible = true;
+                NuovoGruppo.Visible = false;
+                NuovoGruppo.Text = "";
+                btnRichiamaAggiungiGruppo.Visible = false;
+            };
+
+            aggiungiGruppo.Click += (s, e) => { aggiungiGruppo.Visible = false; NuovoGruppo.Visible = true; NuovoGruppo.Focus(); btnRichiamaAggiungiGruppo.Visible = true; };
+
+            PanelAggiungiGruppo.Controls.Add(NuovoGruppo);
+            PanelAggiungiGruppo.Controls.Add(btnRichiamaAggiungiGruppo);
+            PanelAggiungiGruppoERicerca.Controls.Add(ricerca);
+            PanelAggiungiGruppoERicerca.Controls.Add(aggiungiGruppo);
+            RicercaEAggiungiGruppo.Controls.Add(PanelAggiungiGruppoERicerca);
+            RicercaEAggiungiGruppo.Controls.Add(PanelAggiungiGruppo);
+            flowLayoutPanel1.Controls.Add(RicercaEAggiungiGruppo);
+
+
 
             flowLayoutPanel2.Controls.Clear();
             rubrica = service.GetRubrica(IdMacchina);
@@ -239,96 +313,14 @@ namespace StanetRemoteControl
 
                     foreach (var contatto in gruppo)
                     {
-                        // Panel/FlowLayoutPanel per riga orizzontale
-                        FlowLayoutPanel row = new FlowLayoutPanel();
-                        row.FlowDirection = FlowDirection.LeftToRight;
-                        row.WrapContents = false;
-                        row.AutoSize = true;
-                        row.Margin = new Padding(5, 5, 0, 5);
-
-                        // Button principale
-                        Button btn = new Button();
-                        btn.Text = contatto.Nome;
-                        btn.Tag = contatto;
-                        btn.AutoSize = true;
-                        if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
-                        {//se connesso a questo cliccando disconnette
-                            btn.Click += (s, e) => DisconnettiDaRubrica();
-                        }
-                        else 
-                        {//se non connesso a questo cliccando connette
-                            btn.Click += (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password);
-                        }
-                            
-                        row.Controls.Add(btn);
-
-                        // TextBox per rinomina
-                        TextBox newNameContatto = new TextBox();
-                        newNameContatto.Visible = false;
-                        newNameContatto.Size = btn.Size;
-                        newNameContatto.KeyUp += (s, e) => { if (e.KeyCode == Keys.Enter && newNameContatto.Text.CompareTo("") != 0) { service.RinominaContattoInGruppo(((Contatto)btn.Tag).UserName, ((Contatto)btn.Tag).IdGruppo, newNameContatto.Text); rubrica = service.GetRubrica(IdMacchina); flowLayoutPanel2.Controls.Clear(); CaricaContatti(ricerca.Text); } };
-                        newNameContatto.LostFocus += (s, e) => { if (newNameContatto.Text.CompareTo("") != 0) { service.RinominaContattoInGruppo(((Contatto)btn.Tag).UserName, ((Contatto)btn.Tag).IdGruppo, newNameContatto.Text); rubrica = service.GetRubrica(IdMacchina); flowLayoutPanel2.Controls.Clear(); CaricaContatti(ricerca.Text); } };
-                        row.Controls.Add(newNameContatto);
-
-                        // Menu contestuale
-                        ContextMenuStrip menu = new ContextMenuStrip();
-                        if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
-                        {//se connesso a questo chiede se disconnettere
-                            menu.Items.Add("Disconnetti", null, (s, e) => DisconnettiDaRubrica());
-                        }
-                        else 
-                        {//se non connesso a questo chiede se connettere
-                            menu.Items.Add("Connetti", null, (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password));
-                        }
-                        menu.Items.Add("Rinomina", null, (s, e) => { newNameContatto.Text = btn.Text; btn.Visible = false; newNameContatto.Visible = true; newNameContatto.Focus(); });
-                        menu.Items.Add("Elimina", null, (s, e) => CancellaContatto((Contatto)btn.Tag));
-
-                        // Button per aprire il menu
-                        Button apriMenu = new Button();
-                        apriMenu.Text = "⋮";
-                        apriMenu.AutoSize = true;
-                        apriMenu.Click += (s, e) => menu.Show(apriMenu, new Point(0, apriMenu.Height));
-                        row.Controls.Add(apriMenu);
-
-                        // Aggiungo la riga al flowLayoutPanel principale
-                        flowLayoutPanel2.Controls.Add(row);
-                    }
-                }
-                else 
-                {
-                    foreach (var contatto in gruppo)
-                    {
-                        if ((contatto.Nome).Contains(filtro) || (contatto.Nome.ToLower()).Contains(filtro) || (contatto.Nome).Contains(filtro.ToLower()) || (contatto.Nome.ToLower()).Contains(filtro.ToLower()))
+                        if(!string.IsNullOrEmpty(contatto.Nome)) 
                         {
-                            // Panel/FlowLayoutPanel per riga orizzontale (macchina e impostazioni)
-                            FlowLayoutPanel rowGenerale = new FlowLayoutPanel();
-                            rowGenerale.FlowDirection = FlowDirection.TopDown;
-                            rowGenerale.WrapContents = false;
-                            rowGenerale.AutoSize = true;
-                            rowGenerale.Margin = new Padding(5, 5, 0, 5);
-
-                            // Panel/FlowLayoutPanel per riga orizzontale (macchina e impostazioni)
-                            FlowLayoutPanel rowdaGruppo = new FlowLayoutPanel();
-                            rowdaGruppo.WrapContents = false;
-                            rowdaGruppo.AutoSize = true;
-                            rowdaGruppo.Margin = new Padding(5, 5, 0, 5);
-                            rowGenerale.Controls.Add(rowdaGruppo);
-
-                            // Panel/FlowLayoutPanel per riga orizzontale (macchina e impostazioni)
+                            // Panel/FlowLayoutPanel per riga orizzontale
                             FlowLayoutPanel row = new FlowLayoutPanel();
                             row.FlowDirection = FlowDirection.LeftToRight;
                             row.WrapContents = false;
                             row.AutoSize = true;
                             row.Margin = new Padding(5, 5, 0, 5);
-                            rowGenerale.Controls.Add(row);
-
-                            Label daGruppo = new Label();
-                            daGruppo.Text = contatto.NomeGruppo;
-                            daGruppo.AutoSize = true;
-                            daGruppo.Font = new Font("Segoe UI", 8.5f, FontStyle.Regular);
-                            daGruppo.ForeColor = Color.FromArgb(140, 140, 140); // grigino moderno
-                            daGruppo.Margin = new Padding(0, 2, 0, 0);
-                            rowdaGruppo.Controls.Add(daGruppo);
 
                             // Button principale
                             Button btn = new Button();
@@ -339,10 +331,11 @@ namespace StanetRemoteControl
                             {//se connesso a questo cliccando disconnette
                                 btn.Click += (s, e) => DisconnettiDaRubrica();
                             }
-                            else
+                            else 
                             {//se non connesso a questo cliccando connette
                                 btn.Click += (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password);
                             }
+                            
                             row.Controls.Add(btn);
 
                             // TextBox per rinomina
@@ -359,7 +352,7 @@ namespace StanetRemoteControl
                             {//se connesso a questo chiede se disconnettere
                                 menu.Items.Add("Disconnetti", null, (s, e) => DisconnettiDaRubrica());
                             }
-                            else
+                            else 
                             {//se non connesso a questo chiede se connettere
                                 menu.Items.Add("Connetti", null, (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password));
                             }
@@ -374,7 +367,94 @@ namespace StanetRemoteControl
                             row.Controls.Add(apriMenu);
 
                             // Aggiungo la riga al flowLayoutPanel principale
-                            flowLayoutPanel2.Controls.Add(rowGenerale);
+                            flowLayoutPanel2.Controls.Add(row);
+                        }
+                    }
+                }
+                else 
+                {
+                    foreach (var contatto in gruppo)
+                    {
+                        if (!string.IsNullOrEmpty(contatto.Nome)) 
+                        { 
+                            if ( (contatto.Nome).Contains(filtro) || (contatto.Nome.ToLower()).Contains(filtro) || (contatto.Nome).Contains(filtro.ToLower()) || (contatto.Nome.ToLower()).Contains(filtro.ToLower()))
+                            {
+                                // Panel/FlowLayoutPanel per riga orizzontale (macchina e impostazioni)
+                                FlowLayoutPanel rowGenerale = new FlowLayoutPanel();
+                                rowGenerale.FlowDirection = FlowDirection.TopDown;
+                                rowGenerale.WrapContents = false;
+                                rowGenerale.AutoSize = true;
+                                rowGenerale.Margin = new Padding(5, 5, 0, 5);
+
+                                // Panel/FlowLayoutPanel per riga orizzontale (macchina e impostazioni)
+                                FlowLayoutPanel rowdaGruppo = new FlowLayoutPanel();
+                                rowdaGruppo.WrapContents = false;
+                                rowdaGruppo.AutoSize = true;
+                                rowdaGruppo.Margin = new Padding(5, 5, 0, 5);
+                                rowGenerale.Controls.Add(rowdaGruppo);
+
+                                // Panel/FlowLayoutPanel per riga orizzontale (macchina e impostazioni)
+                                FlowLayoutPanel row = new FlowLayoutPanel();
+                                row.FlowDirection = FlowDirection.LeftToRight;
+                                row.WrapContents = false;
+                                row.AutoSize = true;
+                                row.Margin = new Padding(5, 5, 0, 5);
+                                rowGenerale.Controls.Add(row);
+
+                                Label daGruppo = new Label();
+                                daGruppo.Text = contatto.NomeGruppo;
+                                daGruppo.AutoSize = true;
+                                daGruppo.Font = new Font("Segoe UI", 8.5f, FontStyle.Regular);
+                                daGruppo.ForeColor = Color.FromArgb(140, 140, 140); // grigino moderno
+                                daGruppo.Margin = new Padding(0, 2, 0, 0);
+                                rowdaGruppo.Controls.Add(daGruppo);
+
+                                // Button principale
+                                Button btn = new Button();
+                                btn.Text = contatto.Nome;
+                                btn.Tag = contatto;
+                                btn.AutoSize = true;
+                                if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
+                                {//se connesso a questo cliccando disconnette
+                                    btn.Click += (s, e) => DisconnettiDaRubrica();
+                                }
+                                else
+                                {//se non connesso a questo cliccando connette
+                                    btn.Click += (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password);
+                                }
+                                row.Controls.Add(btn);
+
+                                // TextBox per rinomina
+                                TextBox newNameContatto = new TextBox();
+                                newNameContatto.Visible = false;
+                                newNameContatto.Size = btn.Size;
+                                newNameContatto.KeyUp += (s, e) => { if (e.KeyCode == Keys.Enter && newNameContatto.Text.CompareTo("") != 0) { service.RinominaContattoInGruppo(((Contatto)btn.Tag).UserName, ((Contatto)btn.Tag).IdGruppo, newNameContatto.Text); rubrica = service.GetRubrica(IdMacchina); flowLayoutPanel2.Controls.Clear(); CaricaContatti(ricerca.Text); } };
+                                newNameContatto.LostFocus += (s, e) => { if (newNameContatto.Text.CompareTo("") != 0) { service.RinominaContattoInGruppo(((Contatto)btn.Tag).UserName, ((Contatto)btn.Tag).IdGruppo, newNameContatto.Text); rubrica = service.GetRubrica(IdMacchina); flowLayoutPanel2.Controls.Clear(); CaricaContatti(ricerca.Text); } };
+                                row.Controls.Add(newNameContatto);
+
+                                // Menu contestuale
+                                ContextMenuStrip menu = new ContextMenuStrip();
+                                if (controllore.connUscita.ID_Controllato == contatto.IdMacchina)
+                                {//se connesso a questo chiede se disconnettere
+                                    menu.Items.Add("Disconnetti", null, (s, e) => DisconnettiDaRubrica());
+                                }
+                                else
+                                {//se non connesso a questo chiede se connettere
+                                    menu.Items.Add("Connetti", null, (s, e) => ConnettiDaRubrica(contatto.UserName, contatto.Password));
+                                }
+                                menu.Items.Add("Rinomina", null, (s, e) => { newNameContatto.Text = btn.Text; btn.Visible = false; newNameContatto.Visible = true; newNameContatto.Focus(); });
+                                menu.Items.Add("Elimina", null, (s, e) => CancellaContatto((Contatto)btn.Tag));
+
+                                // Button per aprire il menu
+                                Button apriMenu = new Button();
+                                apriMenu.Text = "⋮";
+                                apriMenu.AutoSize = true;
+                                apriMenu.Click += (s, e) => menu.Show(apriMenu, new Point(0, apriMenu.Height));
+                                row.Controls.Add(apriMenu);
+
+                                // Aggiungo la riga al flowLayoutPanel principale
+                                flowLayoutPanel2.Controls.Add(rowGenerale);
+                            }
                         }
                     }
                 }

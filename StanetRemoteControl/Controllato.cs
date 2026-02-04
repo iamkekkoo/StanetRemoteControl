@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -98,13 +99,36 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
-                screenBytes = CaptureScreenBytes(schermo);
-                if (screenBytes != null)
+                if (_sendingFrame)
                 {
-                    await HubSchermo.Invoke("SendScreen", mac.ID, screenBytes);
+                    await Task.Delay(5);
+                    continue;
                 }
-                
-                await Task.Delay(100); // 10 fps
+                Stopwatch sw = Stopwatch.StartNew();
+                var frame = CaptureScreenBytes(schermo);
+                // 3️⃣ Ferma lo Stopwatch
+                sw.Stop();
+
+                // 4️⃣ Mostra il tempo trascorso
+                Console.WriteLine($"Cattura + compressione: {sw.ElapsedMilliseconds} ms");
+                if (frame != null)
+                {
+                    _sendingFrame = true;
+                    try
+                    {
+                        Stopwatch swSend = Stopwatch.StartNew();
+                        await HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        swSend.Stop();
+                        Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
+                    }
+                    finally
+                    {
+                        _sendingFrame = false;
+                        
+                    }
+                }
+
+                await Task.Delay(100); // Controlla la frequenza invio
             }
         }
 
@@ -184,47 +208,41 @@ namespace StanetRemoteControl
 
         private byte[] CaptureScreenBytes(int monitorIndex)
         {
-            try
+            var screen = Screen.AllScreens[monitorIndex];
+            var bounds = screen.Bounds;
+
+            if (_captureBitmap == null || _monitorBounds != bounds)
             {
-                Screen[] screens = Screen.AllScreens;
-                if (monitorIndex < 0 || monitorIndex >= screens.Length)
-                    return null;
+                _captureBitmap?.Dispose();
+                _captureBitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb);
+                _monitorBounds = bounds;
+            }
 
-                Screen screen = screens[monitorIndex];
-                Rectangle bounds = screen.Bounds;
+            using (Graphics g = Graphics.FromImage(_captureBitmap))
+                g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
-                if (_captureBitmap == null || _monitorBounds != bounds)
-                {
-                    _captureBitmap?.Dispose();
-                    _captureBitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb);
-                    _monitorBounds = bounds;
-                }
+            // Thumbnail /2 con HighQualityBicubic
+            int thumbWidth = (int)(bounds.Width * 0.66);
+            int thumbHeight = (int)(bounds.Height * 0.66);
 
-                using (Graphics g = Graphics.FromImage(_captureBitmap))
-                {
-                    g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
-                }
+            using (var thumb = new Bitmap(thumbWidth, thumbHeight))
+            using (Graphics g = Graphics.FromImage(thumb))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
                 using (var ms = new MemoryStream())
                 {
-                    var enc = ImageCodecInfo.GetImageEncoders().First(e => e.MimeType == "image/jpeg");
-                    var ep = new EncoderParameters(1);
-                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
+                    thumb.Save(ms, JpegEnc, Jpeg45);
 
-                    _captureBitmap.Save(ms, enc, ep);
-                    byte[] jpegBytes = ms.ToArray();
-
-                    byte[] result = new byte[8 + jpegBytes.Length];
-                    Array.Copy(BitConverter.GetBytes(bounds.Width), 0, result, 0, 4);
-                    Array.Copy(BitConverter.GetBytes(bounds.Height), 0, result, 4, 4);
-                    Array.Copy(jpegBytes, 0, result, 8, jpegBytes.Length);
+                    int len = (int)ms.Length;
+                    byte[] result = new byte[8 + len];
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
 
                     return result;
                 }
-            }
-            catch
-            {
-                return null;
             }
         }
 

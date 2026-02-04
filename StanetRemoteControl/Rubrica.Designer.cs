@@ -46,7 +46,8 @@ namespace StanetRemoteControl
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.AutoScroll = true;
-            this.flowLayoutPanel1.AutoSize = true;
+            this.flowLayoutPanel1.AutoSize = false;
+            this.flowLayoutPanel1.Size = this.flowLayoutPanel2.Size;
             this.flowLayoutPanel1.Margin = new Padding(5, 0, 0, 0);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
@@ -75,6 +76,7 @@ namespace StanetRemoteControl
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = Color.LightGray;
             this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Width = this.flowLayoutPanel1.Width + 100;
             this.Controls.Add(this.flowLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
