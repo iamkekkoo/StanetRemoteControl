@@ -14,6 +14,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System;
+using System.Runtime.InteropServices;
 
 
 
@@ -21,6 +23,7 @@ namespace StanetRemoteControl
 {
     public partial class Controllato : Form
     {
+        
         public Controllato()
         {
             InitializeComponent();
@@ -324,16 +327,23 @@ namespace StanetRemoteControl
             }
         }
 
-        [DllImport("user32.dll")]
-        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
-
+        // ------------------- Constants -------------------
         const int INPUT_KEYBOARD = 1;
         const uint KEYEVENTF_KEYUP = 0x0002;
+        const uint KEYEVENTF_SCANCODE = 0x0008;
 
+        // ------------------- Win32 Imports -------------------
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+        [DllImport("user32.dll")]
+        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+        // ------------------- Structs -------------------
         [StructLayout(LayoutKind.Sequential)]
         struct INPUT
         {
-            public uint type;   // ✅ uint
+            public uint type;
             public InputUnion u;
         }
 
@@ -426,9 +436,11 @@ namespace StanetRemoteControl
         };
 
 
-        // ------------------- Funzioni invio tasto -------------------
+        // ------------------- Funzioni aggiornate -------------------
         static void KeyDown(ushort key)
         {
+            uint scanCode = MapVirtualKey(key, 0);
+
             INPUT input = new INPUT
             {
                 type = INPUT_KEYBOARD,
@@ -436,19 +448,22 @@ namespace StanetRemoteControl
                 {
                     ki = new KEYBDINPUT
                     {
-                        wVk = key,
-                        wScan = 0,
-                        dwFlags = 0,      // necessario
+                        wVk = 0,
+                        wScan = (ushort)scanCode,
+                        dwFlags = KEYEVENTF_SCANCODE,
                         time = 0,
                         dwExtraInfo = IntPtr.Zero
                     }
                 }
             };
+
             SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
         static void KeyUp(ushort key)
         {
+            uint scanCode = MapVirtualKey(key, 0);
+
             INPUT input = new INPUT
             {
                 type = INPUT_KEYBOARD,
@@ -456,14 +471,15 @@ namespace StanetRemoteControl
                 {
                     ki = new KEYBDINPUT
                     {
-                        wVk = key,
-                        wScan = 0,
-                        dwFlags = KEYEVENTF_KEYUP,
+                        wVk = 0,
+                        wScan = (ushort)scanCode,
+                        dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
                         time = 0,
                         dwExtraInfo = IntPtr.Zero
                     }
                 }
             };
+
             SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
