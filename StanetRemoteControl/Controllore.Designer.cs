@@ -138,7 +138,7 @@ namespace StanetRemoteControl
             this.pictureBox1.BackColor = System.Drawing.Color.Black;
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
