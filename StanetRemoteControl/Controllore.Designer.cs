@@ -35,6 +35,15 @@ namespace StanetRemoteControl
             base.Dispose(disposing);
         }
 
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            this.DoubleBuffered = true; // evita sfarfallio
+
+            DrawGradientBackground(e.Graphics, this.ClientRectangle);
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             HubSchermo.Invoke("LeaveConnection", connUscita.ID_Controllato);
@@ -163,6 +172,7 @@ namespace StanetRemoteControl
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 365);
+            //this.BackColor = Color.FromArgb(255, 30, 87, 153); // rgba(30,87,153,1)
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.rubrica);
@@ -330,6 +340,36 @@ namespace StanetRemoteControl
             return true;
         }
 
+        private void DrawGradientBackground(Graphics g, Rectangle rect)
+        {
+            float angle = 135f;
+
+            Color[] colors = new Color[]
+            {
+                Color.FromArgb(0, 30, 87, 153),    // 0%
+                Color.FromArgb(204, 30, 87, 153),  // 15%
+                Color.FromArgb(255, 30, 87, 153),  // 19%
+                Color.FromArgb(255, 30, 87, 153),  // 20%
+                Color.FromArgb(255, 41, 137, 216), // 50%
+                Color.FromArgb(255, 30, 87, 153),  // 80%
+                Color.FromArgb(255, 30, 87, 153),  // 81%
+                Color.FromArgb(204, 30, 87, 153),  // 85%
+                Color.FromArgb(0, 30, 87, 153)     // 100%
+            };
+
+            float[] positions = new float[] { 0f, 0.15f, 0.19f, 0.20f, 0.50f, 0.80f, 0.81f, 0.85f, 1f };
+
+            using (LinearGradientBrush brush = new LinearGradientBrush(rect, Color.White, Color.White, angle))
+            {
+                ColorBlend blend = new ColorBlend();
+                blend.Colors = colors;
+                blend.Positions = positions;
+                brush.InterpolationColors = blend;
+
+                g.FillRectangle(brush, rect);
+            }
+        }
+
         #endregion
 
 
@@ -351,6 +391,7 @@ namespace StanetRemoteControl
         private Bitmap _displayBitmap;
         private readonly object _bitmapLock = new object();
         private Rubrica Rubrica;
+        private Bitmap bmp;
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;

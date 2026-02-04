@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -56,8 +57,6 @@ namespace StanetRemoteControl
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // label5
@@ -127,15 +126,6 @@ namespace StanetRemoteControl
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // pictureBox1
-            // 
-            pictureBox1.Location = new System.Drawing.Point(13, 190);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new System.Drawing.Size(183, 163);
-            pictureBox1.TabIndex = 6;
-            pictureBox1.TabStop = false;
-            pictureBox1.BackColor = Color.White;
-            // 
             // Controllato
             // 
             this.AcceptButton = this.button1;
@@ -143,7 +133,6 @@ namespace StanetRemoteControl
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(600, 365);
-            this.Controls.Add(pictureBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
@@ -153,7 +142,6 @@ namespace StanetRemoteControl
             this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "Controllato";
             this.Text = "Stanet Remote Control";
-            ((System.ComponentModel.ISupportInitialize)(pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -196,6 +184,21 @@ namespace StanetRemoteControl
         private Connessione connessione;
         private Bitmap _captureBitmap; // bitmap riutilizzabile per il monitor
         private Rectangle _monitorBounds; // salva le dimensioni del monitor
+        private static Screen[] screens = Screen.AllScreens;
+        private Screen screen;
+        private Rectangle bounds;
+        private bool _sendingFrame = false;
+        private static readonly ImageCodecInfo JpegEnc =
+        Array.Find(
+            ImageCodecInfo.GetImageEncoders(),
+            e => e.MimeType == "image/jpeg"
+        );
+
+
+        private static readonly EncoderParameters Jpeg45 = new EncoderParameters(1)
+        {
+            Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L) }
+        };
 
         public FileStream fs;
         public StreamReader reader;
@@ -213,7 +216,6 @@ namespace StanetRemoteControl
         public Label label4;
         public Label label5;
         public Button button1;
-        public static PictureBox pictureBox1;
     }
 }
 
