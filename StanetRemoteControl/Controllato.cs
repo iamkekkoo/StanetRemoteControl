@@ -260,8 +260,8 @@ namespace StanetRemoteControl
             try
             {
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
-                mouseCmd.X = (int)(mouseCmd.X * 3.5);
-                mouseCmd.Y = (int)(mouseCmd.Y * 3.5);
+                mouseCmd.X = (int)(mouseCmd.X * 3.51);
+                mouseCmd.Y = (int)(mouseCmd.Y * 3.51);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
                     if (mouseCmd.X == 0) { schermo = schermo - 1; Task.Delay(1500); }
