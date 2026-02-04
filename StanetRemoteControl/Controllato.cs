@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Collections.Generic;
@@ -264,8 +265,8 @@ namespace StanetRemoteControl
                 mouseCmd.Y = (int)(mouseCmd.Y * 3.51);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
-                    if (mouseCmd.X == 0) { schermo = schermo - 1; Task.Delay(1500); }
-                    else if (mouseCmd.X == Screen.AllScreens[schermo].Bounds.Width) { schermo = schermo + 1; Task.Delay(1500); }
+                    if (mouseCmd.X == 0 && schermo - 1 >= 0) { schermo = schermo - 1; }
+                    else if (mouseCmd.X == Screen.AllScreens[schermo].Bounds.Width && schermo + 1 < Screen.AllScreens.Length) { schermo = schermo + 1; }
                     else {
                     EseguiMouse(mouseCmd);
                     }
