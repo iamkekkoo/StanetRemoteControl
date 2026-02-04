@@ -101,7 +101,7 @@ namespace StanetRemoteControl
             {
                 if (_sendingFrame)
                 {
-                    await Task.Delay(600);
+                    await Task.Delay(5);
                     continue;
                 }
                 //Stopwatch sw = Stopwatch.StartNew();
@@ -255,12 +255,13 @@ namespace StanetRemoteControl
             }
         }
 
-
         private void HandleCommand(string cmdJson)
         {
             try
             {
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
+                mouseCmd.X = (int)(mouseCmd.X * 3.5);
+                mouseCmd.Y = (int)(mouseCmd.Y * 3.5);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
                     if (mouseCmd.X == 0) { schermo = schermo - 1; Task.Delay(1500); }
