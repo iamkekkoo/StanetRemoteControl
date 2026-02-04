@@ -101,16 +101,16 @@ namespace StanetRemoteControl
             {
                 if (_sendingFrame)
                 {
-                    await Task.Delay(5);
+                    await Task.Delay(600);
                     continue;
                 }
-                Stopwatch sw = Stopwatch.StartNew();
+                //Stopwatch sw = Stopwatch.StartNew();
                 var frame = CaptureScreenBytes(schermo);
                 // 3️⃣ Ferma lo Stopwatch
-                sw.Stop();
+                //sw.Stop();
 
                 // 4️⃣ Mostra il tempo trascorso
-                Console.WriteLine($"Cattura + compressione: {sw.ElapsedMilliseconds} ms");
+                //Console.WriteLine($"Cattura + compressione: {sw.ElapsedMilliseconds} ms");
                 if (frame != null)
                 {
                     _sendingFrame = true;
@@ -128,7 +128,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(100); // Controlla la frequenza invio
+                await Task.Delay(33); // 30 fps
             }
         }
 
@@ -214,29 +214,38 @@ namespace StanetRemoteControl
             if (_captureBitmap == null || _monitorBounds != bounds)
             {
                 _captureBitmap?.Dispose();
-                _captureBitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format24bppRgb);
+                _captureBitmap = new Bitmap(
+                    bounds.Width,
+                    bounds.Height,
+                    PixelFormat.Format24bppRgb);
                 _monitorBounds = bounds;
             }
 
             using (Graphics g = Graphics.FromImage(_captureBitmap))
                 g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
-            // Thumbnail /2 con HighQualityBicubic
-            int thumbWidth = (int)(bounds.Width);
-            int thumbHeight = (int)(bounds.Height);
+            // ⭐ SCALA IDEALE PER <500ms
+            int thumbWidth = (int)(bounds.Width / 3.5);
+            int thumbHeight = (int)(bounds.Height / 3.5);
 
-            using (var thumb = new Bitmap(thumbWidth, thumbHeight))
+            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(thumb))
             {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                // ⚠️ NON usare HighQuality
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
+
                 g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg45);
+                    thumb.Save(ms, JpegEnc, Jpeg60);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[8 + len];
+
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
                     Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
@@ -245,6 +254,7 @@ namespace StanetRemoteControl
                 }
             }
         }
+
 
         private void HandleCommand(string cmdJson)
         {

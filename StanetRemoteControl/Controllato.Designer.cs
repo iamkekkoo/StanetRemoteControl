@@ -194,11 +194,12 @@ namespace StanetRemoteControl
             e => e.MimeType == "image/jpeg"
         );
 
-
-        private static readonly EncoderParameters Jpeg45 = new EncoderParameters(1)
+        private static readonly EncoderParameters Jpeg60 =
+        new EncoderParameters(1)
         {
-            Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L) }
+            Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 60L) }
         };
+
 
         public FileStream fs;
         public StreamReader reader;

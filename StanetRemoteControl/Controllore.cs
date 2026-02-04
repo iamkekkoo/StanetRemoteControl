@@ -165,7 +165,6 @@ namespace StanetRemoteControl
             }
         }
 
-
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
             if (_LastMouseMoveCommandToSend == null)
