@@ -549,10 +549,13 @@ namespace StanetRemoteControl
 
         static string FormatSpecial(string key)
         {
+            key = key.ToUpper();
+
             switch (key)
             {
                 case "ENTER": return "{ENTER}";
                 case "TAB": return "{TAB}";
+                case "ESC": return "{ESC}";
                 case "BACKSPACE": return "{BACKSPACE}";
                 case "DELETE": return "{DELETE}";
                 case "SPACE": return " ";
@@ -572,7 +575,8 @@ namespace StanetRemoteControl
                 case "F10": return "{F10}";
                 case "F11": return "{F11}";
                 case "F12": return "{F12}";
-                default: return key;
+                default:
+                    return key.Length == 1 ? key : "";
             }
         }
     }
