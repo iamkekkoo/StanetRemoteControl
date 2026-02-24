@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using StanetRemoteControl.RemoteControlNode;
 using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -11,11 +12,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System;
-using System.Runtime.InteropServices;
 
 
 
@@ -24,25 +25,16 @@ namespace StanetRemoteControl
 
     public partial class Controllato : Form
     {
-        [DllImport("user32.dll")]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        
         public Controllato()
         {
             InitializeComponent();
             this.Load += Controllato_Load;
 
-            // Esempio
-            Process notepad = Process.GetProcessesByName("notepad").FirstOrDefault();
-            if (notepad != null)
-            {
-                SetForegroundWindow(notepad.MainWindowHandle);
-                KeyPress(0x41); // 'A'
-            }
-
             return;
         }
+
+
         private async Task InizializzaSignalR()
         {
             connection = new HubConnection("https://francescostdev.azurewebsites.net");
@@ -261,7 +253,7 @@ namespace StanetRemoteControl
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[8 + len];
-
+                    //
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
                     Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
@@ -339,17 +331,17 @@ namespace StanetRemoteControl
             }
         }
 
-        // ------------------- Constants -------------------
-        const int INPUT_KEYBOARD = 1;
-        const uint KEYEVENTF_KEYUP = 0x0002;
-        const uint KEYEVENTF_SCANCODE = 0x0008;
-
         // ------------------- Win32 Imports -------------------
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
         [DllImport("user32.dll")]
-        static extern uint MapVirtualKey(uint uCode, uint uMapType);
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        // ------------------- Costanti -------------------
+        const int INPUT_KEYBOARD = 1;
+        const uint KEYEVENTF_KEYUP = 0x0002;
+        const uint KEYEVENTF_UNICODE = 0x0004;
 
         // ------------------- Structs -------------------
         [StructLayout(LayoutKind.Sequential)]
@@ -375,84 +367,9 @@ namespace StanetRemoteControl
             public IntPtr dwExtraInfo;
         }
 
-
-        // ------------------- Mappa tasti -------------------
-        static readonly Dictionary<string, ushort> KeyMap = new Dictionary<string, ushort>(StringComparer.OrdinalIgnoreCase)
+        // ------------------- Funzioni Unicode -------------------
+        static void KeyDownUnicode(char ch)
         {
-            // ----------------- LETTERE -----------------
-            { "A", 0x41 }, { "B", 0x42 }, { "C", 0x43 }, { "D", 0x44 },
-            { "E", 0x45 }, { "F", 0x46 }, { "G", 0x47 }, { "H", 0x48 },
-            { "I", 0x49 }, { "J", 0x4A }, { "K", 0x4B }, { "L", 0x4C },
-            { "M", 0x4D }, { "N", 0x4E }, { "O", 0x4F }, { "P", 0x50 },
-            { "Q", 0x51 }, { "R", 0x52 }, { "S", 0x53 }, { "T", 0x54 },
-            { "U", 0x55 }, { "V", 0x56 }, { "W", 0x57 }, { "X", 0x58 },
-            { "Y", 0x59 }, { "Z", 0x5A },
-
-            // ----------------- NUMERI -----------------
-            { "0", 0x30 }, { "1", 0x31 }, { "2", 0x32 }, { "3", 0x33 },
-            { "4", 0x34 }, { "5", 0x35 }, { "6", 0x36 }, { "7", 0x37 },
-            { "8", 0x38 }, { "9", 0x39 },
-
-            // ----------------- FUNZIONE -----------------
-            { "F1", 0x70 },  { "F2", 0x71 },  { "F3", 0x72 },  { "F4", 0x73 },
-            { "F5", 0x74 },  { "F6", 0x75 },  { "F7", 0x76 },  { "F8", 0x77 },
-            { "F9", 0x78 },  { "F10", 0x79 }, { "F11", 0x7A }, { "F12", 0x7B },
-
-            // ----------------- CONTROLLO -----------------
-            { "ENTER", 0x0D },
-            { "ESC", 0x1B },
-            { "TAB", 0x09 },
-            { "SPACE", 0x20 },
-            { "BACKSPACE", 0x08 },
-            { "CAPSLOCK", 0x14 },
-
-            // ----------------- MODIFICATORI -----------------
-            { "SHIFT", 0x10 },
-            { "CTRL", 0x11 },
-            { "CONTROL", 0x11 },
-            { "ALT", 0x12 },
-            { "WIN", 0x5B },
-
-            // ----------------- NAVIGAZIONE -----------------
-            { "LEFT", 0x25 },
-            { "UP", 0x26 },
-            { "RIGHT", 0x27 },
-            { "DOWN", 0x28 },
-            { "HOME", 0x24 },
-            { "END", 0x23 },
-            { "PAGEUP", 0x21 },
-            { "PAGEDOWN", 0x22 },
-            { "INSERT", 0x2D },
-            { "DELETE", 0x2E },
-
-            // ----------------- NUMPAD -----------------
-            { "NUM0", 0x60 }, { "NUM1", 0x61 }, { "NUM2", 0x62 },
-            { "NUM3", 0x63 }, { "NUM4", 0x64 }, { "NUM5", 0x65 },
-            { "NUM6", 0x66 }, { "NUM7", 0x67 }, { "NUM8", 0x68 },
-            { "NUM9", 0x69 },
-            { "NUMMULTIPLY", 0x6A },
-            { "NUMADD", 0x6B },
-            { "NUMSUBTRACT", 0x6D },
-            { "NUMDECIMAL", 0x6E },
-            { "NUMDIVIDE", 0x6F },
-
-            // ----------------- MEDIA -----------------
-            { "VOLUMEUP", 0xAF },
-            { "VOLUMEDOWN", 0xAE },
-            { "MUTE", 0xAD },
-
-            // ----------------- VARI -----------------
-            { "PRINTSCREEN", 0x2C },
-            { "SCROLLLOCK", 0x91 },
-            { "PAUSE", 0x13 }
-        };
-
-
-        // ------------------- Funzioni aggiornate -------------------
-        static void KeyDown(ushort key)
-        {
-            uint scanCode = MapVirtualKey(key, 0);
-
             INPUT input = new INPUT
             {
                 type = INPUT_KEYBOARD,
@@ -461,21 +378,18 @@ namespace StanetRemoteControl
                     ki = new KEYBDINPUT
                     {
                         wVk = 0,
-                        wScan = (ushort)scanCode,
-                        dwFlags = KEYEVENTF_SCANCODE,
+                        wScan = ch,
+                        dwFlags = KEYEVENTF_UNICODE,
                         time = 0,
                         dwExtraInfo = IntPtr.Zero
                     }
                 }
             };
-
             SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
-        static void KeyUp(ushort key)
+        static void KeyUpUnicode(char ch)
         {
-            uint scanCode = MapVirtualKey(key, 0);
-
             INPUT input = new INPUT
             {
                 type = INPUT_KEYBOARD,
@@ -484,64 +398,130 @@ namespace StanetRemoteControl
                     ki = new KEYBDINPUT
                     {
                         wVk = 0,
-                        wScan = (ushort)scanCode,
-                        dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP,
+                        wScan = ch,
+                        dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP,
                         time = 0,
                         dwExtraInfo = IntPtr.Zero
                     }
                 }
             };
-
             SendInput(1, new[] { input }, Marshal.SizeOf(typeof(INPUT)));
         }
 
-        static void KeyPress(ushort key)
+        static void KeyPressUnicode(char ch)
         {
-            KeyDown(key);
-            KeyUp(key);
+            KeyDownUnicode(ch);
+            KeyUpUnicode(ch);
         }
 
-        // ------------------- Gestione KeyCommand -------------------
+        // ------------------- Mappa dei tasti -------------------
+        static readonly Dictionary<string, char> KeyMap = new Dictionary<string, char>(StringComparer.OrdinalIgnoreCase)
+{
+    // LETTERE
+    { "A",'A'},{ "B",'B'},{ "C",'C'},{ "D",'D'},{ "E",'E'},{ "F",'F'},{ "G",'G'},{ "H",'H'},{ "I",'I'},{ "J",'J'},
+    { "K",'K'},{ "L",'L'},{ "M",'M'},{ "N",'N'},{ "O",'O'},{ "P",'P'},{ "Q",'Q'},{ "R",'R'},{ "S",'S'},{ "T",'T'},
+    { "U",'U'},{ "V",'V'},{ "W",'W'},{ "X",'X'},{ "Y",'Y'},{ "Z",'Z'},
+
+    // NUMERI
+    { "0",'0'},{ "1",'1'},{ "2",'2'},{ "3",'3'},{ "4",'4'},{ "5",'5'},{ "6",'6'},{ "7",'7'},{ "8",'8'},{ "9",'9'},
+
+    // TASTI SPECIALI
+    { "ENTER", '\r'},
+    { "TAB", '\t'},
+    { "SPACE",' '},
+    { "BACKSPACE", (char)8},
+    { "ESC", (char)27},
+
+    // MODIFICATORI (gestiti a parte)
+    { "SHIFT", (char)0},
+    { "CTRL", (char)0},
+    { "CONTROL", (char)0},
+    { "ALT", (char)0}
+};
+
+        // ------------------- Funzioni Modificatori -------------------
+        static void KeyDownModifier(string mod)
+        {
+            switch (mod)
+            {
+                case "SHIFT": KeyDownUnicode((char)0); break;
+                case "CTRL":
+                case "CONTROL": KeyDownUnicode((char)0); break;
+                case "ALT": KeyDownUnicode((char)0); break;
+            }
+        }
+
+        static void KeyUpModifier(string mod)
+        {
+            switch (mod)
+            {
+                case "SHIFT": KeyUpUnicode((char)0); break;
+                case "CTRL":
+                case "CONTROL": KeyUpUnicode((char)0); break;
+                case "ALT": KeyUpUnicode((char)0); break;
+            }
+        }
+
+        // ------------------- Mappatura Unicode automatica -------------------
+        static char MapKeyToChar(string key)
+        {
+            if (KeyMap.ContainsKey(key))
+                return KeyMap[key];
+
+            // Lettere e numeri maiuscole automatici
+            if (!string.IsNullOrEmpty(key))
+                return key.ToUpper()[0];
+
+            return '\0';
+        }
+
+        // ------------------- Funzione EseguiKey -------------------
         static void EseguiKey(KeyCommand command)
         {
             if (command.Type != "KEY" || string.IsNullOrEmpty(command.Key))
                 return;
 
             string[] keys = command.Key.Split('+');
+            var modifiers = new List<string> { "SHIFT", "CTRL", "CONTROL", "ALT" };
 
             // Premere modificatori
             for (int i = 0; i < keys.Length - 1; i++)
             {
-                if (KeyMap.ContainsKey(keys[i].ToUpper()))
-                    KeyDown(KeyMap[keys[i].ToUpper()]);
+                string mod = keys[i].ToUpper();
+                if (modifiers.Contains(mod))
+                    KeyDownModifier(mod);
             }
 
             // Tasto principale
             string mainKeyStr = keys[keys.Length - 1].ToUpper();
-            if (!KeyMap.ContainsKey(mainKeyStr))
-                return;
+            char mainChar = MapKeyToChar(mainKeyStr);
 
-            ushort mainKey = KeyMap[mainKeyStr];
+            // Se è maiuscola e non è SHIFT, premere SHIFT automaticamente
+            bool needShift = char.IsLetter(mainChar) && char.IsUpper(mainChar) && !keys.Contains("SHIFT", StringComparer.OrdinalIgnoreCase);
+            if (needShift) KeyDownModifier("SHIFT");
 
             switch (command.Action.ToUpper())
             {
                 case "DOWN":
-                    KeyDown(mainKey);
+                    KeyDownUnicode(mainChar);
                     break;
                 case "UP":
-                    KeyUp(mainKey);
+                    KeyUpUnicode(mainChar);
                     break;
                 default:
                 case "PRESS":
-                    KeyPress(mainKey);
+                    KeyPressUnicode(mainChar);
                     break;
             }
+
+            if (needShift) KeyUpModifier("SHIFT");
 
             // Rilasciare modificatori
             for (int i = keys.Length - 2; i >= 0; i--)
             {
-                if (KeyMap.ContainsKey(keys[i].ToUpper()))
-                    KeyUp(KeyMap[keys[i].ToUpper()]);
+                string mod = keys[i].ToUpper();
+                if (modifiers.Contains(mod))
+                    KeyUpModifier(mod);
             }
         }
     }
