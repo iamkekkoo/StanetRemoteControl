@@ -553,6 +553,7 @@ namespace StanetRemoteControl
 
             switch (key)
             {
+                case "BACK": return "{BACK}";
                 case "ENTER": return "{ENTER}";
                 case "TAB": return "{TAB}";
                 case "ESC": return "{ESC}";
