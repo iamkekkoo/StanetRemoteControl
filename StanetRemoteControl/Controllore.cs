@@ -28,7 +28,7 @@ namespace StanetRemoteControl
             cts = new CancellationTokenSource();
             return;
         }
-
+        //
         private void Controllore_Shown(object sender, EventArgs e)
         {
             Rubrica = new Rubrica(this, serv, IdMacchina);
