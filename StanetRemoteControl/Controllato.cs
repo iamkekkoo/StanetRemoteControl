@@ -481,70 +481,116 @@ namespace StanetRemoteControl
             if (command.Type != "KEY" || string.IsNullOrEmpty(command.Key))
                 return;
 
-            string key = command.Key.ToUpper();
-
-            // ---------------- MODIFICATORI ----------------
-            if (key == "CTRL" || key == "CONTROL")
-            {
-                ctrlDown = command.Action != "UP";
+            if (!string.Equals(command.Action, "PRESS", StringComparison.OrdinalIgnoreCase))
                 return;
-            }
 
-            if (key == "SHIFT")
-            {
-                shiftDown = command.Action != "UP";
-                return;
-            }
+            string sendKeys = ConvertToSendKeys(command.Key);
 
-            if (key == "ALT")
-            {
-                altDown = command.Action != "UP";
-                return;
-            }
-
-            // ---------------- TASTO NORMALE ----------------
-
-            if (command.Action == "DOWN")
-                return; // con SendKeys non gestiamo DOWN separato
-
-            string combo = "";
-
-            if (ctrlDown) combo += "^";
-            if (shiftDown) combo += "+";
-            if (altDown) combo += "%";
-
-            combo += FormatSpecial(key);
-
-            SendKeys.SendWait(combo);
+            if (!string.IsNullOrEmpty(sendKeys))
+                SendKeys.SendWait(sendKeys);
         }
 
-        static string ConvertToSendKeys(string key)
+        static string ConvertToSendKeys(string input)
         {
-            key = key.ToUpper();
+            if (string.IsNullOrEmpty(input))
+                return null;
 
-            if (key.Contains("+"))
+            var parts = input.ToUpper().Split('+');
+            string result = "";
+
+            foreach (var part in parts)
             {
-                var parts = key.Split('+');
-                string result = "";
-
-                foreach (var part in parts)
+                switch (part)
                 {
-                    switch (part)
-                    {
-                        case "CTRL":
-                        case "CONTROL": result += "^"; break;
-                        case "SHIFT": result += "+"; break;
-                        case "ALT": result += "%"; break;
-                        default:
-                            result += FormatSpecial(part);
-                            break;
-                    }
-                }
+                    // ---------------- MODIFICATORI ----------------
+                    case "CTRL":
+                    case "CONTROL":
+                        result += "^";
+                        break;
 
-                return result;
+                    case "SHIFT":
+                        result += "+";
+                        break;
+
+                    case "ALT":
+                        result += "%";
+                        break;
+
+                    // ---------------- TASTI SPECIALI ----------------
+                    case "ENTER": result += "{ENTER}"; break;
+                    case "TAB": result += "{TAB}"; break;
+                    case "ESC": result += "{ESC}"; break;
+                    case "BACKSPACE": result += "{BACKSPACE}"; break;
+                    case "DELETE": result += "{DELETE}"; break;
+                    case "INSERT": result += "{INSERT}"; break;
+                    case "HOME": result += "{HOME}"; break;
+                    case "END": result += "{END}"; break;
+                    case "PAGEUP": result += "{PGUP}"; break;
+                    case "PAGEDOWN": result += "{PGDN}"; break;
+
+                    // ---------------- FRECCE ----------------
+                    case "LEFT": result += "{LEFT}"; break;
+                    case "RIGHT": result += "{RIGHT}"; break;
+                    case "UP": result += "{UP}"; break;
+                    case "DOWN": result += "{DOWN}"; break;
+
+                    // ---------------- FUNZIONE ----------------
+                    case "F1":
+                    case "F2":
+                    case "F3":
+                    case "F4":
+                    case "F5":
+                    case "F6":
+                    case "F7":
+                    case "F8":
+                    case "F9":
+                    case "F10":
+                    case "F11":
+                    case "F12":
+                        result += "{" + part + "}";
+                        break;
+
+                    // ---------------- NUMPAD ----------------
+                    case "NUM0": result += "{NUMPAD0}"; break;
+                    case "NUM1": result += "{NUMPAD1}"; break;
+                    case "NUM2": result += "{NUMPAD2}"; break;
+                    case "NUM3": result += "{NUMPAD3}"; break;
+                    case "NUM4": result += "{NUMPAD4}"; break;
+                    case "NUM5": result += "{NUMPAD5}"; break;
+                    case "NUM6": result += "{NUMPAD6}"; break;
+                    case "NUM7": result += "{NUMPAD7}"; break;
+                    case "NUM8": result += "{NUMPAD8}"; break;
+                    case "NUM9": result += "{NUMPAD9}"; break;
+
+                    case "NUMADD": result += "{ADD}"; break;
+                    case "NUMSUBTRACT": result += "{SUBTRACT}"; break;
+                    case "NUMMULTIPLY": result += "{MULTIPLY}"; break;
+                    case "NUMDIVIDE": result += "{DIVIDE}"; break;
+                    case "NUMDECIMAL": result += "{DECIMAL}"; break;
+
+                    // ---------------- SPAZIO ----------------
+                    case "SPACE":
+                        result += " ";
+                        break;
+
+                    // ---------------- CARATTERI SPECIALI QWERTY ----------------
+                    case "+": result += "{+}"; break;
+                    case "^": result += "{^}"; break;
+                    case "%": result += "{%}"; break;
+                    case "~": result += "{~}"; break;
+                    case "(": result += "{(}"; break;
+                    case ")": result += "{)}"; break;
+                    case "{": result += "{{}"; break;
+                    case "}": result += "{}}"; break;
+
+                    default:
+                        if (part.Length == 1)
+                            result += part;
+                        break;
+                }
             }
 
-            return FormatSpecial(key);
+            return result;
         }
 
         static string FormatSpecial(string key)
