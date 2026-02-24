@@ -233,8 +233,8 @@ namespace StanetRemoteControl
                 g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = (int)(bounds.Width / 3.5);
-            int thumbHeight = (int)(bounds.Height / 3.5);
+            int thumbWidth = (int)(bounds.Width / 0.6);
+            int thumbHeight = (int)(bounds.Height / 0.6);
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(thumb))
@@ -550,7 +550,7 @@ namespace StanetRemoteControl
         static string FormatSpecial(string key)
         {
             key = key.ToUpper();
-
+            Console.WriteLine(key);
             switch (key)
             {
                 case "BACK": return "{BACK}";
