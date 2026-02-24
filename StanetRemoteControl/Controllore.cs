@@ -133,7 +133,7 @@ namespace StanetRemoteControl
             _renderTimer.Tick += SendMouseMoveCommand;
             _renderTimer.Start();
         }
-
+        //
         private void RenderFrame(byte[] _latestFrame)
         {
             if (_latestFrame == null || _latestFrame.Length <= 8)
