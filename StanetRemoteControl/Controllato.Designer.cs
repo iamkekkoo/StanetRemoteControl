@@ -207,6 +207,10 @@ namespace StanetRemoteControl
         public string macchina;
         public int schermo = 0;
 
+        static bool ctrlDown = false;
+        static bool shiftDown = false;
+        static bool altDown = false;
+
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
 
         public EventArgs COMANDO;
