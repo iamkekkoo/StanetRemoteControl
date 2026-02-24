@@ -481,47 +481,67 @@ namespace StanetRemoteControl
             if (command.Type != "KEY" || string.IsNullOrEmpty(command.Key))
                 return;
 
-            string[] keys = command.Key.Split('+');
-            var modifiers = new List<string> { "SHIFT", "CTRL", "CONTROL", "ALT" };
+            string formatted = ConvertToSendKeys(command.Key);
 
-            // Premere modificatori
-            for (int i = 0; i < keys.Length - 1; i++)
+            SendKeys.SendWait(formatted);
+        }
+
+        static string ConvertToSendKeys(string key)
+        {
+            key = key.ToUpper();
+
+            if (key.Contains("+"))
             {
-                string mod = keys[i].ToUpper();
-                if (modifiers.Contains(mod))
-                    KeyDownModifier(mod);
+                var parts = key.Split('+');
+                string result = "";
+
+                foreach (var part in parts)
+                {
+                    switch (part)
+                    {
+                        case "CTRL":
+                        case "CONTROL": result += "^"; break;
+                        case "SHIFT": result += "+"; break;
+                        case "ALT": result += "%"; break;
+                        default:
+                            result += FormatSpecial(part);
+                            break;
+                    }
+                }
+
+                return result;
             }
 
-            // Tasto principale
-            string mainKeyStr = keys[keys.Length - 1].ToUpper();
-            char mainChar = MapKeyToChar(mainKeyStr);
+            return FormatSpecial(key);
+        }
 
-            // Se è maiuscola e non è SHIFT, premere SHIFT automaticamente
-            bool needShift = char.IsLetter(mainChar) && char.IsUpper(mainChar) && !keys.Contains("SHIFT", StringComparer.OrdinalIgnoreCase);
-            if (needShift) KeyDownModifier("SHIFT");
-
-            switch (command.Action.ToUpper())
+        static string FormatSpecial(string key)
+        {
+            switch (key)
             {
-                case "DOWN":
-                    KeyDownUnicode(mainChar);
-                    break;
-                case "UP":
-                    KeyUpUnicode(mainChar);
-                    break;
+                case "ENTER": return "{ENTER}";
+                case "TAB": return "{TAB}";
+                case "ESC": return "{ESC}";
+                case "BACKSPACE": return "{BACKSPACE}";
+                case "DELETE": return "{DELETE}";
+                case "LEFT": return "{LEFT}";
+                case "RIGHT": return "{RIGHT}";
+                case "UP": return "{UP}";
+                case "DOWN": return "{DOWN}";
+                case "F1": return "{F1}";
+                case "F2": return "{F2}";
+                case "F3": return "{F3}";
+                case "F4": return "{F4}";
+                case "F5": return "{F5}";
+                case "F6": return "{F6}";
+                case "F7": return "{F7}";
+                case "F8": return "{F8}";
+                case "F9": return "{F9}";
+                case "F10": return "{F10}";
+                case "F11": return "{F11}";
+                case "F12": return "{F12}";
                 default:
-                case "PRESS":
-                    KeyPressUnicode(mainChar);
-                    break;
-            }
-
-            if (needShift) KeyUpModifier("SHIFT");
-
-            // Rilasciare modificatori
-            for (int i = keys.Length - 2; i >= 0; i--)
-            {
-                string mod = keys[i].ToUpper();
-                if (modifiers.Contains(mod))
-                    KeyUpModifier(mod);
+                    return key;
             }
         }
     }
