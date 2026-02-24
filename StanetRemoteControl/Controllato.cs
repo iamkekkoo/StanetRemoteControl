@@ -21,13 +21,25 @@ using System.Runtime.InteropServices;
 
 namespace StanetRemoteControl
 {
+
     public partial class Controllato : Form
     {
+        [DllImport("user32.dll")]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
         
         public Controllato()
         {
             InitializeComponent();
             this.Load += Controllato_Load;
+
+            // Esempio
+            Process notepad = Process.GetProcessesByName("notepad").FirstOrDefault();
+            if (notepad != null)
+            {
+                SetForegroundWindow(notepad.MainWindowHandle);
+                KeyPress(0x41); // 'A'
+            }
 
             return;
         }
