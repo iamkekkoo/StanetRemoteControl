@@ -502,10 +502,9 @@ namespace StanetRemoteControl
                 return;
             }
 
-            // ---------------- TASTO NORMALE ----------------
-
-            if (command.Action == "DOWN")
-                return; // con SendKeys non gestiamo DOWN separato
+            // Con SendKeys gestiamo solo PRESS
+            if (command.Action == "DOWN" || command.Action == "UP")
+                return;
 
             string combo = "";
 
@@ -513,9 +512,10 @@ namespace StanetRemoteControl
             if (shiftDown) combo += "+";
             if (altDown) combo += "%";
 
-            combo += FormatSpecial(key);
+            combo += GetSendKeysToken(key);
 
-            SendKeys.SendWait(combo);
+            if (!string.IsNullOrEmpty(combo))
+                SendKeys.SendWait(combo);
         }
 
         static string ConvertToSendKeys(string key)
@@ -536,7 +536,7 @@ namespace StanetRemoteControl
                         case "SHIFT": result += "+"; break;
                         case "ALT": result += "%"; break;
                         default:
-                            result += FormatSpecial(part);
+                            result += GetSendKeysToken(part);
                             break;
                     }
                 }
@@ -544,16 +544,13 @@ namespace StanetRemoteControl
                 return result;
             }
 
-            return FormatSpecial(key);
+            return GetSendKeysToken(key);
         }
 
-        static string FormatSpecial(string key)
+        static string GetSendKeysToken(string key)
         {
-            key = key.ToUpper();
-
             switch (key)
             {
-                case "BACK": return "{BACK}";
                 case "ENTER": return "{ENTER}";
                 case "TAB": return "{TAB}";
                 case "ESC": return "{ESC}";
@@ -577,7 +574,7 @@ namespace StanetRemoteControl
                 case "F11": return "{F11}";
                 case "F12": return "{F12}";
                 default:
-                    return key.Length == 1 ? key : "";
+                    return key.Length == 1 ? key : null;
             }
         }
     }
