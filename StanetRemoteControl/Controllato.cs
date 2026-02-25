@@ -125,10 +125,10 @@ namespace StanetRemoteControl
                     _sendingFrame = true;
                     try
                     {
-                        //Stopwatch swSend = Stopwatch.StartNew();
+                        Stopwatch swSend = Stopwatch.StartNew();
                         HubSchermo.Invoke("SendScreen", mac.ID, frame);
-                        //swSend.Stop();
-                        //Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
+                        swSend.Stop();
+                        Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                     }
                     finally
                     {
@@ -257,7 +257,6 @@ namespace StanetRemoteControl
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[16 + len];
-
 
                     Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
