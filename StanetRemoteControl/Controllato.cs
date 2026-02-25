@@ -256,12 +256,12 @@ namespace StanetRemoteControl
                     thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
-                    byte[] result = new byte[8 + len];
+                    byte[] result = new byte[16 + len];
 
                     Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
 
                     return result;
                 }

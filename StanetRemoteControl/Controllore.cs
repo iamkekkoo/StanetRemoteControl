@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
-using Org.BouncyCastle.Utilities;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -140,12 +139,11 @@ namespace StanetRemoteControl
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
 
-            //se il frame è più vecchio di 60ms viene scartato
             if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000 > 60) //10000 ticks = 1 ms
                 return;
 
-            int width = BitConverter.ToInt32(_latestFrame, 8);
-            int height = BitConverter.ToInt32(_latestFrame, 12);
+            int width = BitConverter.ToInt32(_latestFrame, 0);
+            int height = BitConverter.ToInt32(_latestFrame, 4);
 
             using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8, false))
             {
