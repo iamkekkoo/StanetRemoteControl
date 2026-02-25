@@ -125,7 +125,7 @@ namespace StanetRemoteControl
                     try
                     {
                         Stopwatch swSend = Stopwatch.StartNew();
-                        HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        _ = HubSchermo.Invoke("SendScreen", mac.ID, frame);
                         swSend.Stop();
                         Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                     }
