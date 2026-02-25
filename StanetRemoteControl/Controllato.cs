@@ -107,8 +107,10 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
+                Stopwatch swSend = Stopwatch.StartNew();
                 var frame = CaptureScreenBytes(schermo);
-                
+                swSend.Stop();
+                Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                 if (frame != null)
                 {
                     _sendingFrame = true;
@@ -123,7 +125,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(33); // 30 fps
             }
         }
 
@@ -214,7 +216,7 @@ namespace StanetRemoteControl
                 _captureBitmap = new Bitmap(
                     bounds.Width,
                     bounds.Height,
-                    PixelFormat.Format64bppArgb);
+                    PixelFormat.Format32bppArgb);
 
                 _captureGraphics = Graphics.FromImage(_captureBitmap);
                 _monitorBounds = bounds;
@@ -226,20 +228,20 @@ namespace StanetRemoteControl
             int thumbWidth = (int)(bounds.Width);
             int thumbHeight = (int)(bounds.Height);
 
-            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format64bppArgb))
+            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppArgb))
             using (Graphics g = Graphics.FromImage(thumb))
             {
                 // ⚠️ NON usare HighQuality
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
 
                 g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg80);
+                    thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[8 + len];

@@ -136,7 +136,6 @@ namespace StanetRemoteControl
 
         private void RenderFrame(byte[] _latestFrame)
         {
-            Stopwatch swSend = Stopwatch.StartNew();
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
 
@@ -164,8 +163,6 @@ namespace StanetRemoteControl
                     old?.Dispose();
                 }
             }
-            swSend.Stop();
-            Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
         }
 
         private void SendMouseMoveCommand(object sender, EventArgs e)
