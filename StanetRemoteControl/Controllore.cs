@@ -142,10 +142,10 @@ namespace StanetRemoteControl
             if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000 > 60) //10000 ticks = 1 ms
                 return;
 
-            int width = BitConverter.ToInt32(_latestFrame, 0);
-            int height = BitConverter.ToInt32(_latestFrame, 4);
+            int width = BitConverter.ToInt32(_latestFrame, 8);
+            int height = BitConverter.ToInt32(_latestFrame, 12);
 
-            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8, false))
+            using (var ms = new MemoryStream(_latestFrame, 16, _latestFrame.Length - 16, false))
             {
                 var thumb = new Bitmap(ms); // thumbnail ricevuto dal controllato
 
