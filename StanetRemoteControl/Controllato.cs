@@ -232,7 +232,7 @@ namespace StanetRemoteControl
 
                 _captureGraphics = Graphics.FromImage(_captureBitmap);
                 _monitorBounds = bounds;
-            }
+            }//
 
             _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
