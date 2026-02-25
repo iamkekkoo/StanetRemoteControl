@@ -261,7 +261,7 @@ namespace StanetRemoteControl
                     Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
 
                     return result;
                 }

@@ -140,7 +140,10 @@ namespace StanetRemoteControl
                 return;
 
             if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000 > 60) //10000 ticks = 1 ms
+            {
+                Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000);
                 return;
+            } 
 
             int width = BitConverter.ToInt32(_latestFrame, 8);
             int height = BitConverter.ToInt32(_latestFrame, 12);
