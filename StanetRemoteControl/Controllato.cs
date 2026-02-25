@@ -225,7 +225,7 @@ namespace StanetRemoteControl
                 _captureGraphics?.Dispose();
                 _captureBitmap?.Dispose();
 
-                _captureBitmap = new Bitmap(
+                _captureBitmap = new Bitmap(//
                     bounds.Width,
                     bounds.Height,
                     PixelFormat.Format24bppRgb);
