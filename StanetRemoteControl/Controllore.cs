@@ -139,7 +139,7 @@ namespace StanetRemoteControl
             if (_latestFrame == null || _latestFrame.Length <= 16)
                 return;
 
-            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000 > 2000) //10000 ticks = 1 ms
+            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000 > 60) //10000 ticks = 1 ms
             {
                 Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000);
                 return;
