@@ -86,9 +86,10 @@ namespace StanetRemoteControl
 
             await connection.Start();
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
+            Console.WriteLine("Schermo connesso a: " + connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
-            
+            //StartRenderTimer();
             StartSendMouseMoveCommandTimer();
         }
 
@@ -135,7 +136,6 @@ namespace StanetRemoteControl
 
         private void RenderFrame(byte[] _latestFrame)
         {
-            Stopwatch swSend = Stopwatch.StartNew();
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
 
@@ -163,8 +163,6 @@ namespace StanetRemoteControl
                     old?.Dispose();
                 }
             }
-            swSend.Stop();
-            Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
         }
 
         private void SendMouseMoveCommand(object sender, EventArgs e)
