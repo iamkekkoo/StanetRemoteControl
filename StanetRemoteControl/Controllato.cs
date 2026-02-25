@@ -226,8 +226,8 @@ namespace StanetRemoteControl
             _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = (int)(bounds.Width);
-            int thumbHeight = (int)(bounds.Height);
+            int thumbWidth = (int)(bounds.Width / 1.4);
+            int thumbHeight = (int)(bounds.Height / 1.4);
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppArgb))
             using (Graphics g = Graphics.FromImage(thumb))
@@ -242,7 +242,7 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg10);
+                    thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[8 + len];
