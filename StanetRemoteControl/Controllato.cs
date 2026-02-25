@@ -221,16 +221,19 @@ namespace StanetRemoteControl
 
             if (_captureBitmap == null || _monitorBounds != bounds)
             {
+                _captureGraphics?.Dispose();
                 _captureBitmap?.Dispose();
+
                 _captureBitmap = new Bitmap(
                     bounds.Width,
                     bounds.Height,
                     PixelFormat.Format24bppRgb);
+
+                _captureGraphics = Graphics.FromImage(_captureBitmap);
                 _monitorBounds = bounds;
             }
 
-            using (Graphics g = Graphics.FromImage(_captureBitmap))
-                g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
+            _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
             int thumbWidth = (int)(bounds.Width / 1.5);

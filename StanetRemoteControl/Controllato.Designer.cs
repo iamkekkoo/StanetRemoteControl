@@ -199,7 +199,7 @@ namespace StanetRemoteControl
         {
             Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 65L) }
         };
-
+        private Graphics _captureGraphics;
 
         public FileStream fs;
         public StreamReader reader;
