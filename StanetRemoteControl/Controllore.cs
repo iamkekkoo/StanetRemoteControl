@@ -57,7 +57,7 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
@@ -68,7 +68,7 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
@@ -79,7 +79,7 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
