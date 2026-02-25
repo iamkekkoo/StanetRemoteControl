@@ -136,7 +136,7 @@ namespace StanetRemoteControl
 
         private void RenderFrame(byte[] _latestFrame)
         {
-            if (_latestFrame == null || _latestFrame.Length <= 8)
+            if (_latestFrame == null || _latestFrame.Length <= 16)
                 return;
 
             if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000 > 60) //10000 ticks = 1 ms
