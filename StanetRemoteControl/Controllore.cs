@@ -57,7 +57,7 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
@@ -68,7 +68,7 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
@@ -79,17 +79,16 @@ namespace StanetRemoteControl
                 try
                 {
                     await connection.Start();
-                    HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
 
             await connection.Start();
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
-            Console.WriteLine("Schermo connesso a: " + connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
-            //StartRenderTimer();
+            
             StartSendMouseMoveCommandTimer();
         }
 
