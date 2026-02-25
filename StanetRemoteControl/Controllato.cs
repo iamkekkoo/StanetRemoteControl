@@ -113,7 +113,7 @@ namespace StanetRemoteControl
                     await Task.Delay(5);
                     continue;
                 }
-                
+                //Stopwatch swSend = Stopwatch.StartNew();
                 var frame = CaptureScreenBytes(schermo);
                 // 3️⃣ Ferma lo Stopwatch
                 //sw.Stop();
@@ -125,10 +125,10 @@ namespace StanetRemoteControl
                     _sendingFrame = true;
                     try
                     {
-                        Stopwatch swSend = Stopwatch.StartNew();
+                        
                         HubSchermo.Invoke("SendScreen", mac.ID, frame);
-                        swSend.Stop();
-                        Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
+                        //swSend.Stop();
+                        //Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                     }
                     finally
                     {
@@ -256,12 +256,12 @@ namespace StanetRemoteControl
                     thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
-                    byte[] result = new byte[16 + len];
+                    byte[] result = new byte[8 + len];
 
-                    Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
+                    //Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
 
                     return result;
                 }
