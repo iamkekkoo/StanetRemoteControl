@@ -112,7 +112,7 @@ namespace StanetRemoteControl
                     await Task.Delay(5);
                     continue;
                 }
-                //Stopwatch sw = Stopwatch.StartNew();
+                
                 var frame = CaptureScreenBytes(schermo);
                 // 3️⃣ Ferma lo Stopwatch
                 //sw.Stop();
@@ -125,7 +125,8 @@ namespace StanetRemoteControl
                     try
                     {
                         Stopwatch swSend = Stopwatch.StartNew();
-                        await HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                            //.ContinueWith(t => { if (t.Exception != null) Console.WriteLine(t.Exception); }); ;
                         swSend.Stop();
                         Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                     }
