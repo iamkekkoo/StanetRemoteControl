@@ -33,7 +33,7 @@ namespace StanetRemoteControl
         {
             Rubrica = new Rubrica(this, serv, IdMacchina);
         }
-
+        //
         private async Task InizializzaSignalR()
         {
             connection = new HubConnection("https://francescostdev.azurewebsites.net");

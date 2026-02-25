@@ -236,8 +236,8 @@ namespace StanetRemoteControl
             _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = (int)(bounds.Width / 1.5);
-            int thumbHeight = (int)(bounds.Height / 1.5);
+            int thumbWidth = (int)(bounds.Width);
+            int thumbHeight = (int)(bounds.Height);
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(thumb))
@@ -252,7 +252,7 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg65);
+                    thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[8 + len];
@@ -271,8 +271,8 @@ namespace StanetRemoteControl
             try
             {
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
-                mouseCmd.X = (int)(mouseCmd.X * 3.51);
-                mouseCmd.Y = (int)(mouseCmd.Y * 3.51);
+                mouseCmd.X = (int)(mouseCmd.X);
+                mouseCmd.Y = (int)(mouseCmd.Y);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
                     if (mouseCmd.X == 0 && schermo - 1 >= 0) { schermo = schermo - 1; }
