@@ -228,7 +228,7 @@ namespace StanetRemoteControl
                 _captureBitmap = new Bitmap(
                     bounds.Width,
                     bounds.Height,
-                    PixelFormat.Format24bppRgb);
+                    PixelFormat.Format32bppPArgb);
 
                 _captureGraphics = Graphics.FromImage(_captureBitmap);
                 _monitorBounds = bounds;
@@ -240,7 +240,7 @@ namespace StanetRemoteControl
             int thumbWidth = (int)(bounds.Width);
             int thumbHeight = (int)(bounds.Height);
 
-            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb))
+            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppPArgb))
             using (Graphics g = Graphics.FromImage(thumb))
             {
                 // ⚠️ NON usare HighQuality
@@ -253,7 +253,7 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg100);
+                    thumb.Save(ms, JpegEnc, Jpeg60);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[16 + len];
