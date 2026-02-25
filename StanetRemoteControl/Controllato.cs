@@ -232,7 +232,7 @@ namespace StanetRemoteControl
             using (Graphics g = Graphics.FromImage(thumb))
             {
                 // ⚠️ NON usare HighQuality
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                 g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
                 g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
@@ -241,7 +241,7 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg100);
+                    thumb.Save(ms, JpegEnc, Jpeg80);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[8 + len];
