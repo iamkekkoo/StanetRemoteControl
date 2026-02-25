@@ -107,7 +107,7 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
-                //Stopwatch swSend = Stopwatch.StartNew();
+                Stopwatch swSend = Stopwatch.StartNew();
                 var frame = CaptureScreenBytes(schermo);
                 
                 if (frame != null)
@@ -116,8 +116,8 @@ namespace StanetRemoteControl
                     try
                     {
                         HubSchermo.Invoke("SendScreen", mac.ID, frame);
-                        //swSend.Stop();
-                        //Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
+                        swSend.Stop();
+                        Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                     }
                     finally
                     {
@@ -226,8 +226,8 @@ namespace StanetRemoteControl
             _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = (int)(bounds.Width);
-            int thumbHeight = (int)(bounds.Height);
+            int thumbWidth = (int)(bounds.Width/3.6);
+            int thumbHeight = (int)(bounds.Height/3.6);
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppArgb))
             using (Graphics g = Graphics.FromImage(thumb))
@@ -242,7 +242,7 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg100);
+                    thumb.Save(ms, JpegEnc, Jpeg65);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[8 + len];
