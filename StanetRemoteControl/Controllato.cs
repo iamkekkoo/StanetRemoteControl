@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
+using Org.BouncyCastle.Asn1.Cms;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System;
@@ -112,7 +113,7 @@ namespace StanetRemoteControl
                     await Task.Delay(5);
                     continue;
                 }
-                //Stopwatch sw = Stopwatch.StartNew();
+                
                 var frame = CaptureScreenBytes(schermo);
                 // 3️⃣ Ferma lo Stopwatch
                 //sw.Stop();
@@ -125,7 +126,7 @@ namespace StanetRemoteControl
                     try
                     {
                         Stopwatch swSend = Stopwatch.StartNew();
-                        await HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        HubSchermo.Invoke("SendScreen", mac.ID, frame);
                         swSend.Stop();
                         Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                     }
@@ -221,20 +222,23 @@ namespace StanetRemoteControl
 
             if (_captureBitmap == null || _monitorBounds != bounds)
             {
+                _captureGraphics?.Dispose();
                 _captureBitmap?.Dispose();
+
                 _captureBitmap = new Bitmap(
                     bounds.Width,
                     bounds.Height,
                     PixelFormat.Format24bppRgb);
+
+                _captureGraphics = Graphics.FromImage(_captureBitmap);
                 _monitorBounds = bounds;
             }
 
-            using (Graphics g = Graphics.FromImage(_captureBitmap))
-                g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
+            _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = (int)(bounds.Width / 3.5);
-            int thumbHeight = (int)(bounds.Height / 3.5);
+            int thumbWidth = (int)(bounds.Width);
+            int thumbHeight = (int)(bounds.Height);
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(thumb))
@@ -249,14 +253,15 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg60);
+                    thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
-                    byte[] result = new byte[8 + len];
+                    byte[] result = new byte[16 + len];
 
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
+                    Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
 
                     return result;
                 }
@@ -268,8 +273,8 @@ namespace StanetRemoteControl
             try
             {
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
-                mouseCmd.X = (int)(mouseCmd.X * 3.51);
-                mouseCmd.Y = (int)(mouseCmd.Y * 3.51);
+                mouseCmd.X = (int)(mouseCmd.X);
+                mouseCmd.Y = (int)(mouseCmd.Y);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
                     if (mouseCmd.X == 0 && schermo - 1 >= 0) { schermo = schermo - 1; }
@@ -550,7 +555,7 @@ namespace StanetRemoteControl
         static string FormatSpecial(string key)
         {
             key = key.ToUpper();
-
+            Console.WriteLine(key);
             switch (key)
             {
                 case "BACK": return "{BACK}";
