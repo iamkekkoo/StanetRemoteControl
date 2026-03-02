@@ -43,11 +43,14 @@ namespace StanetRemoteControl
 
             // Ricezione screen
             HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
+                Stopwatch swSend = Stopwatch.StartNew();
                 lock (_frameLock)
                 {
                     _latestFrame = screenBytes;
                 }
                 RenderFrame(screenBytes);
+                swSend.Stop();
+                Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
             });
 
             // riconnessione semplice a SignalR
@@ -138,6 +141,8 @@ namespace StanetRemoteControl
         {
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
+
+            
 
             int width = BitConverter.ToInt32(_latestFrame, 0);
             int height = BitConverter.ToInt32(_latestFrame, 4);
