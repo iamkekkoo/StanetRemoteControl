@@ -86,7 +86,6 @@ namespace StanetRemoteControl
 
             await connection.Start();
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
-            Console.WriteLine("Schermo connesso a: " + connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
             //StartRenderTimer();
