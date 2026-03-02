@@ -194,18 +194,22 @@ namespace StanetRemoteControl
             e => e.MimeType == "image/jpeg"
         );
 
-        private static readonly EncoderParameters Jpeg60 =
+        private static readonly EncoderParameters Jpeg100 =
         new EncoderParameters(1)
         {
-            Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 60L) }
+            Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L) }
         };
-
+        private Graphics _captureGraphics;
 
         public FileStream fs;
         public StreamReader reader;
         public StreamWriter writer;
         public string macchina;
         public int schermo = 0;
+
+        static bool ctrlDown = false;
+        static bool shiftDown = false;
+        static bool altDown = false;
 
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
 
