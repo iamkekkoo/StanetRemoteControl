@@ -134,7 +134,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(33); // 10 fps
+                await Task.Delay(100); // 10 fps
             }
         }
 
@@ -250,7 +250,7 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg40);
+                    thumb.Save(ms, JpegEnc, Jpeg30);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[16 + len];
