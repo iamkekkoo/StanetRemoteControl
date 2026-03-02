@@ -139,6 +139,8 @@ namespace StanetRemoteControl
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
 
+            Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0);
+
             if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1.0) return;
 
             int width = BitConverter.ToInt32(_latestFrame, 8);
