@@ -246,7 +246,7 @@ namespace StanetRemoteControl
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg70);
+                    thumb.Save(ms, JpegEnc, Jpeg60);
 
                     int len = (int)ms.Length;
                     byte[] result = new byte[16 + len];
