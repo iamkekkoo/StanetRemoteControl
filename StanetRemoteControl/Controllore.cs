@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using static NPOI.POIFS.Crypt.CryptoFunctions;
 
 
 namespace StanetRemoteControl
@@ -43,11 +44,11 @@ namespace StanetRemoteControl
 
             // Ricezione screen
             HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
-                lock (_frameLock)
-                {
-                    _latestFrame = screenBytes;
-                }
-                RenderFrame(screenBytes);
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                Interlocked.Exchange(ref _latestFrame, screenBytes);
+                RenderFrame(_latestFrame);
+                stopwatch.Stop();
+                Console.WriteLine("Ricezione + Rendering: " + stopwatch.ElapsedMilliseconds);
             });
 
             // riconnessione semplice a SignalR
@@ -88,7 +89,6 @@ namespace StanetRemoteControl
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
-            //StartRenderTimer();
             StartSendMouseMoveCommandTimer();
         }
 
@@ -113,17 +113,8 @@ namespace StanetRemoteControl
 
                 //_ = AggiornaPictureBoxAsync();
                 _ = InizializzaSignalR();
-
             }
         }
-
-        /*private void StartRenderTimer()
-        {
-            _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 3; // ~240 FPS   //provo da 4->3 (240 ->360 fps)
-            _renderTimer.Tick += RenderFrame;
-            _renderTimer.Start();
-        }*/
 
         private void StartSendMouseMoveCommandTimer()
         {
@@ -249,41 +240,6 @@ namespace StanetRemoteControl
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 365);
             this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-        }
-
-        // ====== UTILS ======
-
-        private static Bitmap ResizeImage(Bitmap src, int maxW, int maxH)
-        {
-            var bmp = new Bitmap(maxW, maxH);
-            using (var g = Graphics.FromImage(bmp))
-            {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.DrawImage(src, 0, 0, maxW, maxH);
-            }
-
-            src.Dispose();
-            return bmp;
-        }
-
-        public static System.Drawing.Image BytesToImage(byte[] value)
-        {
-            try
-            {
-                using (var ms = new MemoryStream(value))
-                using (var img = System.Drawing.Image.FromStream(ms, false, false))
-                {
-                    return (Bitmap)new Bitmap(img).Clone();
-                }
-            }
-            catch (Exception e)
-            {
-                // Se i byte non sono validi, ritorna un'immagine nera 800x600
-                Bitmap bmp = new Bitmap(800, 600, PixelFormat.Format24bppRgb);
-                using (Graphics g = Graphics.FromImage(bmp))
-                    g.Clear(Color.Black);
-                return bmp;
-            }
         }
         
 

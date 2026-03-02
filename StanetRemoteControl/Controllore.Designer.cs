@@ -378,6 +378,7 @@ namespace StanetRemoteControl
         internal Int64 IdMacchina;
         internal Int64? IdSottoscrizione;
         byte[] _latestFrame = null;
+        internal byte[] _Frame = null;
         private readonly object _frameLock = new object();
         private System.Windows.Forms.Timer _renderTimer;
         public static Bitmap immagine = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);

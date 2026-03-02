@@ -168,7 +168,7 @@ namespace StanetRemoteControl
             set { label5.Text = value; }
         }
 
-        public static Macchina mac = new Macchina();
+        internal static Macchina mac = new Macchina();
         public static List<Connessione> connIngresso = new List<Connessione>();
         public Controllore paginaConn = new Controllore();
         public static byte[] screenBytes;
@@ -184,6 +184,7 @@ namespace StanetRemoteControl
         private Connessione connessione;
         private Bitmap _captureBitmap; // bitmap riutilizzabile per il monitor
         private Rectangle _monitorBounds; // salva le dimensioni del monitor
+        private double ridimensionamento = 1;
         private static Screen[] screens = Screen.AllScreens;
         private Screen screen;
         private Rectangle bounds;

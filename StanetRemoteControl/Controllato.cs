@@ -108,24 +108,21 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                var frame = CaptureScreenBytes(schermo);
+
                 if (_sendingFrame)
                 {
                     await Task.Delay(5);
-                    continue;
+                    frame = null;
                 }
-                
-                var frame = CaptureScreenBytes(schermo);
-                // 3️⃣ Ferma lo Stopwatch
-                //sw.Stop();
 
-                // 4️⃣ Mostra il tempo trascorso
-                //Console.WriteLine($"Cattura + compressione: {sw.ElapsedMilliseconds} ms");
                 if (frame != null)
                 {
                     _sendingFrame = true;
                     try
                     {
-                        HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                      HubSchermo.Invoke("SendScreen", mac.ID, frame);
                     }
                     finally
                     {
@@ -134,7 +131,9 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(200); // 5 fps
+                stopwatch.Stop();
+                Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
         }
 
@@ -234,15 +233,15 @@ namespace StanetRemoteControl
             _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = bounds.Width;
-            int thumbHeight = bounds.Height;
+            int thumbWidth = (int)(bounds.Width / ridimensionamento);
+            int thumbHeight = (int)(bounds.Height / ridimensionamento);
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppPArgb))
             using (Graphics g = Graphics.FromImage(thumb))
             {
                 // ⚠️ NON usare HighQuality
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
-                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
                 g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
 
@@ -258,7 +257,7 @@ namespace StanetRemoteControl
                     Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
+                    Buffer.BlockCopy(ms.ToArray(), 0, result, 16, len);
 
                     return result;
                 }
@@ -270,8 +269,8 @@ namespace StanetRemoteControl
             try
             {
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
-                mouseCmd.X = (int)(mouseCmd.X);
-                mouseCmd.Y = (int)(mouseCmd.Y);
+                mouseCmd.X = (int)(mouseCmd.X * ridimensionamento);
+                mouseCmd.Y = (int)(mouseCmd.Y * ridimensionamento);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
                     if (mouseCmd.X == 0 && schermo - 1 >= 0) { schermo = schermo - 1; }
@@ -293,16 +292,7 @@ namespace StanetRemoteControl
             catch { }
         }
 
-        private static byte[] Compress(byte[] data)
-        {
-            MemoryStream output = new MemoryStream();
-            using (DeflateStream dstream = new DeflateStream(output, CompressionLevel.Optimal))
-            {
-                dstream.Write(data, 0, data.Length);
-            }
-            return output.ToArray();
-        }
-
+        
         static void EseguiMouse(MouseCommand cmd)
         {
             if (cmd.Action == "MOVE")
@@ -555,7 +545,7 @@ namespace StanetRemoteControl
             Console.WriteLine(key);
             switch (key)
             {
-                case "BACK": return "{BACK}";
+                case "BACK": return "\b";
                 case "ENTER": return "{ENTER}";
                 case "TAB": return "{TAB}";
                 case "ESC": return "{ESC}";
