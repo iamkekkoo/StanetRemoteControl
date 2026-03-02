@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
+using Org.BouncyCastle.Asn1.Cms;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System;
@@ -136,7 +137,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(16); // 60 fps
+                await Task.Delay(33); // 30 fps
             }
         }
 
@@ -255,11 +256,12 @@ namespace StanetRemoteControl
                     thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
-                    byte[] result = new byte[8 + len];
+                    byte[] result = new byte[16 + len];
 
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
+                    Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
 
                     return result;
                 }
