@@ -247,7 +247,7 @@ namespace StanetRemoteControl
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                 g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;//
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
 
                 g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
