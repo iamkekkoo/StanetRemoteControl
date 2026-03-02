@@ -129,7 +129,7 @@ namespace StanetRemoteControl
                     }
                     finally
                     {
-                        _sendingFrame = false;
+                        _sendingFrame = false;//
                         
                     }
                 }
