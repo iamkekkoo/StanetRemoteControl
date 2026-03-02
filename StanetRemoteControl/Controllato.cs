@@ -134,7 +134,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(100); // 10 fps
+                await Task.Delay(33); // 10 fps
             }
         }
 
