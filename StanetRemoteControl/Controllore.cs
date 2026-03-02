@@ -139,10 +139,12 @@ namespace StanetRemoteControl
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
 
-            int width = BitConverter.ToInt32(_latestFrame, 0);
-            int height = BitConverter.ToInt32(_latestFrame, 4);
+            Console.WriteLine("Latenza netta: " + (DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)));
 
-            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8, false))
+            int width = BitConverter.ToInt32(_latestFrame, 8);
+            int height = BitConverter.ToInt32(_latestFrame, 12);
+
+            using (var ms = new MemoryStream(_latestFrame, 16, _latestFrame.Length - 16, false))
             {
                 var thumb = new Bitmap(ms); // thumbnail ricevuto dal controllato
 

@@ -124,10 +124,7 @@ namespace StanetRemoteControl
                     _sendingFrame = true;
                     try
                     {
-                        Stopwatch swSend = Stopwatch.StartNew();
                         HubSchermo.Invoke("SendScreen", mac.ID, frame);
-                        swSend.Stop();
-                        Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
                     }
                     finally
                     {
@@ -233,8 +230,8 @@ namespace StanetRemoteControl
                 g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
             // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = (int)(bounds.Width / 3.5);
-            int thumbHeight = (int)(bounds.Height / 3.5);
+            int thumbWidth = bounds.Width;
+            int thumbHeight = bounds.Height;
 
             using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(thumb))
@@ -252,11 +249,12 @@ namespace StanetRemoteControl
                     thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
-                    byte[] result = new byte[8 + len];
-                    //
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
+                    byte[] result = new byte[16 + len];
+
+                    Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
 
                     return result;
                 }
@@ -268,8 +266,8 @@ namespace StanetRemoteControl
             try
             {
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
-                mouseCmd.X = (int)(mouseCmd.X * 3.51);
-                mouseCmd.Y = (int)(mouseCmd.Y * 3.51);
+                mouseCmd.X = mouseCmd.X;
+                mouseCmd.Y = mouseCmd.Y;
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
                     if (mouseCmd.X == 0 && schermo - 1 >= 0) { schermo = schermo - 1; }
