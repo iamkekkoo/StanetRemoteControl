@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
+using Org.BouncyCastle.Asn1.Cms;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System;
@@ -107,14 +108,24 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
-                Stopwatch swSend = Stopwatch.StartNew();
-                var frame = CaptureScreenBytes(schermo);
+                if (_sendingFrame)
+                {
+                    await Task.Delay(5);
+                    continue;
+                }
                 
+                var frame = CaptureScreenBytes(schermo);
+                // 3️⃣ Ferma lo Stopwatch
+                //sw.Stop();
+
+                // 4️⃣ Mostra il tempo trascorso
+                //Console.WriteLine($"Cattura + compressione: {sw.ElapsedMilliseconds} ms");
                 if (frame != null)
                 {
                     _sendingFrame = true;
                     try
                     {
+                        Stopwatch swSend = Stopwatch.StartNew();
                         HubSchermo.Invoke("SendScreen", mac.ID, frame);
                         swSend.Stop();
                         Console.WriteLine($"Invio SignalR: {swSend.ElapsedMilliseconds} ms");
@@ -217,7 +228,7 @@ namespace StanetRemoteControl
                 _captureBitmap = new Bitmap(
                     bounds.Width,
                     bounds.Height,
-                    PixelFormat.Format32bppArgb);
+                    PixelFormat.Format24bppRgb);
 
                 _captureGraphics = Graphics.FromImage(_captureBitmap);
                 _monitorBounds = bounds;
@@ -229,27 +240,28 @@ namespace StanetRemoteControl
             int thumbWidth = (int)(bounds.Width);
             int thumbHeight = (int)(bounds.Height);
 
-            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppArgb))
+            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(thumb))
             {
                 // ⚠️ NON usare HighQuality
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                 g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
                 g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
 
                 g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
                 using (var ms = new MemoryStream())
                 {
-                    thumb.Save(ms, JpegEnc, Jpeg10);
+                    thumb.Save(ms, JpegEnc, Jpeg100);
 
                     int len = (int)ms.Length;
-                    byte[] result = new byte[8 + len];
+                    byte[] result = new byte[16 + len];
 
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 4, 4);
-                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 8, len);
+                    Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
+                    Buffer.BlockCopy(ms.GetBuffer(), 0, result, 16, len);
 
                     return result;
                 }
@@ -261,7 +273,8 @@ namespace StanetRemoteControl
             try
             {
                 var mouseCmd = JsonConvert.DeserializeObject<MouseCommand>(cmdJson);
-                
+                mouseCmd.X = (int)(mouseCmd.X);
+                mouseCmd.Y = (int)(mouseCmd.Y);
                 if (mouseCmd != null && mouseCmd.Type == "MOUSE")
                 {
                     if (mouseCmd.X == 0 && schermo - 1 >= 0) { schermo = schermo - 1; }
