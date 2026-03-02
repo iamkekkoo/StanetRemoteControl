@@ -124,7 +124,7 @@ namespace StanetRemoteControl
                     _sendingFrame = true;
                     try
                     {
-                        HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        await HubSchermo.Invoke("SendScreen", mac.ID, frame);
                     }
                     finally
                     {
