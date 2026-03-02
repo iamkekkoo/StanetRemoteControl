@@ -28,7 +28,7 @@ namespace StanetRemoteControl
             cts = new CancellationTokenSource();
             return;
         }
-
+        //
         private void Controllore_Shown(object sender, EventArgs e)
         {
             Rubrica = new Rubrica(this, serv, IdMacchina);
@@ -136,14 +136,10 @@ namespace StanetRemoteControl
 
         private void RenderFrame(byte[] _latestFrame)
         {
-            if (_latestFrame == null || _latestFrame.Length <= 16)
+            if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
 
-            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000 > 60) //10000 ticks = 1 ms
-            {
-                Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000);
-                return;
-            } 
+            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1.0) return;
 
             int width = BitConverter.ToInt32(_latestFrame, 8);
             int height = BitConverter.ToInt32(_latestFrame, 12);
