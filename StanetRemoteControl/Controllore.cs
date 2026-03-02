@@ -139,7 +139,7 @@ namespace StanetRemoteControl
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
 
-            Console.WriteLine("Latenza netta: " + (DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)));
+            Console.WriteLine("Latenza netta: " + ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0) + " secondi");
 
             int width = BitConverter.ToInt32(_latestFrame, 8);
             int height = BitConverter.ToInt32(_latestFrame, 12);
