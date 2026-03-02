@@ -134,7 +134,7 @@ namespace StanetRemoteControl
             _renderTimer.Start();
         }
 
-        private void RenderFrame(byte[] _latestFrame)
+        private void RenderFrame(byte[] _latestFrame)//
         {
             if (_latestFrame == null || _latestFrame.Length <= 8)
                 return;
