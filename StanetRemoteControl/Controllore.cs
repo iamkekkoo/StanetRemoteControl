@@ -28,12 +28,12 @@ namespace StanetRemoteControl
             cts = new CancellationTokenSource();
             return;
         }
-
+        
         private void Controllore_Shown(object sender, EventArgs e)
         {
             Rubrica = new Rubrica(this, serv, IdMacchina);
         }
-
+        
         private async Task InizializzaSignalR()
         {
             connection = new HubConnection("https://francescostdev.azurewebsites.net");
@@ -136,13 +136,19 @@ namespace StanetRemoteControl
 
         private void RenderFrame(byte[] _latestFrame)
         {
-            if (_latestFrame == null || _latestFrame.Length <= 8)
+            if (_latestFrame == null || _latestFrame.Length <= 16)
                 return;
 
-            int width = BitConverter.ToInt32(_latestFrame, 0);
-            int height = BitConverter.ToInt32(_latestFrame, 4);
+            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000 > 60) //10000 ticks = 1 ms
+            {
+                Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000);
+                return;
+            } 
 
-            using (var ms = new MemoryStream(_latestFrame, 8, _latestFrame.Length - 8, false))
+            int width = BitConverter.ToInt32(_latestFrame, 8);
+            int height = BitConverter.ToInt32(_latestFrame, 12);
+
+            using (var ms = new MemoryStream(_latestFrame, 16, _latestFrame.Length - 16, false))
             {
                 var thumb = new Bitmap(ms); // thumbnail ricevuto dal controllato
 
