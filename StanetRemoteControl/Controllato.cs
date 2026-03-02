@@ -240,7 +240,7 @@ namespace StanetRemoteControl
             int thumbWidth = (int)(bounds.Width);
             int thumbHeight = (int)(bounds.Height);
 
-            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppPArgb))
+            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppPArgb))//
             using (Graphics g = Graphics.FromImage(thumb))
             {
                 // ⚠️ NON usare HighQuality
