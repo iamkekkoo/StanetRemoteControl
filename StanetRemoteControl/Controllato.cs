@@ -111,12 +111,6 @@ namespace StanetRemoteControl
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 var frame = CaptureScreenBytes(schermo);
 
-                if (_sendingFrame)
-                {
-                    await Task.Delay(5);
-                    frame = null;
-                }
-
                 if (frame != null)
                 {
                     _sendingFrame = true;

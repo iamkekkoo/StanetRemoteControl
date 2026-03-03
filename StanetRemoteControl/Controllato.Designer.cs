@@ -184,7 +184,7 @@ namespace StanetRemoteControl
         private Connessione connessione;
         private Bitmap _captureBitmap; // bitmap riutilizzabile per il monitor
         private Rectangle _monitorBounds; // salva le dimensioni del monitor
-        private double ridimensionamento = 1;
+        private double ridimensionamento = 1.3;
         private static Screen[] screens = Screen.AllScreens;
         private Screen screen;
         private Rectangle bounds;
