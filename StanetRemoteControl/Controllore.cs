@@ -94,7 +94,7 @@ namespace StanetRemoteControl
 
             connUscita = serv.ChiediAccesso(UserName, Password, IdMacchina);
             
-            if (connUscita.ID != 0) 
+            if (connUscita.ID != 0) //Connesso signalR
             {
                 textBox1.Size = new Size(0, 0);
                 textBox2.Size = new Size(0, 0);
@@ -108,7 +108,6 @@ namespace StanetRemoteControl
 
                 pictureBox1.Visible = true;
 
-                //_ = AggiornaPictureBoxAsync();
                 _ = InizializzaSignalR();
             }
         }
