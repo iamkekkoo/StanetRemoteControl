@@ -131,7 +131,7 @@ namespace StanetRemoteControl
 
             Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0);
 
-            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1) //10000 ticks = 1 ms
+            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1.5) //10000 ticks = 1 ms
             {
                 return;
             } 
