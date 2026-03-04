@@ -44,11 +44,7 @@ namespace StanetRemoteControl
 
             // Ricezione screen
             HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                Interlocked.Exchange(ref _latestFrame, screenBytes);
-                RenderFrame(_latestFrame);
-                stopwatch.Stop();
-                Console.WriteLine("Ricezione + Rendering: " + stopwatch.ElapsedMilliseconds);
+                _latestFrame = screenBytes;
             });
 
             // riconnessione semplice a SignalR
@@ -90,6 +86,7 @@ namespace StanetRemoteControl
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
             StartSendMouseMoveCommandTimer();
+            RenderFrameTimer();
         }
 
         public void button1_Click(string UserName, string Password)
@@ -124,14 +121,22 @@ namespace StanetRemoteControl
             _renderTimer.Start();
         }
 
-        private void RenderFrame(byte[] _latestFrame)
+        private void RenderFrameTimer()
+        {
+            _renderTimer = new System.Windows.Forms.Timer();
+            _renderTimer.Interval = 1; // ~10 FPS
+            _renderTimer.Tick += RenderFrame;
+            _renderTimer.Start();
+        }
+
+        private void RenderFrame(object sender, EventArgs e)
         {
             if (_latestFrame == null || _latestFrame.Length <= 16)
                 return;
 
             Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0);
 
-            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1) //10000 ticks = 1 ms
+            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1.5) //10000 ticks = 1 ms
             {
                 return;
             } 
