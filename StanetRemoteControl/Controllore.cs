@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
+using Microsoft.MixedReality.WebRTC;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -107,7 +108,6 @@ namespace StanetRemoteControl
                 pictureBox1.Width = Width; pictureBox1.Height = Height;
 
                 pictureBox1.Visible = true;
-
                 _ = InizializzaSignalR();
             }
         }
