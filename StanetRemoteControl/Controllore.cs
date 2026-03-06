@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using Microsoft.MixedReality.WebRTC;
+using StanetRemoteControl.RemoteControlNode;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -28,7 +30,45 @@ namespace StanetRemoteControl
         private void Controllore_Load(object sender, EventArgs e) 
         {
             cts = new CancellationTokenSource();
+
+            /*Inizializza variabili per signaling UDP*/
+            InitWebRTC();
+
+            pc.LocalSdpReadytoSend += async (SdpMessage message) =>
+            {
+                if (message.Type == SdpMessageType.Offer)
+                {
+                    await HubSchermo.Invoke("SendOffer", connUscita.ID_Controllato, message.Content);
+                    Console.WriteLine("Offer inviata da controllore");
+                }
+                else if (message.Type == SdpMessageType.Answer)
+                {
+                    await HubSchermo.Invoke("SendAnswer", connUscita.ID_Controllato, message.Content);
+                    Console.WriteLine("Answer inviata da controllore");
+                }
+            };
+
+            pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
+            {
+                await HubSchermo.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate.Content);
+            };
+
             return;
+        }
+
+        async Task InitWebRTC()
+        {
+            pc = new PeerConnection();
+
+            var config = new PeerConnectionConfiguration
+            {
+                IceServers = new List<IceServer>
+                {
+                    new IceServer{ Urls = { "stun:stun.l.google.com:19302" } }
+                }
+            };
+
+            await pc.InitializeAsync(config);
         }
 
         private void Controllore_Shown(object sender, EventArgs e)
@@ -47,6 +87,8 @@ namespace StanetRemoteControl
             HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
                 _latestFrame = screenBytes;
             });
+
+            
 
             // riconnessione semplice a SignalR
             connection.Closed += async () =>
@@ -86,6 +128,28 @@ namespace StanetRemoteControl
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
+
+            /*Signaling UDP*/
+            HubSchermo.On<string, string>("ReceiveOffer", async (connId, sdp) =>
+            {
+                Console.WriteLine("Offerta ricevuta da controllore");
+                var msg = new SdpMessage
+                {
+                    Type = SdpMessageType.Offer,
+                    Content = sdp
+                };
+
+                await pc.SetRemoteDescriptionAsync(msg);
+
+                pc.CreateAnswer();
+            });
+
+            HubSchermo.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
+            {
+                pc.AddIceCandidate(candidate);
+            });
+
+            /*Streaming TCP*/
             StartSendMouseMoveCommandTimer();
             RenderFrameTimer();
         }

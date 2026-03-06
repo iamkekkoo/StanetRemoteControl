@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
+using Microsoft.MixedReality.WebRTC;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
 using Org.BouncyCastle.Asn1.Cms;
@@ -60,6 +61,8 @@ namespace StanetRemoteControl
                 });
             }
 
+            
+
             // Riconnessione
             connection.Closed += async () =>
             {
@@ -97,8 +100,29 @@ namespace StanetRemoteControl
             await HubPreciousCommand.Invoke("JoinConnection", mac.ID);
             await HubMouseMove.Invoke("JoinConnection", mac.ID);
 
-            // Avvia streaming
+            //Signaling UDP
+            HubSchermo.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
+            {
+                var msg = new SdpMessage
+                {
+                    Type = SdpMessageType.Answer,
+                    Content = sdp
+                };
+
+                await pc.SetRemoteDescriptionAsync(msg);
+            });
+
+            HubSchermo.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
+            {
+                pc.AddIceCandidate(candidate);
+            });
+
+            pc.CreateOffer();
+            Console.WriteLine("Offer Creata");
+
+            // Avvia streaming TCP
             _ = StartStreaming(cts.Token);
+
 
             // Avvia timer ricezione comandi MouseMove
             StartMouseMoveCommandTimer();
@@ -127,7 +151,7 @@ namespace StanetRemoteControl
 
                 await Task.Delay(200); // 5 fps
                 stopwatch.Stop();
-                Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
+                //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
         }
 
@@ -154,6 +178,7 @@ namespace StanetRemoteControl
             HandleCommand(command);
         }
 
+        /*Carica Utente + licenza*/
         private void CaricaMacchina()
         {
             // Lettura
@@ -184,15 +209,53 @@ namespace StanetRemoteControl
             MiaPsw = mac.Password;
         }
 
+        /*CaricaMacchina, inizializza variabili per signaling UDP, Apre connessione a DB, chiama SignalR (TCP)*/
         private void Controllato_Load(object sender, EventArgs e)
         {
             CaricaMacchina();
+            InitWebRTC();
 
-            connessione = Controllore.serv.ApriConnessione(mac);
+            pc.LocalSdpReadytoSend += async (SdpMessage message) =>
+            {
+                if (message.Type == SdpMessageType.Offer)
+                {
+                    await HubSchermo.Invoke("SendOffer", mac.ID, message.Content);
+                    Console.WriteLine("Offer inviata da controllato");
+                }
+                else if (message.Type == SdpMessageType.Answer)
+                {
+                    await HubSchermo.Invoke("SendAnswer", mac.ID, message.Content);
+                    Console.WriteLine("Answer inviata da controllato");
+                }
+            };
+
+            pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
+            {
+                await HubSchermo.Invoke("SendIceCandidate", mac.ID, candidate.Content);
+            };
+
+            connessione = Controllore.serv.ApriConnessione(mac);  //apre connessione a DB
             cts = new CancellationTokenSource();
             _ = InizializzaSignalR();
         }
 
+        /*Inizializza PeerConnection per UDP*/
+        async Task InitWebRTC()
+        {
+            pc = new PeerConnection();
+
+            var config = new PeerConnectionConfiguration
+            {
+                IceServers = new List<IceServer>
+                {
+                    new IceServer{ Urls = { "stun:stun.l.google.com:19302" } }
+                }
+            };
+
+            await pc.InitializeAsync(config);
+        }
+
+        /*Se non era già registrato carica l'utenza + sottoscrizione nell'applicazione*/
         private void button1_Click(object sender, EventArgs e)
         {
             new Thread(delegate ()
@@ -286,7 +349,6 @@ namespace StanetRemoteControl
             catch { }
         }
 
-        
         static void EseguiMouse(MouseCommand cmd)
         {
             if (cmd.Action == "MOVE")
