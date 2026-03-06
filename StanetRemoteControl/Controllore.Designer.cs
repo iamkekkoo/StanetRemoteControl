@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
+using Microsoft.MixedReality.WebRTC;
 using Newtonsoft.Json;
 using StanetRemoteControl.RemoteControlNode;
 using System;
@@ -386,7 +387,7 @@ namespace StanetRemoteControl
         internal IHubProxy HubSchermo;
         internal IHubProxy HubPreciousCommand;
         internal IHubProxy HubMouseMove;
-        private CancellationTokenSource cts = new CancellationTokenSource();
+        private CancellationTokenSource cts = new CancellationTokenSource();//
         private string _LastMouseMoveCommandToSend = null;
         private string _LastMouseMoveCommandSent = null;
         private Bitmap _displayBitmap;

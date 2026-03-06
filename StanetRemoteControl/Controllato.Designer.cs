@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
+using Microsoft.MixedReality.WebRTC;
 using StanetRemoteControl.RemoteControlNode;
 using System;
 using System.Collections.Generic;
@@ -177,6 +178,7 @@ namespace StanetRemoteControl
         private IHubProxy HubSchermo;
         private IHubProxy HubPreciousCommand;
         private IHubProxy HubMouseMove;
+        PeerConnection pc = new PeerConnection();
         private string _LatestMouseMoveCommandString = null;
         private readonly object _commandLock = new object();
         private System.Windows.Forms.Timer _renderTimer;
