@@ -386,7 +386,7 @@ namespace StanetRemoteControl
         internal IHubProxy HubSchermo;
         internal IHubProxy HubPreciousCommand;
         internal IHubProxy HubMouseMove;
-        private CancellationTokenSource cts = new CancellationTokenSource();//
+        private CancellationTokenSource cts = new CancellationTokenSource();
         private string _LastMouseMoveCommandToSend = null;
         private string _LastMouseMoveCommandSent = null;
         private Bitmap _displayBitmap;
