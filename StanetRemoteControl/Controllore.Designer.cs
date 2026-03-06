@@ -387,6 +387,7 @@ namespace StanetRemoteControl
         internal IHubProxy HubSchermo;
         internal IHubProxy HubPreciousCommand;
         internal IHubProxy HubMouseMove;
+        private IHubProxy HubSignaling;
         PeerConnection pc = new PeerConnection();
         private CancellationTokenSource cts = new CancellationTokenSource();//
         private string _LastMouseMoveCommandToSend = null;

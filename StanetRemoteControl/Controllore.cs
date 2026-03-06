@@ -36,21 +36,13 @@ namespace StanetRemoteControl
 
             pc.LocalSdpReadytoSend += async (SdpMessage message) =>
             {
-                if (message.Type == SdpMessageType.Offer)
-                {
-                    await HubSchermo.Invoke("SendOffer", connUscita.ID_Controllato, message.Content);
-                    Console.WriteLine("Offer inviata da controllore");
-                }
-                else if (message.Type == SdpMessageType.Answer)
-                {
-                    await HubSchermo.Invoke("SendAnswer", connUscita.ID_Controllato, message.Content);
-                    Console.WriteLine("Answer inviata da controllore");
-                }
+                await HubSignaling.Invoke("SendAnswer", connUscita.ID_Controllato, message.Content);
             };
 
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
             {
-                await HubSchermo.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate.Content);
+                await HubSignaling.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate.Content);
+                Console.WriteLine("ICE inviata da controllore");
             };
 
             return;
@@ -82,13 +74,33 @@ namespace StanetRemoteControl
             HubSchermo = connection.CreateHubProxy("ScreenHub");
             HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
             HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
+            HubSignaling = connection.CreateHubProxy("SignalingHub");
 
-            // Ricezione screen
-            HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
-                _latestFrame = screenBytes;
-            });
+            // Hub ON
+            { 
+                HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
+                    _latestFrame = screenBytes;
+                });
 
-            
+                HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
+                {
+                    var msg = new SdpMessage
+                    {
+                        Type = SdpMessageType.Offer,
+                        Content = sdp
+                    };
+
+                    await pc.SetRemoteDescriptionAsync(msg);
+
+                    pc.CreateAnswer();
+                });
+
+                HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
+                {
+                    Console.WriteLine("ICE ricevuta da controllore");
+                    pc.AddIceCandidate(candidate);
+                });
+            }
 
             // riconnessione semplice a SignalR
             connection.Closed += async () =>
@@ -98,28 +110,9 @@ namespace StanetRemoteControl
                 {
                     await connection.Start();
                     await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
-                }
-                catch { Console.WriteLine("Errore connessione"); }
-            };
-
-            connection.Closed += async () =>
-            {
-                await Task.Delay(1000);
-                try
-                {
-                    await connection.Start();
                     await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
-                }
-                catch { Console.WriteLine("Errore connessione"); }
-            };
-
-            connection.Closed += async () =>
-            {
-                await Task.Delay(1000);
-                try
-                {
-                    await connection.Start();
                     await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
+                    await HubSignaling.Invoke("JoinConnection", connUscita.ID_Controllato);
                 }
                 catch { Console.WriteLine("Errore connessione"); }
             };
@@ -128,26 +121,8 @@ namespace StanetRemoteControl
             await HubSchermo.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubPreciousCommand.Invoke("JoinConnection", connUscita.ID_Controllato);
             await HubMouseMove.Invoke("JoinConnection", connUscita.ID_Controllato);
-
-            /*Signaling UDP*/
-            HubSchermo.On<string, string>("ReceiveOffer", async (connId, sdp) =>
-            {
-                Console.WriteLine("Offerta ricevuta da controllore");
-                var msg = new SdpMessage
-                {
-                    Type = SdpMessageType.Offer,
-                    Content = sdp
-                };
-
-                await pc.SetRemoteDescriptionAsync(msg);
-
-                pc.CreateAnswer();
-            });
-
-            HubSchermo.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
-            {
-                pc.AddIceCandidate(candidate);
-            });
+            await HubSignaling.Invoke("JoinConnection", connUscita.ID_Controllato);
+            
 
             /*Streaming TCP*/
             StartSendMouseMoveCommandTimer();

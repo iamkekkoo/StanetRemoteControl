@@ -19,6 +19,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Interop;
 
 
 
@@ -45,8 +46,9 @@ namespace StanetRemoteControl
             HubSchermo = connection.CreateHubProxy("ScreenHub");
             HubPreciousCommand = connection.CreateHubProxy("PreciousCommandHub");
             HubMouseMove = connection.CreateHubProxy("MouseMoveHub");
+            HubSignaling = connection.CreateHubProxy("SignalingHub");
 
-            // Ricezione comandi
+            // Hub ON
             {
                 /*Comandi importanti*/
                 HubPreciousCommand.On<string>("ReceiveCommand", cmdJson => { HandleCommand(cmdJson); });
@@ -59,70 +61,62 @@ namespace StanetRemoteControl
                         _LatestMouseMoveCommandString = cmdJson;
                     }
                 });
+
+                HubSignaling.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
+                {
+                    Console.WriteLine("Answer ricevuta da controllato: " + sdp);
+                    var msg = new SdpMessage
+                    {
+                        Type = SdpMessageType.Answer,
+                        Content = sdp
+                    };
+
+                    await pc.SetRemoteDescriptionAsync(msg);
+                });
+
+                HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
+                {
+                    Console.WriteLine("ICE inviata da controllato");
+                    pc.AddIceCandidate(candidate);
+                });
             }
 
-            
-
-            // Riconnessione
+            // riconnessione semplice a SignalR
             connection.Closed += async () =>
             {
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 try
                 {
                     await connection.Start();
                     await HubSchermo.Invoke("JoinConnection", mac.ID);
-                }
-                catch { }
-            };
-            connection.Closed += async () =>
-            {
-                await Task.Delay(2000);
-                try
-                {
-                    await connection.Start();
                     await HubPreciousCommand.Invoke("JoinConnection", mac.ID);
-                }
-                catch { }
-            };
-            connection.Closed += async () =>
-            {
-                await Task.Delay(2000);
-                try
-                {
-                    await connection.Start();
                     await HubMouseMove.Invoke("JoinConnection", mac.ID);
+                    await HubSignaling.Invoke("JoinConnection", mac.ID);
                 }
-                catch { }
+                catch { Console.WriteLine("Errore connessione"); }
             };
 
             await connection.Start();
             await HubSchermo.Invoke("JoinConnection", mac.ID);
             await HubPreciousCommand.Invoke("JoinConnection", mac.ID);
             await HubMouseMove.Invoke("JoinConnection", mac.ID);
+            await HubSignaling.Invoke("JoinConnection", mac.ID);
 
-            //Signaling UDP
-            HubSchermo.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
-            {
-                var msg = new SdpMessage
-                {
-                    Type = SdpMessageType.Answer,
-                    Content = sdp
-                };
-
-                await pc.SetRemoteDescriptionAsync(msg);
-            });
-
-            HubSchermo.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
-            {
-                pc.AddIceCandidate(candidate);
-            });
-
-            pc.CreateOffer();
-            Console.WriteLine("Offer Creata");
 
             // Avvia streaming TCP
             _ = StartStreaming(cts.Token);
 
+            // Crea il source esterno
+            var videoSource = ExternalVideoTrackSource.CreateFromI420ACallback(_lastI420Frame);
+
+            var trackConfig = new LocalVideoTrackInitConfig
+            {
+                trackName = "ScreenCapture"
+            };
+
+            try { var localVideoTrack = LocalVideoTrack.CreateFromSource(videoSource, trackConfig); } catch (Exception e) { Console.WriteLine(e.Message); }
+
+            pc.AddTransceiver(MediaKind.Video);
 
             // Avvia timer ricezione comandi MouseMove
             StartMouseMoveCommandTimer();
@@ -133,14 +127,15 @@ namespace StanetRemoteControl
             while (!token.IsCancellationRequested)
             {
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                var frame = CaptureScreenBytes(schermo);
+                frame = CaptureScreenBytes(schermo);
 
                 if (frame != null)
                 {
                     _sendingFrame = true;
                     try
                     {
-                      HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        pc.CreateOffer();
                     }
                     finally
                     {
@@ -149,7 +144,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(200); // 5 fps
+                await Task.Delay(1000); // 5 fps
                 stopwatch.Stop();
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
@@ -219,19 +214,14 @@ namespace StanetRemoteControl
             {
                 if (message.Type == SdpMessageType.Offer)
                 {
-                    await HubSchermo.Invoke("SendOffer", mac.ID, message.Content);
-                    Console.WriteLine("Offer inviata da controllato");
-                }
-                else if (message.Type == SdpMessageType.Answer)
-                {
-                    await HubSchermo.Invoke("SendAnswer", mac.ID, message.Content);
-                    Console.WriteLine("Answer inviata da controllato");
+                    await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
                 }
             };
 
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
             {
-                await HubSchermo.Invoke("SendIceCandidate", mac.ID, candidate.Content);
+                await HubSignaling.Invoke("SendIceCandidate", mac.ID, candidate.Content);
+                Console.WriteLine("ICE inviata da controllato");
             };
 
             connessione = Controllore.serv.ApriConnessione(mac);  //apre connessione a DB
@@ -304,6 +294,22 @@ namespace StanetRemoteControl
 
                 g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
+                var rect = new Rectangle(0, 0, thumbWidth, thumbHeight);
+                BitmapData bmpData = thumb.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+                try
+                {
+                    int bufferSize = bmpData.Stride * thumbHeight;
+
+                    _lastArgb32Stride = bmpData.Stride;
+
+                    // Copia i pixel raw in _lastArgb32Pixels
+                    Marshal.Copy(bmpData.Scan0, _lastArgb32Pixels, 0, bufferSize);
+                }
+                finally
+                {
+                    thumb.UnlockBits(bmpData);
+                }
+
                 using (var ms = new MemoryStream())
                 {
                     thumb.Save(ms, JpegEnc, Jpeg35);
@@ -315,6 +321,37 @@ namespace StanetRemoteControl
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
                     Buffer.BlockCopy(ms.ToArray(), 0, result, 16, len);
+
+                    // Aggiorna il delegate WebRTC (UDP)
+                    lock (_frameLock)
+                    {
+                        int width = thumb.Width;
+                        int height = thumb.Height;
+
+                        _lastWidth = width;
+                        _lastHeight = height;
+                        _lastI420Frame = (in FrameRequest request) =>
+                        {
+                            unsafe
+                            {
+                                fixed (byte* ptr = result)
+                                {
+                                    Argb32VideoFrame frame = new Argb32VideoFrame
+                                    {
+                                        width = (uint)thumbWidth,
+                                        height = (uint)thumbHeight,
+                                        stride = _lastArgb32Stride,
+                                        data = (IntPtr)ptr
+                                    };
+                                    
+                                    request.Source.CompleteFrameRequest(
+                                        request.RequestId,
+                                        request.TimestampMs,
+                                        in frame);
+                                }
+                            }
+                        };
+                    }
 
                     return result;
                 }
