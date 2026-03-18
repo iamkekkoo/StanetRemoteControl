@@ -97,11 +97,11 @@ namespace StanetRemoteControl
                     pc.CreateAnswer();
                 });
 
-                HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
+                /*HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
                 {
                     Console.WriteLine("ICE ricevuta da controllore");
                     pc.AddIceCandidate(candidate);
-                });
+                });*/
             }
 
             // riconnessione semplice a SignalR
