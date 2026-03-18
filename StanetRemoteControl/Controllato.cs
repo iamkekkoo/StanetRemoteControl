@@ -106,17 +106,7 @@ namespace StanetRemoteControl
             // Avvia streaming TCP
             _ = StartStreaming(cts.Token);
 
-            // Crea il source esterno
-            var videoSource = ExternalVideoTrackSource.CreateFromI420ACallback(_lastI420Frame);
-
-            var trackConfig = new LocalVideoTrackInitConfig
-            {
-                trackName = "ScreenCapture"
-            };
-
-            try { var localVideoTrack = LocalVideoTrack.CreateFromSource(videoSource, trackConfig); } catch (Exception e) { Console.WriteLine(e.Message); }
-
-            pc.AddTransceiver(MediaKind.Video);
+            
 
             // Avvia timer ricezione comandi MouseMove
             StartMouseMoveCommandTimer();
@@ -126,16 +116,17 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                frame = CaptureScreenBytes(schermo);
+                
+                CaptureScreenBytes(schermo);
 
-                if (frame != null)
+                if (_lastArgb32Pixels != null)
                 {
                     _sendingFrame = true;
                     try
                     {
-                        HubSchermo.Invoke("SendScreen", mac.ID, frame);
+                        //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
                         pc.CreateOffer();
+                        
                     }
                     finally
                     {
@@ -145,7 +136,7 @@ namespace StanetRemoteControl
                 }
 
                 await Task.Delay(1000); // 5 fps
-                stopwatch.Stop();
+               
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
         }
@@ -215,6 +206,7 @@ namespace StanetRemoteControl
                 if (message.Type == SdpMessageType.Offer)
                 {
                     await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
+                    Console.WriteLine("Offer inviata da controllato");
                 }
             };
 
@@ -258,7 +250,7 @@ namespace StanetRemoteControl
             }).Start();
         }
 
-        private byte[] CaptureScreenBytes(int monitorIndex)
+        private void CaptureScreenBytes(int monitorIndex)
         {
             var screen = Screen.AllScreens[monitorIndex];
             var bounds = screen.Bounds;
@@ -294,21 +286,8 @@ namespace StanetRemoteControl
 
                 g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
-                var rect = new Rectangle(0, 0, thumbWidth, thumbHeight);
-                BitmapData bmpData = thumb.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
-                try
-                {
-                    int bufferSize = bmpData.Stride * thumbHeight;
 
-                    _lastArgb32Stride = bmpData.Stride;
-
-                    // Copia i pixel raw in _lastArgb32Pixels
-                    Marshal.Copy(bmpData.Scan0, _lastArgb32Pixels, 0, bufferSize);
-                }
-                finally
-                {
-                    thumb.UnlockBits(bmpData);
-                }
+                
 
                 using (var ms = new MemoryStream())
                 {
@@ -353,7 +332,7 @@ namespace StanetRemoteControl
                         };
                     }
 
-                    return result;
+                    _lastArgb32Pixels = result;
                 }
             }
         }
