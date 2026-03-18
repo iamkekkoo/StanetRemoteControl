@@ -37,6 +37,7 @@ namespace StanetRemoteControl
             pc.LocalSdpReadytoSend += async (SdpMessage message) =>
             {
                 await HubSignaling.Invoke("SendAnswer", connUscita.ID_Controllato, message.Content);
+                Console.WriteLine("Answer inviata da controllore");
             };
 
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
