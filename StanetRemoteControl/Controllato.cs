@@ -64,7 +64,7 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
                 {
-                    Console.WriteLine("Answer ricevuta da controllato: " + sdp);
+                    Console.WriteLine("Answer ricevuta da controllore: " + sdp);
                     var msg = new SdpMessage
                     {
                         Type = SdpMessageType.Answer,
