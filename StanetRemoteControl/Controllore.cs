@@ -79,12 +79,13 @@ namespace StanetRemoteControl
 
             // Hub ON
             { 
-                HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
+                /*HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
                     _latestFrame = screenBytes;
-                });
+                });*/
 
-               /* HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
+                HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
                 {
+                    Console.WriteLine("Offer Ricevuta da " + connId + "Signaling");
                     var msg = new SdpMessage
                     {
                         Type = SdpMessageType.Offer,
@@ -100,12 +101,8 @@ namespace StanetRemoteControl
                 {
                     Console.WriteLine("ICE ricevuta da controllore");
                     pc.AddIceCandidate(candidate);
-                });*/
+                });
             }
-
-            connection.Received += data => {
-                Console.WriteLine("Dati grezzi ricevuti: " + data);
-            };
 
             // riconnessione semplice a SignalR
             connection.Closed += async () =>
