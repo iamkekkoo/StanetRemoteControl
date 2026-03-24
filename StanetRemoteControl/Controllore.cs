@@ -85,7 +85,7 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
                 {
-                    Console.WriteLine("Offer Ricevuta da " + connId + "Signaling");
+                    //Console.WriteLine("Offer Ricevuta da " + connId + "Signaling");
                     var msg = new SdpMessage
                     {
                         Type = SdpMessageType.Offer,
@@ -97,11 +97,11 @@ namespace StanetRemoteControl
                     pc.CreateAnswer();
                 });
 
-                /*HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
+                HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
                 {
-                    Console.WriteLine("ICE ricevuta da controllore");
+                    Console.WriteLine("ICE ricevuta da controllore: " + candidate.ToString());
                     pc.AddIceCandidate(candidate);
-                });*/
+                });
             }
 
             // riconnessione semplice a SignalR
