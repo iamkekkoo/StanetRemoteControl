@@ -56,6 +56,7 @@ namespace StanetRemoteControl
                     // QUESTI SONO I TUOI PIXEL! 
                     // Arrivano Peer-to-Peer, senza passare dal server SignalR.
                     _latestFrame = data;
+                    Console.WriteLine(_latestFrame);
                 };
             };
 
