@@ -99,7 +99,6 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
                 {
-                    //Console.WriteLine("Offer Ricevuta da " + connId + "Signaling");
                     var msg = new SdpMessage
                     {
                         Type = SdpMessageType.Offer,
@@ -188,7 +187,7 @@ namespace StanetRemoteControl
             if (_latestFrame == null || _latestFrame.Length <= 16)
                 return;
 
-            //Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0);
+            Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0);
 
             if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1.5) //10000 ticks = 1 ms
             {

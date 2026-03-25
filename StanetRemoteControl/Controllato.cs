@@ -124,7 +124,7 @@ namespace StanetRemoteControl
                     try
                     {
                         //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
-                        pc.CreateOffer();
+                        try { pc.CreateOffer(); } catch (Exception e) { throw e; }
 
                         if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
                         {
