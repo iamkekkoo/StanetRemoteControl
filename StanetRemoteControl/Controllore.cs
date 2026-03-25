@@ -42,7 +42,7 @@ namespace StanetRemoteControl
 
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
             {
-                await HubSignaling.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate.Content);
+                await HubSignaling.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate);
                 Console.WriteLine("ICE inviata da controllore");
             };
 
