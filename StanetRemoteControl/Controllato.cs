@@ -125,7 +125,9 @@ namespace StanetRemoteControl
                     {
                         //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
                         pc.CreateOffer();
-                        
+
+                        dataChannel.SendMessage(_lastArgb32Pixels);
+
                     }
                     finally
                     {

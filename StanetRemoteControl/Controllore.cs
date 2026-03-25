@@ -46,6 +46,19 @@ namespace StanetRemoteControl
                 Console.WriteLine("ICE inviata da controllore");
             };
 
+            pc.DataChannelAdded += (DataChannel channel) =>
+            {
+                Console.WriteLine($"Canale '{channel.Label}' rilevato!");
+
+                // Registriamo l'evento di ricezione DIRETTAMENTE sul canale WebRTC
+                channel.MessageReceived += (byte[] data) =>
+                {
+                    // QUESTI SONO I TUOI PIXEL! 
+                    // Arrivano Peer-to-Peer, senza passare dal server SignalR.
+                    _latestFrame = data;
+                };
+            };
+
             return;
         }
 
