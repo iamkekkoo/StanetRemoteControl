@@ -205,7 +205,6 @@ namespace StanetRemoteControl
                 if (message.Type == SdpMessageType.Offer)
                 {
                     await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
-                    //Console.WriteLine("Offer inviata da controllato a " + mac.ID + "Signaling");
                 }
             };
 
@@ -234,6 +233,7 @@ namespace StanetRemoteControl
             };
 
             await pc.InitializeAsync(config);
+            dataChannel = await pc.AddDataChannelAsync("pixel_stream", true, true);
         }
 
         /*Se non era già registrato carica l'utenza + sottoscrizione nell'applicazione*/

@@ -189,7 +189,7 @@ namespace StanetRemoteControl
         private byte[] frame;
         // Lock per thread safety
         private readonly object _frameLock = new object();
-
+        DataChannel dataChannel;
         private byte[] _lastArgb32Pixels;
         private int _lastArgb32Stride;
 
