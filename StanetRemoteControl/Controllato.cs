@@ -239,7 +239,7 @@ namespace StanetRemoteControl
             };
 
             await pc.InitializeAsync(config);
-            dataChannel = await pc.AddDataChannelAsync("pixel_stream", true, true);
+            dataChannel = await pc.AddDataChannelAsync("pixel_stream", true, false);
         }
 
         /*Se non era già registrato carica l'utenza + sottoscrizione nell'applicazione*/
