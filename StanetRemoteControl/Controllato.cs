@@ -126,7 +126,10 @@ namespace StanetRemoteControl
                         //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
                         pc.CreateOffer();
 
-                        dataChannel.SendMessage(_lastArgb32Pixels);
+                        if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
+                        {
+                            dataChannel.SendMessage(_lastArgb32Pixels);
+                        }
 
                     }
                     finally
@@ -197,10 +200,10 @@ namespace StanetRemoteControl
         }
 
         /*CaricaMacchina, inizializza variabili per signaling UDP, Apre connessione a DB, chiama SignalR (TCP)*/
-        private void Controllato_Load(object sender, EventArgs e)
+        async private void Controllato_Load(object sender, EventArgs e)
         {
             CaricaMacchina();
-            InitWebRTC();
+            await InitWebRTC();
 
             pc.LocalSdpReadytoSend += async (SdpMessage message) =>
             {
