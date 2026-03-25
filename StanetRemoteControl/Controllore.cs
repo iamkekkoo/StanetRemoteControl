@@ -112,7 +112,6 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
                 {
-                    Console.WriteLine("ICE ricevuta da controllore: " + candidate.ToString());
                     pc.AddIceCandidate(candidate);
                 });
             }
