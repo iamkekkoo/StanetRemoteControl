@@ -396,6 +396,7 @@ namespace StanetRemoteControl
         private readonly object _bitmapLock = new object();
         private Rubrica Rubrica;
         private Bitmap bmp;
+        private bool connessioneStabilita = false;
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;

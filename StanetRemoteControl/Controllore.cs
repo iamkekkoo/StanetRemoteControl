@@ -106,8 +106,9 @@ namespace StanetRemoteControl
                     };
 
                     await pc.SetRemoteDescriptionAsync(msg);
-
+                    Console.WriteLine("Offer ricevuta");
                     pc.CreateAnswer();
+                    connessioneStabilita = true;
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
@@ -145,7 +146,7 @@ namespace StanetRemoteControl
 
         public void button1_Click(string UserName, string Password)
         {
-
+            
             connUscita = serv.ChiediAccesso(UserName, Password, IdMacchina);
             
             if (connUscita.ID != 0) //Connesso signalR
@@ -183,7 +184,7 @@ namespace StanetRemoteControl
 
         private void RenderFrame(object sender, EventArgs e)
         {
-            if (_latestFrame == null || _latestFrame.Length <= 16)
+            if (_latestFrame == null || _latestFrame.Length <= 16 || !connessioneStabilita)
                 return;
 
             Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0);
@@ -221,7 +222,7 @@ namespace StanetRemoteControl
 
         private void SendMouseMoveCommand(object sender, EventArgs e)
         {
-            if (_LastMouseMoveCommandToSend == null)
+            if (_LastMouseMoveCommandToSend == null || !connessioneStabilita)
                 return;
 
             if (_LastMouseMoveCommandToSend != _LastMouseMoveCommandSent) 

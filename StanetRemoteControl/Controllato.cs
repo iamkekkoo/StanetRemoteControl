@@ -70,7 +70,7 @@ namespace StanetRemoteControl
                         Type = SdpMessageType.Answer,
                         Content = sdp
                     };
-                    try { pc.SetRemoteDescriptionAsync(msg); } catch (Exception e) { throw e; }
+                    try { pc.SetRemoteDescriptionAsync(msg); connessioneStabilita = true; } catch (Exception e) { throw e; }
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
@@ -113,33 +113,39 @@ namespace StanetRemoteControl
 
         private async Task StartStreaming(CancellationToken token)
         {
+            
             while (!token.IsCancellationRequested)
             {
-                
-                CaptureScreenBytes(schermo);
+                if (connessioneStabilita) 
+                { 
+                    CaptureScreenBytes(schermo);
 
-                if (_lastArgb32Pixels != null)
-                {
-                    _sendingFrame = true;
-                    try
+                    if (_lastArgb32Pixels != null)
                     {
-                        //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
-                        try { pc.CreateOffer(); } catch (Exception e) { throw e; }
-
-                        if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
+                        _sendingFrame = true;
+                        try
                         {
-                            dataChannel.SendMessage(_lastArgb32Pixels);
-                        }
+                            //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
 
-                    }
-                    finally
-                    {
-                        _sendingFrame = false;
+
+                            if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
+                            {
+                                dataChannel.SendMessage(_lastArgb32Pixels);
+                                Console.WriteLine("Schermo inviato");
+                            }
+                            Console.WriteLine("Schermo inviato");
+                        }
+                        finally
+                        {
+                            _sendingFrame = false;
                         
+                        }
                     }
                 }
 
-                await Task.Delay(60); // 30 fps
+                if (!connessioneStabilita) { try { pc.CreateOffer(); } catch (Exception e) { throw e; } }
+                
+                await Task.Delay(66); // 30 fps
                
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
@@ -156,16 +162,19 @@ namespace StanetRemoteControl
         private void RenderMouseMove(object sender, EventArgs e)
         {
             string command;
-
-            lock (_commandLock)
+            if (connessioneStabilita) 
             {
-                if (_LatestMouseMoveCommandString == null)
-                    return;
+                lock (_commandLock)
+                {
+                    if (_LatestMouseMoveCommandString == null)
+                        return;
 
-                command = _LatestMouseMoveCommandString;
+                    command = _LatestMouseMoveCommandString;
+                }
+
+                HandleCommand(command);
             }
-
-            HandleCommand(command);
+            
         }
 
         /*Carica Utente + licenza*/

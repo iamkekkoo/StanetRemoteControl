@@ -198,6 +198,7 @@ namespace StanetRemoteControl
         private int _lastHeight;
 
         // Delegate WebRTC per I420A
+        private bool connessioneStabilita = false;
         private Microsoft.MixedReality.WebRTC.I420AVideoFrameRequestDelegate _lastI420Frame;
         private Rectangle _monitorBounds; // salva le dimensioni del monitor
         private double ridimensionamento = 1.0;
