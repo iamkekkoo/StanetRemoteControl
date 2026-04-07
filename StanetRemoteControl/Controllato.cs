@@ -139,7 +139,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(48); // 30 fps
+                Thread.Sleep(33) // 30 fps
                
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
