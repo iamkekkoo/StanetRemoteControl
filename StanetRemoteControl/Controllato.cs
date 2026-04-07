@@ -139,7 +139,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                Thread.Sleep(33); // 30 fps
+                await Task.Delay(33); // 30 fps
                
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
@@ -209,7 +209,7 @@ namespace StanetRemoteControl
             {
                 if (message.Type == SdpMessageType.Offer)
                 {
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000);
                     await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
                     Console.WriteLine("Offer inviata");
                 }
