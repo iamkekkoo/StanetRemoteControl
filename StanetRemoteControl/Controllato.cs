@@ -70,7 +70,7 @@ namespace StanetRemoteControl
                         Type = SdpMessageType.Answer,
                         Content = sdp
                     };
-                    await pc.SetRemoteDescriptionAsync(msg);
+                    try { pc.SetRemoteDescriptionAsync(msg); } catch (Exception e) { throw e; }
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
@@ -139,7 +139,7 @@ namespace StanetRemoteControl
                     }
                 }
 
-                await Task.Delay(1000); // 5 fps
+                await Task.Delay(33); // 30 fps
                
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
@@ -210,7 +210,7 @@ namespace StanetRemoteControl
                 if (message.Type == SdpMessageType.Offer)
                 {
                     await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
-                    Console.WriteLine(message.ToString());
+                    Console.WriteLine("Offer inviata");
                 }
             };
 
