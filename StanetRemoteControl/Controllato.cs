@@ -209,7 +209,7 @@ namespace StanetRemoteControl
             {
                 if (message.Type == SdpMessageType.Offer)
                 {
-                    
+                    Task.Delay(33);
                     await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
                     Console.WriteLine("Offer inviata");
                 }

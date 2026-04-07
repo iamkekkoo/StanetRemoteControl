@@ -47,7 +47,7 @@ namespace StanetRemoteControl
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            HubSchermo.Invoke("LeaveConnection", connUscita.ID_Controllato);
+            //HubSchermo.Invoke("LeaveConnection", connUscita.ID_Controllato);
             HubMouseMove.Invoke("LeaveConnection", connUscita.ID_Controllato);
             HubPreciousCommand.Invoke("LeaveConnection", connUscita.ID_Controllato);
             base.OnClosing(e);
