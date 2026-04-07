@@ -145,7 +145,7 @@ namespace StanetRemoteControl
 
                 if (!connessioneStabilita) { try { pc.CreateOffer(); } catch (Exception e) { throw e; } }
                 
-                await Task.Delay(66); // 30 fps
+                await Task.Delay(1000); // 30 fps
                
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
