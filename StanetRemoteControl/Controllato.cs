@@ -113,7 +113,7 @@ namespace StanetRemoteControl
 
         private async Task StartStreaming(CancellationToken token)
         {
-            
+            //
             while (!token.IsCancellationRequested)
             {
                 if (connessioneStabilita) 
