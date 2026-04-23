@@ -34,6 +34,7 @@ namespace StanetRemoteControl
             InitializeComponent();
             this.Load += Controllato_Load;
 
+
             return;
         }
 
@@ -64,18 +65,43 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
                 {
-                    Console.WriteLine("Answer ricevuta da controllato: " + sdp);
                     var msg = new SdpMessage
                     {
                         Type = SdpMessageType.Answer,
                         Content = sdp
                     };
                     await pc.SetRemoteDescriptionAsync(msg);
+
+                    if (!firstSent)
+                    {
+                        CaptureScreenBytes(schermo);
+
+                        if (_lastArgb32Pixels != null)
+                        {
+                            _sendingFrame = true;
+                            try
+                            {
+                                //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
+
+
+                                if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
+                                {
+                                    dataChannel.SendMessage(_lastArgb32Pixels);
+                                }
+
+                            }
+                            finally
+                            {
+                                _sendingFrame = false;
+
+                            }
+                        }
+                        firstSent = true;
+                    }
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
                 {
-                    Console.WriteLine("ICE inviata da controllato");
                     pc.AddIceCandidate(candidate);
                 });
             }
@@ -115,31 +141,9 @@ namespace StanetRemoteControl
         {
             while (!token.IsCancellationRequested)
             {
-                
-                CaptureScreenBytes(schermo);
+                try { pc.CreateOffer(); } catch (Exception e) { throw e; }
 
-                if (_lastArgb32Pixels != null)
-                {
-                    _sendingFrame = true;
-                    try
-                    {
-                        //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
-                        try { pc.CreateOffer(); } catch (Exception e) { throw e; }
-
-                        if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
-                        {
-                            dataChannel.SendMessage(_lastArgb32Pixels);
-                        }
-
-                    }
-                    finally
-                    {
-                        _sendingFrame = false;
-                        
-                    }
-                }
-
-                await Task.Delay(1000); // 5 fps
+                await Task.Delay(5000); // 5 fps
                
                 //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
             }
@@ -210,14 +214,43 @@ namespace StanetRemoteControl
                 if (message.Type == SdpMessageType.Offer)
                 {
                     await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
-                    Console.WriteLine(message.ToString());
                 }
             };
 
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
             {
                 await HubSignaling.Invoke("SendIceCandidate", mac.ID, candidate);
-                Console.WriteLine("ICE inviata da controllato");
+            };
+
+            dataChannel.MessageReceived += (byte[] message) => {
+                string request = System.Text.Encoding.UTF8.GetString(message);
+
+                if (request == "NEXT")
+                {
+                    // Avvia la logica di cattura e invio
+                    CaptureScreenBytes(schermo);
+
+                    if (_lastArgb32Pixels != null)
+                    {
+                        _sendingFrame = true;
+                        try
+                        {
+                            //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
+                            
+
+                            if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
+                            {
+                                dataChannel.SendMessage(_lastArgb32Pixels);
+                            }
+
+                        }
+                        finally
+                        {
+                            _sendingFrame = false;
+
+                        }
+                    }
+                }
             };
 
             connessione = Controllore.serv.ApriConnessione(mac);  //apre connessione a DB

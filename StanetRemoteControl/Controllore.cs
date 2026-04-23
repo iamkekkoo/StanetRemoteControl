@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.ServiceModel.Channels;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -49,14 +50,13 @@ namespace StanetRemoteControl
             pc.DataChannelAdded += (DataChannel channel) =>
             {
                 Console.WriteLine($"Canale '{channel.Label}' rilevato!");
-
+                dataChannel = channel;
                 // Registriamo l'evento di ricezione DIRETTAMENTE sul canale WebRTC
                 channel.MessageReceived += (byte[] data) =>
                 {
                     // QUESTI SONO I TUOI PIXEL! 
                     // Arrivano Peer-to-Peer, senza passare dal server SignalR.
                     _latestFrame = data;
-                    Console.WriteLine(_latestFrame);
                 };
             };
 
@@ -217,6 +217,7 @@ namespace StanetRemoteControl
                     old?.Dispose();
                 }
             }
+            dataChannel.SendMessage(System.Text.Encoding.UTF8.GetBytes("NEXT"));
         }
 
         private void SendMouseMoveCommand(object sender, EventArgs e)

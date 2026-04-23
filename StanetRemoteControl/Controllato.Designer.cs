@@ -205,6 +205,10 @@ namespace StanetRemoteControl
         private Screen screen;
         private Rectangle bounds;
         private bool _sendingFrame = false;
+        private bool firstSent = false;
+        private bool _isBufferFull = false;
+        private const long MaxBufferLimit = 1000000; // 1MB - soglia critica
+        private const long LowBufferThreshold = 250000; // 250KB - soglia per ripartire
         private static readonly ImageCodecInfo JpegEnc =
         Array.Find(
             ImageCodecInfo.GetImageEncoders(),
