@@ -2,6 +2,7 @@
 using Microsoft.MixedReality.WebRTC;
 using StanetRemoteControl.RemoteControlNode;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,6 +10,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.ServiceModel.Channels;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -38,27 +40,31 @@ namespace StanetRemoteControl
             pc.LocalSdpReadytoSend += async (SdpMessage message) =>
             {
                 await HubSignaling.Invoke("SendAnswer", connUscita.ID_Controllato, message.Content);
-                Console.WriteLine("Answer inviata da controllore");
+                
             };
 
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
             {
                 await HubSignaling.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate);
-                Console.WriteLine("ICE inviata da controllore");
+                
             };
 
             pc.DataChannelAdded += (DataChannel channel) =>
             {
                 Console.WriteLine($"Canale '{channel.Label}' rilevato!");
                 dataChannel = channel;
+
                 // Registriamo l'evento di ricezione DIRETTAMENTE sul canale WebRTC
                 channel.MessageReceived += (byte[] data) =>
                 {
                     // QUESTI SONO I TUOI PIXEL! 
                     // Arrivano Peer-to-Peer, senza passare dal server SignalR.
                     _latestFrame = data;
+                    RenderFrame();
                 };
             };
+
+            
 
             return;
         }
@@ -140,7 +146,7 @@ namespace StanetRemoteControl
 
             /*Streaming TCP*/
             StartSendMouseMoveCommandTimer();
-            RenderFrameTimer();
+            //RenderFrameTimer();
         }
 
         public void button1_Click(string UserName, string Password)
@@ -173,15 +179,15 @@ namespace StanetRemoteControl
             _renderTimer.Start();
         }
 
-        private void RenderFrameTimer()
+        /*private void RenderFrameTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
             _renderTimer.Interval = 1; // ~10 FPS
             _renderTimer.Tick += RenderFrame;
             _renderTimer.Start();
-        }
+        }*/
 
-        private void RenderFrame(object sender, EventArgs e)
+        private async Task RenderFrame()
         {
             if (_latestFrame == null || _latestFrame.Length <= 16)
                 return;
