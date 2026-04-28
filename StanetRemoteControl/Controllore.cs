@@ -49,7 +49,7 @@ namespace StanetRemoteControl
                 
             };
 
-            pc.DataChannelAdded += (DataChannel channel) =>
+            /*pc.DataChannelAdded += (DataChannel channel) =>
             {
                 Console.WriteLine($"Canale '{channel.Label}' rilevato!");
                 dataChannel = channel;
@@ -62,11 +62,25 @@ namespace StanetRemoteControl
                     _latestFrame = data;
                     RenderFrame();
                 };
+            };*/
+
+
+            pc.VideoTrackAdded += (RemoteVideoTrack track) =>
+            {
+                Console.WriteLine("Ponte video stabilito! La traccia è pronta.");
+
+                // Qui la traccia è garantita, non serve loop o delay
+                track.I420AVideoFrameReady += RemoteVideoTrack_I420AVideoFrameReady;
             };
 
-            
-
             return;
+        }
+
+        private void RemoteVideoTrack_I420AVideoFrameReady(I420AVideoFrame frame)
+        {
+            RenderFrame(frame);
+            Console.WriteLine("Frame aggiornato");
+            //throw new NotImplementedException();
         }
 
         async Task InitWebRTC()
@@ -105,6 +119,7 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
                 {
+                    
                     var msg = new SdpMessage
                     {
                         Type = SdpMessageType.Offer,
@@ -187,43 +202,72 @@ namespace StanetRemoteControl
             _renderTimer.Start();
         }*/
 
-        private async Task RenderFrame()
+        private void RenderFrame(I420AVideoFrame frame)
         {
-            if (_latestFrame == null || _latestFrame.Length <= 16)
-                return;
-
-            Console.WriteLine((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0);
-
-            if ((DateTime.UtcNow.Ticks - BitConverter.ToInt64(_latestFrame, 0)) / 10000000.0 > 1.5) //10000 ticks = 1 ms
+            try
             {
-                return;
-            } 
+                int w = (int)frame.width;
+                int h = (int)frame.height;
 
-            int width = BitConverter.ToInt32(_latestFrame, 8);
-            int height = BitConverter.ToInt32(_latestFrame, 12);
-
-            using (var ms = new MemoryStream(_latestFrame, 16, _latestFrame.Length - 16, false))
-            {
-                var thumb = new Bitmap(ms); // thumbnail ricevuto dal controllato
-
-                // Aggiorna PictureBox con Zoom
-                if (pictureBox1.InvokeRequired)
+                // 1. Gestione dinamica del canvas: lo ricreiamo solo se cambia la risoluzione
+                if (_renderCanvas == null || _renderCanvas.Width != w || _renderCanvas.Height != h)
                 {
-                    pictureBox1.BeginInvoke(new Action(() =>
+                    _renderCanvas?.Dispose();
+                    _renderCanvas = new Bitmap(w, h, PixelFormat.Format32bppArgb);
+                }
+
+                // 2. Accesso diretto alla memoria della Bitmap
+                var data = _renderCanvas.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+                unsafe
+                {
+                    byte* pDest = (byte*)data.Scan0;
+                    byte* srcY = (byte*)frame.dataY;
+                    byte* srcU = (byte*)frame.dataU;
+                    byte* srcV = (byte*)frame.dataV;
+
+                    for (int y = 0; y < h; y++)
                     {
-                        var old = pictureBox1.Image;
-                        pictureBox1.Image = thumb;
-                        old?.Dispose();
-                    }));
+                        for (int x = 0; x < w; x++)
+                        {
+                            // Calcolo indici con Stride (fondamentale per WebRTC)
+                            int yIdx = (y * frame.strideY) + x;
+                            int uvIdx = ((y / 2) * frame.strideU) + (x / 2);
+
+                            // Estrazione YUV
+                            int Y = srcY[yIdx] - 16;
+                            int U = srcU[uvIdx] - 128;
+                            int V = srcV[uvIdx] - 128;
+
+                            // Conversione YUV -> RGB (Formula Integer-Shift veloce)
+                            int r = (298 * Y + 409 * V + 128) >> 8;
+                            int g = (298 * Y - 100 * U - 208 * V + 128) >> 8;
+                            int b = (298 * Y + 516 * U + 128) >> 8;
+
+                            // Scrittura pixel in formato BGRA (con clamping manuale 0-255)
+                            int dIdx = (y * data.Stride) + (x * 4);
+                            pDest[dIdx] = (byte)(b < 0 ? 0 : (b > 255 ? 255 : b)); // Blue
+                            pDest[dIdx + 1] = (byte)(g < 0 ? 0 : (g > 255 ? 255 : g)); // Green
+                            pDest[dIdx + 2] = (byte)(r < 0 ? 0 : (r > 255 ? 255 : r)); // Red
+                            pDest[dIdx + 3] = 255;                                     // Alpha
+                        }
+                    }
                 }
-                else
+
+                _renderCanvas.UnlockBits(data);
+
+                // 3. Aggiornamento UI (Invoke necessario perché WebRTC lavora su un altro thread)
+                pictureBox1.BeginInvoke(new Action(() =>
                 {
-                    var old = pictureBox1.Image;
-                    pictureBox1.Image = thumb;
-                    old?.Dispose();
-                }
+                    var oldImg = pictureBox1.Image;
+                    pictureBox1.Image = new Bitmap(_renderCanvas); // Copia per la UI
+                    oldImg?.Dispose(); // Libera la memoria della vecchia immagine
+                }));
             }
-            dataChannel.SendMessage(System.Text.Encoding.UTF8.GetBytes("NEXT"));
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore nel rendering: {ex.Message}");
+            }
         }
 
         private void SendMouseMoveCommand(object sender, EventArgs e)

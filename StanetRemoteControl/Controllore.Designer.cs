@@ -397,6 +397,7 @@ namespace StanetRemoteControl
         private Rubrica Rubrica;
         private Bitmap bmp;
         private DataChannel dataChannel;
+        private Bitmap _renderCanvas = null;
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;

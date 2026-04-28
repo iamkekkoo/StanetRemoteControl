@@ -49,7 +49,12 @@ namespace StanetRemoteControl
             /*Avvia i servizi di trasmissione: SignalR e WebRTC*/
             _ = InizializzaSignalR(); //utilizzato prima per Signaling WebRTC e poi come trasmissione di backup
             _ = InizializzaWebRTC();
+
+            await Task.Delay(3000);
+            sendOffer();
         }
+
+        private void sendOffer() { while (true) { Task.Delay(5000); pc.CreateOffer(); } }
 
         /*Carica in memoria i dati relativi all'utenza ed alla licenza della macchina locale*/
         private void CaricaMacchina()
@@ -123,6 +128,7 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
                 {
+                    
                     pc.AddIceCandidate(candidate);
                 });
             }
@@ -155,7 +161,6 @@ namespace StanetRemoteControl
 
         async Task InizializzaWebRTC()
         {
-            CaptureScreenBytes(0);
             /*Creazione canale*/
             pc = new PeerConnection();
 
@@ -182,32 +187,86 @@ namespace StanetRemoteControl
             {
                 await HubSignaling.Invoke("SendIceCandidate", mac.ID, candidate);
             };
+
+            /*Aggiunge Trasciver per trasmissione video*/
+            videoSource = ExternalVideoTrackSource.CreateFromI420ACallback(CompleteRequest);
             
-                /*Aggiunge Trasciver per trasmissione video*/
-                videoSource = ExternalVideoTrackSource.CreateFromI420ACallback(_lastI420Frame);
-
-                var videoTrackConfig = new LocalVideoTrackInitConfig
-                {
-                    trackName = "video_track"
-                };
+            var videoTrackConfig = new LocalVideoTrackInitConfig
+            {
+                trackName = "video_track"
+            };
                 
-                localVideoTrack = LocalVideoTrack.CreateFromSource(videoSource, videoTrackConfig);
+            localVideoTrack = LocalVideoTrack.CreateFromSource(videoSource, videoTrackConfig);
                 
 
-                var transcInitSett = new TransceiverInitSettings
-                {
-                    Name = "Ricetrasmettitore_Schermo",
-                    InitialDesiredDirection = Transceiver.Direction.SendOnly
-                };
+            var transcInitSett = new TransceiverInitSettings
+            {
+                Name = "Ricetrasmettitore_Schermo",
+                InitialDesiredDirection = Transceiver.Direction.SendOnly
+            };
 
-                trans = pc.AddTransceiver(MediaKind.Video, transcInitSett);
-                trans.LocalVideoTrack = localVideoTrack; //Agganciato trasmettitore con fonte video
-            
-            StartCaptureScreenBytesTimer();
+            trans = pc.AddTransceiver(MediaKind.Video, transcInitSett);
+            trans.LocalVideoTrack = localVideoTrack; //Agganciato trasmettitore con fonte video
         }
 
 
         //------------------------------TOOLS------------------------------------
+
+        private void CompleteRequest(in FrameRequest request)
+        {
+            // 1. Cattura lo schermo (aggiorna l'array byte[])
+            CaptureScreenBytes(schermo);
+
+            // 2. Prepariamo i buffer per i piani I420
+            byte[] yPlane = new byte[_lastWidth * _lastHeight];
+            byte[] uPlane = new byte[(_lastWidth / 2) * (_lastHeight / 2)];
+            byte[] vPlane = new byte[(_lastWidth / 2) * (_lastHeight / 2)];
+
+            unsafe
+            {
+                fixed (byte* src = _lastArgb32Pixels)
+                fixed (byte* yPtr = yPlane, uPtr = uPlane, vPtr = vPlane)
+                {
+                    for (int y = 0; y < _lastHeight; y++)
+                    {
+                        for (int x = 0; x < _lastWidth; x++)
+                        {
+                            // Individua il pixel ARGB (BGRA in memoria GDI+)
+                            int i = (y * _lastArgb32Stride) + (x * 4);
+                            byte b = src[i];
+                            byte g = src[i + 1];
+                            byte r = src[i + 2];
+
+                            // Conversione in Piano Y (Luminosità)
+                            yPtr[y * _lastWidth + x] = (byte)(((66 * r + 129 * g + 25 * b + 128) >> 8) + 16);
+
+                            // Conversione in Piani U e V (Crominanza) ogni 2x2 pixel
+                            if (x % 2 == 0 && y % 2 == 0)
+                            {
+                                int uvIdx = (y / 2) * (_lastWidth / 2) + (x / 2);
+                                uPtr[uvIdx] = (byte)(((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128);
+                                vPtr[uvIdx] = (byte)(((112 * r - 94 * g - 18 * b + 128) >> 8) + 128);
+                            }
+                        }
+                    }
+
+                    // 3. Compilazione della richiesta WebRTC
+                    var i420Frame = new I420AVideoFrame
+                    {
+                        width = (uint)_lastWidth,
+                        height = (uint)_lastHeight,
+                        dataY = (IntPtr)yPtr,
+                        dataU = (IntPtr)uPtr,
+                        dataV = (IntPtr)vPtr,
+                        strideY = _lastWidth,
+                        strideU = _lastWidth / 2,
+                        strideV = _lastWidth / 2
+                    };
+
+                    request.CompleteRequest(i420Frame);
+                }
+            }
+        }
 
         /*Cattura le immagini del monitor indicato e le memorizza sia in _lastI420Frame (x trasmissione WebRTC) che in _lastArgb32Pixels (per trasmissione SignalR)*/
         private void CaptureScreenBytes(int monitorIndex)
@@ -215,82 +274,37 @@ namespace StanetRemoteControl
             var screen = Screen.AllScreens[monitorIndex];
             var bounds = screen.Bounds;
 
+            // Gestione Bitmap e Graphics (riutilizzo)
             if (_captureBitmap == null || _monitorBounds != bounds)
             {
-                _captureGraphics?.Dispose();
                 _captureBitmap?.Dispose();
-
-                _captureBitmap = new Bitmap(
-                    bounds.Width,
-                    bounds.Height,
-                    PixelFormat.Format32bppPArgb);
-
+                _captureGraphics?.Dispose();
+                _captureBitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format32bppPArgb);
                 _captureGraphics = Graphics.FromImage(_captureBitmap);
                 _monitorBounds = bounds;
             }
 
             _captureGraphics.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
 
-            // ⭐ SCALA IDEALE PER <500ms
-            int thumbWidth = (int)(bounds.Width / ridimensionamento);
-            int thumbHeight = (int)(bounds.Height / ridimensionamento);
+            // Lock dei bit per estrarre i byte ARGB
+            var data = _captureBitmap.LockBits(new Rectangle(0, 0, bounds.Width, bounds.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
 
-            using (var thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format32bppPArgb))
-            using (Graphics g = Graphics.FromImage(thumb))
+            try
             {
-                // ⚠️ NON usare HighQuality
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
-                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
+                int size = data.Stride * bounds.Height;
+                if (_lastArgb32Pixels == null || _lastArgb32Pixels.Length != size)
+                    _lastArgb32Pixels = new byte[size];
 
-                g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
+                // Copia i pixel nel byte[]
+                System.Runtime.InteropServices.Marshal.Copy(data.Scan0, _lastArgb32Pixels, 0, size);
 
-                using (var ms = new MemoryStream())
-                {
-                    thumb.Save(ms, JpegEnc, Jpeg35);
-
-                    int len = (int)ms.Length;
-                    byte[] result = new byte[16 + len];
-
-                    Buffer.BlockCopy(BitConverter.GetBytes(DateTime.UtcNow.Ticks), 0, result, 0, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbWidth), 0, result, 8, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(thumbHeight), 0, result, 12, 4);
-                    Buffer.BlockCopy(ms.ToArray(), 0, result, 16, len);
-
-                    // Aggiorna il delegate WebRTC (UDP)
-                    lock (_frameLock)
-                    {
-                        int width = thumb.Width;
-                        int height = thumb.Height;
-
-                        _lastWidth = width;
-                        _lastHeight = height;
-                        _lastI420Frame = (in FrameRequest request) =>
-                        {
-                            unsafe
-                            {
-                                fixed (byte* ptr = result)
-                                {
-                                    Argb32VideoFrame frame = new Argb32VideoFrame
-                                    {
-                                        width = (uint)thumbWidth,
-                                        height = (uint)thumbHeight,
-                                        stride = _lastArgb32Stride,
-                                        data = (IntPtr)ptr
-                                    };
-
-                                    request.Source.CompleteFrameRequest(
-                                        request.RequestId,
-                                        request.TimestampMs,
-                                        in frame);
-                                }
-                            }
-                        };
-                    }
-
-                    _lastArgb32Pixels = result;
-                }
+                _lastWidth = bounds.Width;
+                _lastHeight = bounds.Height;
+                _lastArgb32Stride = data.Stride;
+            }
+            finally
+            {
+                _captureBitmap.UnlockBits(data);
             }
         }
 
@@ -304,13 +318,13 @@ namespace StanetRemoteControl
         }
 
         /*Timer per cattura schermo*/
-        private void StartCaptureScreenBytesTimer()
+        /*private void StartCaptureScreenBytesTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();
             _renderTimer.Interval = 66; // ~60 FPS
             _renderTimer.Tick += (e, s) => CaptureScreenBytes(schermo);
             _renderTimer.Start();
-        }
+        }*/
 
         private void button1_Click(object sender, EventArgs e)
         {

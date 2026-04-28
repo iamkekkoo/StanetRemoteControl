@@ -194,7 +194,7 @@ namespace StanetRemoteControl
         private byte[] _lastArgb32Pixels;
         private int _lastArgb32Stride;
         private Transceiver trans;
-        private ExternalVideoTrackSource videoSource = null;
+        private VideoTrackSource videoSource = null;
         private LocalVideoTrack localVideoTrack = null;
         
 
