@@ -28,6 +28,7 @@ namespace StanetRemoteControl
 
     public partial class Controllato : Form
     {
+        //------------------------Funzionamento Base-----------------------------
 
         public Controllato()
         {
@@ -36,9 +37,56 @@ namespace StanetRemoteControl
 
 
             return;
+        } //Costruttore 
+
+        /*Carica i dati della macchina, apre la connessione al DB ed avvia le connessioni di trasmissione video e ricezione comandi*/
+        async private void Controllato_Load(object sender, EventArgs e)
+        {
+            CaricaMacchina(); //Carica i dati della macchina
+
+            connessione = Controllore.serv.ApriConnessione(mac);  //apre connessione a DB
+
+            /*Avvia i servizi di trasmissione: SignalR e WebRTC*/
+            _ = InizializzaSignalR(); //utilizzato prima per Signaling WebRTC e poi come trasmissione di backup
+            _ = InizializzaWebRTC();
         }
 
+        /*Carica in memoria i dati relativi all'utenza ed alla licenza della macchina locale*/
+        private void CaricaMacchina()
+        {
+            // Lettura
+            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StanetRemoteControl");
+            var filename = Path.Combine(dir, "Macchina.txt");
+            
+            
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
 
+            if (!File.Exists(filename))
+                File.WriteAllText(filename, "");
+
+            string macchina = File.ReadAllText(filename);
+
+            // Scrittura
+            if (string.IsNullOrEmpty(macchina))
+            {
+                mac = Controllore.serv.RegistraMacchina(new Macchina());
+                File.WriteAllText(filename, JsonConvert.SerializeObject(mac));
+            }
+            else
+            {
+                mac = JsonConvert.DeserializeObject<Macchina>(macchina);
+            }
+
+            MioId = mac.UserName;
+            MiaPsw = mac.Password;
+        }
+        
+        
+        
+        //--------------------------SignalR e WebRTC-----------------------------
+
+        /*Apre i canali di trasmissione video TCP e ricezione comandi*/
         private async Task InizializzaSignalR()
         {
             connection = new HubConnection("https://francescostdev.azurewebsites.net");
@@ -71,33 +119,6 @@ namespace StanetRemoteControl
                         Content = sdp
                     };
                     await pc.SetRemoteDescriptionAsync(msg);
-
-                    if (!firstSent)
-                    {
-                        CaptureScreenBytes(schermo);
-
-                        if (_lastArgb32Pixels != null)
-                        {
-                            _sendingFrame = true;
-                            try
-                            {
-                                //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
-
-
-                                if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
-                                {
-                                    dataChannel.SendMessage(_lastArgb32Pixels);
-                                }
-
-                            }
-                            finally
-                            {
-                                _sendingFrame = false;
-
-                            }
-                        }
-                        firstSent = true;
-                    }
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
@@ -128,87 +149,27 @@ namespace StanetRemoteControl
             await HubSignaling.Invoke("JoinConnection", mac.ID);
 
 
-            // Avvia streaming TCP
-            _ = StartStreaming(cts.Token);
-
-            
-
             // Avvia timer ricezione comandi MouseMove
             StartMouseMoveCommandTimer();
         }
 
-        private async Task StartStreaming(CancellationToken token)
+        async Task InizializzaWebRTC()
         {
-            while (!token.IsCancellationRequested)
+            CaptureScreenBytes(0);
+            /*Creazione canale*/
+            pc = new PeerConnection();
+
+            var config = new PeerConnectionConfiguration
             {
-                try { pc.CreateOffer(); } catch (Exception e) { throw e; }
+                IceServers = new List<IceServer>
+                {
+                    new IceServer{ Urls = { "stun:stun.cloudflare.com:3478" } }
+                }
+            };
 
-                await Task.Delay(5000); // 5 fps
-               
-                //Console.WriteLine("Cattura + Inoltro: " + stopwatch.ElapsedMilliseconds);
-            }
-        }
+            await pc.InitializeAsync(config);
 
-        private void StartMouseMoveCommandTimer()
-        {
-            _renderTimer = new System.Windows.Forms.Timer();
-            _renderTimer.Interval = 4; // ~240 FPS
-            _renderTimer.Tick += RenderMouseMove;
-            _renderTimer.Start();
-        }
-
-        private void RenderMouseMove(object sender, EventArgs e)
-        {
-            string command;
-
-            lock (_commandLock)
-            {
-                if (_LatestMouseMoveCommandString == null)
-                    return;
-
-                command = _LatestMouseMoveCommandString;
-            }
-
-            HandleCommand(command);
-        }
-
-        /*Carica Utente + licenza*/
-        private void CaricaMacchina()
-        {
-            // Lettura
-            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StanetRemoteControl");
-            var filename = Path.Combine(dir, "Macchina.txt");
-            
-            
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            if (!File.Exists(filename))
-                File.WriteAllText(filename, "");
-
-            string macchina = File.ReadAllText(filename);
-
-            // Scrittura
-            if (string.IsNullOrEmpty(macchina))
-            {
-                mac = Controllore.serv.RegistraMacchina(new Macchina());
-                File.WriteAllText(filename, JsonConvert.SerializeObject(mac));
-            }
-            else
-            {
-                mac = JsonConvert.DeserializeObject<Macchina>(macchina);
-            }
-
-            MioId = mac.UserName;
-            MiaPsw = mac.Password;
-        }
-
-        /*CaricaMacchina, inizializza variabili per signaling UDP, Apre connessione a DB, chiama SignalR (TCP)*/
-        async private void Controllato_Load(object sender, EventArgs e)
-        {
-            CaricaMacchina();
-            await InitWebRTC();
-
+            /*Aggiunge eventi per Signaling*/
             pc.LocalSdpReadytoSend += async (SdpMessage message) =>
             {
                 if (message.Type == SdpMessageType.Offer)
@@ -221,74 +182,34 @@ namespace StanetRemoteControl
             {
                 await HubSignaling.Invoke("SendIceCandidate", mac.ID, candidate);
             };
-
-            dataChannel.MessageReceived += (byte[] message) => {
-                string request = System.Text.Encoding.UTF8.GetString(message);
-
-                if (request == "NEXT")
-                {
-                    // Avvia la logica di cattura e invio
-                    CaptureScreenBytes(schermo);
-
-                    if (_lastArgb32Pixels != null)
-                    {
-                        _sendingFrame = true;
-                        try
-                        {
-                            //HubSchermo.Invoke("SendScreen", mac.ID, _lastArgb32Pixels);
-                            
-
-                            if (dataChannel != null && dataChannel.State == DataChannel.ChannelState.Open)
-                            {
-                                dataChannel.SendMessage(_lastArgb32Pixels);
-                            }
-
-                        }
-                        finally
-                        {
-                            _sendingFrame = false;
-
-                        }
-                    }
-                }
-            };
-
-            connessione = Controllore.serv.ApriConnessione(mac);  //apre connessione a DB
-            cts = new CancellationTokenSource();
-            _ = InizializzaSignalR();
-        }
-
-        /*Inizializza PeerConnection per UDP*/
-        async Task InitWebRTC()
-        {
-            pc = new PeerConnection();
-
-            var config = new PeerConnectionConfiguration
-            {
-                IceServers = new List<IceServer>
-                {
-                    new IceServer{ Urls = { "stun:stun.l.google.com:19302" } }
-                }
-            };
-
-            await pc.InitializeAsync(config);
-            dataChannel = await pc.AddDataChannelAsync("pixel_stream", false, false);
             
+                /*Aggiunge Trasciver per trasmissione video*/
+                videoSource = ExternalVideoTrackSource.CreateFromI420ACallback(_lastI420Frame);
+
+                var videoTrackConfig = new LocalVideoTrackInitConfig
+                {
+                    trackName = "video_track"
+                };
+                
+                localVideoTrack = LocalVideoTrack.CreateFromSource(videoSource, videoTrackConfig);
+                
+
+                var transcInitSett = new TransceiverInitSettings
+                {
+                    Name = "Ricetrasmettitore_Schermo",
+                    InitialDesiredDirection = Transceiver.Direction.SendOnly
+                };
+
+                trans = pc.AddTransceiver(MediaKind.Video, transcInitSett);
+                trans.LocalVideoTrack = localVideoTrack; //Agganciato trasmettitore con fonte video
+            
+            StartCaptureScreenBytesTimer();
         }
 
-        /*Se non era già registrato carica l'utenza + sottoscrizione nell'applicazione*/
-        private void button1_Click(object sender, EventArgs e)
-        {
-            new Thread(delegate ()
-            {
-                paginaConn = new Controllore();
-                Application.EnableVisualStyles();
-                paginaConn.IdMacchina = mac.ID;
-                paginaConn.IdSottoscrizione = mac.IdSottoscrizione;
-                Application.Run(paginaConn);
-            }).Start();
-        }
 
+        //------------------------------TOOLS------------------------------------
+
+        /*Cattura le immagini del monitor indicato e le memorizza sia in _lastI420Frame (x trasmissione WebRTC) che in _lastArgb32Pixels (per trasmissione SignalR)*/
         private void CaptureScreenBytes(int monitorIndex)
         {
             var screen = Screen.AllScreens[monitorIndex];
@@ -325,9 +246,6 @@ namespace StanetRemoteControl
 
                 g.DrawImage(_captureBitmap, 0, 0, thumbWidth, thumbHeight);
 
-
-                
-
                 using (var ms = new MemoryStream())
                 {
                     thumb.Save(ms, JpegEnc, Jpeg35);
@@ -361,7 +279,7 @@ namespace StanetRemoteControl
                                         stride = _lastArgb32Stride,
                                         data = (IntPtr)ptr
                                     };
-                                    
+
                                     request.Source.CompleteFrameRequest(
                                         request.RequestId,
                                         request.TimestampMs,
@@ -374,6 +292,52 @@ namespace StanetRemoteControl
                     _lastArgb32Pixels = result;
                 }
             }
+        }
+
+        /*Timer per ricezione ed esecuzione comandi di mouse e tastiera ricevuti dal pc remoto*/
+        private void StartMouseMoveCommandTimer()
+        {
+            _renderTimer = new System.Windows.Forms.Timer();
+            _renderTimer.Interval = 4; // ~240 FPS
+            _renderTimer.Tick += RenderMouseMove;
+            _renderTimer.Start();
+        }
+
+        /*Timer per cattura schermo*/
+        private void StartCaptureScreenBytesTimer()
+        {
+            _renderTimer = new System.Windows.Forms.Timer();
+            _renderTimer.Interval = 66; // ~60 FPS
+            _renderTimer.Tick += (e, s) => CaptureScreenBytes(schermo);
+            _renderTimer.Start();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            new Thread(delegate ()
+            {
+                paginaConn = new Controllore();
+                Application.EnableVisualStyles();
+                paginaConn.IdMacchina = mac.ID;
+                paginaConn.IdSottoscrizione = mac.IdSottoscrizione;
+                Application.Run(paginaConn);
+            }).Start();
+        }
+
+        //-------------------------MOUSE E TASTIERA-------------------------------
+        private void RenderMouseMove(object sender, EventArgs e)
+        {
+            string command;
+
+            lock (_commandLock)
+            {
+                if (_LatestMouseMoveCommandString == null)
+                    return;
+
+                command = _LatestMouseMoveCommandString;
+            }
+
+            HandleCommand(command);
         }
 
         private void HandleCommand(string cmdJson)
@@ -683,6 +647,7 @@ namespace StanetRemoteControl
                     return key.Length == 1 ? key : "";
             }
         }
+    
     }
     public class MouseCommand
         {

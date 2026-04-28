@@ -173,32 +173,37 @@ namespace StanetRemoteControl
         public static List<Connessione> connIngresso = new List<Connessione>();
         public Controllore paginaConn = new Controllore();
         
-        public static bool attivo = true;
+        
         private HubConnection connection;
         private IHubProxy HubSchermo;
         private IHubProxy HubPreciousCommand;
         private IHubProxy HubMouseMove;
         private IHubProxy HubSignaling;
+
         PeerConnection pc = new PeerConnection();
         private string _LatestMouseMoveCommandString = null;
         private readonly object _commandLock = new object();
         private System.Windows.Forms.Timer _renderTimer;
-        private CancellationTokenSource cts;
+        private CancellationTokenSource cts = new CancellationTokenSource();
         private Connessione connessione;
         private Bitmap _captureBitmap; // bitmap riutilizzabile per il monitor
         private byte[] frame;
         // Lock per thread safety
         private readonly object _frameLock = new object();
-        DataChannel dataChannel;
+        
         private byte[] _lastArgb32Pixels;
         private int _lastArgb32Stride;
+        private Transceiver trans;
+        private ExternalVideoTrackSource videoSource = null;
+        private LocalVideoTrack localVideoTrack = null;
+        
 
         // Dimensioni correnti del frame
         private int _lastWidth;
         private int _lastHeight;
 
         // Delegate WebRTC per I420A
-        private Microsoft.MixedReality.WebRTC.I420AVideoFrameRequestDelegate _lastI420Frame;
+        private Microsoft.MixedReality.WebRTC.I420AVideoFrameRequestDelegate _lastI420Frame = null;
         private Rectangle _monitorBounds; // salva le dimensioni del monitor
         private double ridimensionamento = 1.0;
         private static Screen[] screens = Screen.AllScreens;
