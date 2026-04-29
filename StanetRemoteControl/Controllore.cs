@@ -79,7 +79,6 @@ namespace StanetRemoteControl
         private void RemoteVideoTrack_I420AVideoFrameReady(I420AVideoFrame frame)
         {
             RenderFrame(frame);
-            Console.WriteLine("Frame aggiornato");
             //throw new NotImplementedException();
         }
 

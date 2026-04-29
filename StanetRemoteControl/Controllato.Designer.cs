@@ -190,12 +190,14 @@ namespace StanetRemoteControl
         private byte[] frame;
         // Lock per thread safety
         private readonly object _frameLock = new object();
-        
+        private readonly object _syncRoot = new object();
+
         private byte[] _lastArgb32Pixels;
         private int _lastArgb32Stride;
         private Transceiver trans;
         private VideoTrackSource videoSource = null;
         private LocalVideoTrack localVideoTrack = null;
+        private bool connesso = false;
         
 
         // Dimensioni correnti del frame

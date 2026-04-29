@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.SignalR.Client;
+﻿using MathNet.Numerics.Optimization;
+using Microsoft.AspNet.SignalR.Client;
 using Microsoft.MixedReality.WebRTC;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
@@ -54,7 +55,7 @@ namespace StanetRemoteControl
             sendOffer();
         }
 
-        private void sendOffer() { while (true) { Task.Delay(5000); pc.CreateOffer(); } }
+        private void sendOffer() { while (true) { if (connesso) { return; } Task.Delay(5000); pc.CreateOffer(); Console.WriteLine("offer inviata"); } }
 
         /*Carica in memoria i dati relativi all'utenza ed alla licenza della macchina locale*/
         private void CaricaMacchina()
@@ -118,12 +119,17 @@ namespace StanetRemoteControl
 
                 HubSignaling.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
                 {
-                    var msg = new SdpMessage
+                    if (!connesso)
                     {
-                        Type = SdpMessageType.Answer,
-                        Content = sdp
-                    };
-                    await pc.SetRemoteDescriptionAsync(msg);
+                        var msg = new SdpMessage
+                        {
+                            Type = SdpMessageType.Answer,
+                            Content = sdp
+                        };
+                        await pc.SetRemoteDescriptionAsync(msg);
+                        connesso = true;
+                    }
+                    else { return; }
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
