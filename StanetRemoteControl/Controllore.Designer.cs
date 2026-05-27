@@ -374,6 +374,7 @@ namespace StanetRemoteControl
         #endregion
 
 
+        private bool connesso = false;
         public static IService1 serv = new RemoteControlNode.Service1Client();
         internal Connessione connUscita = new Connessione();
         internal Int64 IdMacchina;

@@ -35,43 +35,7 @@ namespace StanetRemoteControl
             cts = new CancellationTokenSource();
 
             /*Inizializza variabili per signaling UDP*/
-            InitWebRTC();
-
-            pc.LocalSdpReadytoSend += async (SdpMessage message) =>
-            {
-                await HubSignaling.Invoke("SendAnswer", connUscita.ID_Controllato, message.Content);
-                
-            };
-
-            pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
-            {
-                await HubSignaling.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate);
-                
-            };
-
-            /*pc.DataChannelAdded += (DataChannel channel) =>
-            {
-                Console.WriteLine($"Canale '{channel.Label}' rilevato!");
-                dataChannel = channel;
-
-                // Registriamo l'evento di ricezione DIRETTAMENTE sul canale WebRTC
-                channel.MessageReceived += (byte[] data) =>
-                {
-                    // QUESTI SONO I TUOI PIXEL! 
-                    // Arrivano Peer-to-Peer, senza passare dal server SignalR.
-                    _latestFrame = data;
-                    RenderFrame();
-                };
-            };*/
-
-
-            pc.VideoTrackAdded += (RemoteVideoTrack track) =>
-            {
-                Console.WriteLine("Ponte video stabilito! La traccia è pronta.");
-
-                // Qui la traccia è garantita, non serve loop o delay
-                track.I420AVideoFrameReady += RemoteVideoTrack_I420AVideoFrameReady;
-            };
+            
 
             return;
         }
@@ -95,6 +59,30 @@ namespace StanetRemoteControl
             };
 
             await pc.InitializeAsync(config);
+
+            pc.LocalSdpReadytoSend += async (SdpMessage message) =>
+            {
+                if (message.Type == SdpMessageType.Offer)
+                {
+                    await HubSignaling.Invoke("SendOffer", connUscita.ID_Controllato, message.Content);
+                }
+            };
+
+            pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
+            {
+                await HubSignaling.Invoke("SendIceCandidate", connUscita.ID_Controllato, candidate);
+                Console.WriteLine("Ice candidate inviato da controllore");
+
+            };
+
+            pc.VideoTrackAdded += (RemoteVideoTrack track) =>
+            {
+                Console.WriteLine("Ponte video stabilito! La traccia è pronta.");
+
+                // Qui la traccia è garantita, non serve loop o delay
+                track.I420AVideoFrameReady += RemoteVideoTrack_I420AVideoFrameReady;
+            };
+
         }
 
         private void Controllore_Shown(object sender, EventArgs e)
@@ -112,22 +100,21 @@ namespace StanetRemoteControl
 
             // Hub ON
             { 
-                /*HubSchermo.On<byte[]>("ReceiveScreen", screenBytes => {
-                    _latestFrame = screenBytes;
-                });*/
-
-                HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
+               HubSignaling.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
                 {
-                    
-                    var msg = new SdpMessage
-                    {
-                        Type = SdpMessageType.Offer,
-                        Content = sdp
-                    };
+                    Console.WriteLine("Answer ricevuta da controllore");
 
-                    await pc.SetRemoteDescriptionAsync(msg);
-
-                    pc.CreateAnswer();
+                    if (!connesso) 
+                    { 
+                        var msg = new SdpMessage
+                        {
+                            Type = SdpMessageType.Answer,
+                            Content = sdp
+                        };
+                        await pc.SetRemoteDescriptionAsync(msg);
+                        Console.WriteLine("SDP: " + sdp);
+                        connesso = true;
+                    }
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
@@ -159,11 +146,11 @@ namespace StanetRemoteControl
             
 
             /*Streaming TCP*/
-            StartSendMouseMoveCommandTimer();
+            //StartSendMouseMoveCommandTimer();
             //RenderFrameTimer();
         }
 
-        public void button1_Click(string UserName, string Password)
+        public async void button1_Click(string UserName, string Password)
         {
 
             connUscita = serv.ChiediAccesso(UserName, Password, IdMacchina);
@@ -181,10 +168,15 @@ namespace StanetRemoteControl
                 pictureBox1.Width = Width; pictureBox1.Height = Height;
 
                 pictureBox1.Visible = true;
+
+                _ = InitWebRTC();
                 _ = InizializzaSignalR();
+                await Task.Delay(5000);
+
+                sendOffer();
             }
         }
-
+        private async void sendOffer() { while (!connesso) { await Task.Delay(5000); pc.CreateOffer(); Console.WriteLine("offer inviata"); } }
         private void StartSendMouseMoveCommandTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();

@@ -51,11 +51,9 @@ namespace StanetRemoteControl
             _ = InizializzaSignalR(); //utilizzato prima per Signaling WebRTC e poi come trasmissione di backup
             _ = InizializzaWebRTC();
 
-            await Task.Delay(3000);
-            sendOffer();
+            
         }
 
-        private void sendOffer() { while (true) { if (connesso) { return; } Task.Delay(5000); pc.CreateOffer(); Console.WriteLine("offer inviata"); } }
 
         /*Carica in memoria i dati relativi all'utenza ed alla licenza della macchina locale*/
         private void CaricaMacchina()
@@ -117,19 +115,18 @@ namespace StanetRemoteControl
                     }
                 });
 
-                HubSignaling.On<string, string>("ReceiveAnswer", async (connId, sdp) =>
+                HubSignaling.On<string, string>("ReceiveOffer", async (connId, sdp) =>
                 {
-                    if (!connesso)
+                    Console.WriteLine("Offer ricevuta da controllato");
+                    var msg = new SdpMessage
                     {
-                        var msg = new SdpMessage
-                        {
-                            Type = SdpMessageType.Answer,
-                            Content = sdp
-                        };
-                        await pc.SetRemoteDescriptionAsync(msg);
-                        connesso = true;
-                    }
-                    else { return; }
+                        Type = SdpMessageType.Offer,
+                        Content = sdp
+                    };
+
+                    await pc.SetRemoteDescriptionAsync(msg);
+
+                    pc.CreateAnswer();
                 });
 
                 HubSignaling.On<string, IceCandidate>("ReceiveIceCandidate", async (connId, candidate) =>
@@ -181,12 +178,12 @@ namespace StanetRemoteControl
             await pc.InitializeAsync(config);
 
             /*Aggiunge eventi per Signaling*/
+            
+
             pc.LocalSdpReadytoSend += async (SdpMessage message) =>
             {
-                if (message.Type == SdpMessageType.Offer)
-                {
-                    await HubSignaling.Invoke("SendOffer", mac.ID, message.Content);
-                }
+                await HubSignaling.Invoke("SendAnswer", mac.ID, message.Content);
+
             };
 
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
