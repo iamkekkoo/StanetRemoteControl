@@ -83,6 +83,14 @@ namespace StanetRemoteControl
                 track.I420AVideoFrameReady += RemoteVideoTrack_I420AVideoFrameReady;
             };
 
+
+            // 1. Il ricevitore crea il suo transceiver per "ascoltare"
+            var transcInitSett = new TransceiverInitSettings
+            {
+                Name = "Ricezione_Video",
+                InitialDesiredDirection = Transceiver.Direction.ReceiveOnly // "Voglio solo ricevere"
+            };
+            pc.AddTransceiver(MediaKind.Video, transcInitSett);
         }
 
         private void Controllore_Shown(object sender, EventArgs e)
@@ -105,7 +113,8 @@ namespace StanetRemoteControl
                     Console.WriteLine("Answer ricevuta da controllore");
 
                     if (!connesso) 
-                    { 
+                    {
+                        connesso = true;
                         var msg = new SdpMessage
                         {
                             Type = SdpMessageType.Answer,
@@ -113,7 +122,7 @@ namespace StanetRemoteControl
                         };
                         await pc.SetRemoteDescriptionAsync(msg);
                         Console.WriteLine("SDP: " + sdp);
-                        connesso = true;
+                        
                     }
                 });
 
@@ -176,7 +185,8 @@ namespace StanetRemoteControl
                 sendOffer();
             }
         }
-        private async void sendOffer() { while (!connesso) { await Task.Delay(5000); pc.CreateOffer(); Console.WriteLine("offer inviata"); } }
+        private async void sendOffer() { while (!connesso) { pc.CreateOffer(); Console.WriteLine("offer inviata"); await Task.Delay(5000); } }
+        
         private void StartSendMouseMoveCommandTimer()
         {
             _renderTimer = new System.Windows.Forms.Timer();

@@ -189,6 +189,7 @@ namespace StanetRemoteControl
             pc.IceCandidateReadytoSend += async (IceCandidate candidate) =>
             {
                 await HubSignaling.Invoke("SendIceCandidate", mac.ID, candidate);
+                Console.WriteLine("Ice candidate inviato da controllato");
             };
 
             /*Aggiunge Trasciver per trasmissione video*/
